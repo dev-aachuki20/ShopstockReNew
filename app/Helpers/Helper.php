@@ -100,12 +100,14 @@ if (!function_exists('getSetting')) {
 	{
 		$result = null;
 		$setting = Setting::where('key',$key)->where('status',1)->first();
-		if($setting->type == 'image'){
-			$result = $setting->image_url;
-		}elseif($setting->type == 'video'){
-			$result = $setting->video_url;
-		}else{
-			$result = $setting->value;
+		if($setting){
+			if($setting->type == 'image'){
+				$result = $setting->image_url;
+			}elseif($setting->type == 'video'){
+				$result = $setting->video_url;
+			}else{
+				$result = $setting->value;
+			}
 		}
 		return $result;
 	}
