@@ -44,6 +44,44 @@
 
 
 
+
+
+
+        <li class="treeview {{ request()->is('admin/master*') || request()->is('admin/products*') || request()->is('admin/areas*') ? 'active' : '' }}">
+            <a href="#">
+                <i class="fa fa-asterisk"></i>
+                <span>@lang('quickadmin.master-management.title')</span>
+                <span class="pull-right-container">
+                    <i class="fa  fa-angle-left pull-right"></i>
+                </span>
+            </a> 
+            <ul class="treeview-menu {{ request()->is('admin/master*') ? 'menu-open' : '' }}">
+                    <li class="{{ request()->is('admin/master/brands*') ? 'active menu-open' : '' }}">
+                        <a href="{{ route('brands.index') }}">
+                            <i class="fa fa-user"></i>
+                            <span>@lang('quickadmin.brand_master.title')</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/master/categories*') ? 'active menu-open' : '' }}">
+                        <a href="{{ route('categories.index') }}">
+                            <i class="fa fa-list"></i>
+                            <span>@lang('quickadmin.category_master.title')</span>
+                        </a>
+                    </li>
+                    <li class="{{ request()->is('admin/master/categories*') ? 'active menu-open' : '' }}">
+                        <a href="{{ route('areas.index') }}">
+                            <i class="fa fa-list"></i>
+                            <span>Area</span>
+                        </a>
+                    </li>
+            </ul>
+        </li>
+
+
+
+
+
+
         <li class="{{ Request::is('logout*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('logout') }}">
                 <x-side-bar-svg-icon icon="logout" />

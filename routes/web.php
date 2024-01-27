@@ -8,6 +8,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+
+use App\Http\Controllers\Admin\Master\CategoriesController;
+use App\Http\Controllers\Admin\Master\BrandController;
+use App\Http\Controllers\Admin\Master\AreaController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -24,7 +29,24 @@ Route::group(['middleware' => 'guest'], function () {
 
 });
 
+Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin'], function () {
+    Route::group(['prefix' => 'master', 'as' => 'master.', 'namespace' => 'Admin\Master'], function () {
+        //Route::resource('/categories', CategoriesController::class);
+	    
+       //Route::post('categories_mass_destroy', ['uses' => 'CategoriesController@massDestroy', 'as' => 'categories.mass_destroy']);
+        //Route::resource('logActivities', 'LogActivitiesController')->only(['index','show']);
+
+    });
+});
+
+
+
+
 Route::middleware(['auth','PreventBackHistory'])->group(function () {
+    Route::resource('/categories', CategoriesController::class);	
+    Route::resource('/brands', BrandController::class);	
+    Route::resource('/areas', AreaController::class);	
+
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
     Route::get('/logout',[LoginController::class,'logout'])->name('logout');
     Route::resource('/roles',RoleController::class);
