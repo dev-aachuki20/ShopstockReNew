@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Brand;
+use App\Models\Group;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -12,7 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class BrandDataTable extends DataTable
+class GroupDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -29,13 +29,13 @@ class BrandDataTable extends DataTable
             })
             ->addColumn('action',function($row){
                 $action='';
-                 if (Gate::check('brand_edit')) {
+                 if (Gate::check('group_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_brand" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_group" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
                  }
-                 if (Gate::check('brand_delete')) {
+                 if (Gate::check('group_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_brand" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_group" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                  }
                 return $action;
             })->rawColumns(['action']);
@@ -44,10 +44,10 @@ class BrandDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Brand $model): QueryBuilder
+    public function query(Group $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['brands.*']);
+        $query = $model->newQuery()->select(['groups.*']);
         return $this->applyScopes($query);
     }
 
@@ -57,7 +57,7 @@ class BrandDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('brand-table')
+                    ->setTableId('group-table')
                     ->parameters([
                         'responsive' => true,
                         'pageLength' => 70,
@@ -84,7 +84,7 @@ class BrandDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.brand_master.fields.name')),
+            Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)
@@ -98,6 +98,6 @@ class BrandDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Brand_' . date('YmdHis');
+        return 'Group' . date('YmdHis');
     }
 }

@@ -8,6 +8,8 @@ use App\DataTables\BrandDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\Brand;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class BrandController extends Controller
 {
@@ -16,6 +18,7 @@ class BrandController extends Controller
      */
     public function index(BrandDataTable $dataTable)
     {
+        abort_if(Gate::denies('brand_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.master.brand.index');
     }
 
@@ -32,6 +35,7 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(Gate::denies('brand_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:brands,name',
         ]);  
@@ -65,6 +69,7 @@ class BrandController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_if(Gate::denies('brand_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
         $validator = Validator::make($request->all(), [
             'name' => [
@@ -85,6 +90,7 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
+        abort_if(Gate::denies('brand_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Brand::find(decrypt($id));
         $record->delete();
         return response()->json(['success' => 'Brand Deleted successfully.']);

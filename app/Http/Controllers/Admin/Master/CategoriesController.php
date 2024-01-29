@@ -7,6 +7,8 @@ use App\DataTables\CategoryDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\ProductCategory;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 class CategoriesController extends Controller
 {
     /**
@@ -14,6 +16,7 @@ class CategoriesController extends Controller
      */
     public function index(CategoryDataTable $dataTable)
     {
+        abort_if(Gate::denies('category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.master.category.index');
     }
 
@@ -30,6 +33,7 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:product_categories,name',
         ]);  
@@ -62,7 +66,8 @@ class CategoriesController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {   
+    {  
+        abort_if(Gate::denies('category_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
         $validator = Validator::make($request->all(), [
             'name' => [
@@ -83,6 +88,7 @@ class CategoriesController extends Controller
      */
     public function destroy(string $id)
     {
+        abort_if(Gate::denies('category_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = ProductCategory::find(decrypt($id));
         $record->delete();
         return response()->json(['success' => 'Category Delete successfully.']);

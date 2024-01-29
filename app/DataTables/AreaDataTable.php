@@ -24,19 +24,19 @@ class AreaDataTable extends DataTable
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
-            ->editColumn('address',function($role){
-                return $role->address ?? "";
+            ->editColumn('address',function($row){
+                return $row->address ?? "";
             })
-            ->addColumn('action',function($role){
+            ->addColumn('action',function($row){
                 $action='';
-                // if (Gate::check('role_edit')) {
+                 if (Gate::check('area_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_area" data-id="'.encrypt($role->id).'" data-address="'.$role->address.'">'.$editIcon.'</a>';
-                // }
-                // if (Gate::check('role_show')) {
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_area" data-id="'.encrypt($row->id).'" data-address="'.$row->address.'">'.$editIcon.'</a>';
+                 }
+                 if (Gate::check('area_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_area" data-id="'.encrypt($role->id).'">  '.$deleteIcon.'</a>';
-                // }
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_area" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
+                 }
                 return $action;
             })->rawColumns(['action']);
     }
@@ -48,9 +48,6 @@ class AreaDataTable extends DataTable
     {
         //return $model->newQuery();
         $query = $model->newQuery()->select(['areas.*']);
-        if (!(auth()->user()->hasRole(config('app.roleid.super_admin')))) {
-            $query->whereNotIn('id', [1]);
-        }
         return $this->applyScopes($query);
     }
 
@@ -87,7 +84,7 @@ class AreaDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('address')->title('Address'),
+            Column::make('address')->title(trans('quickadmin.area_master.fields.address')),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)
@@ -101,6 +98,6 @@ class AreaDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Role_' . date('YmdHis');
+        return 'Area_' . date('YmdHis');
     }
 }

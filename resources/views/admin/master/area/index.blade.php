@@ -13,10 +13,10 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>Area Master</h4>
-                  {{-- @can('role_create') --}}
-                  <a href="javascript:void(0)" class="btn btn-outline-primary add_area" ><i class="fas fa-plus"></i>Add Area</a>
-                  {{-- @endcan --}}
+                  <h4>@lang('quickadmin.area_master.title')</h4>
+                  @can('area_create')
+                  <a href="javascript:void(0)" class="btn btn-outline-primary add_area" ><i class="fas fa-plus"></i>@lang('quickadmin.area_master.add')</a>
+                  @endcan
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -98,9 +98,11 @@
             var _id = $(".area_edit_id").val();
             $('.save_btn').prop('disabled', true);
             var postType = "POST";
-            var post_url = "{{ route('areas.store') }}"
+            var post_url = "{{ route('admin.master.areas.store') }}"
             if(_id){
-               var post_url = "/areas/" + _id;
+              //  var post_url = "/admin/master/areas/" + _id;
+              var post_url = "{{ route('admin.master.areas.update',['area'=> ':areaId']) }}";
+              post_url = post_url.replace(':areaId', _id);
                var postType = "PUT";
             }
             $.ajax({
@@ -133,12 +135,13 @@
           $(document).on('click','.delete_area',function(){
             if (confirm('are you sure want to delete?')) {
                 var delete_id = $(this).data('id');
+                var delete_url = "{{ route('admin.master.areas.destroy',['area'=> ':areaId']) }}";
+                  delete_url = delete_url.replace(':areaId', delete_id);
                 $.ajax({
                 type: "DELETE",
-                url: "/areas/" + delete_id,              
+                url: delete_url,              
                 success: function(data) {
                   if ($.isEmptyObject(data.error)) {
-                    alert(data.success);
                     location.reload();
                   } 
                 }

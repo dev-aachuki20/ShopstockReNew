@@ -57,21 +57,31 @@
             </a> 
             <ul class="treeview-menu {{ request()->is('admin/master*') ? 'menu-open' : '' }}">
                     <li class="{{ request()->is('admin/master/brands*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('brands.index') }}">
+                        <a href="{{ route('admin.master.brands.index') }}">
                             <i class="fa fa-user"></i>
                             <span>@lang('quickadmin.brand_master.title')</span>
                         </a>
                     </li>
+                    <li class="{{ request()->is('admin/master/groups*') ? 'active menu-open' : '' }}">
+                        <a href="{{ route('admin.master.groups.index') }}">
+                            <i class="fa fa-user"></i>
+                            <span>@lang('quickadmin.group_master.title')</span>
+                        </a>
+                    </li>
+
+                    @if (Gate::check('category_access'))
                     <li class="{{ request()->is('admin/master/categories*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('categories.index') }}">
+                        <a href="{{ route('admin.master.categories.index') }}">
                             <i class="fa fa-list"></i>
                             <span>@lang('quickadmin.category_master.title')</span>
                         </a>
                     </li>
-                    <li class="{{ request()->is('admin/master/categories*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('areas.index') }}">
+                    @endif
+
+                    <li class="{{ request()->is('admin/master/areas*') ? 'active menu-open' : '' }}">
+                        <a href="{{ route('admin.master.areas.index') }}">
                             <i class="fa fa-list"></i>
-                            <span>Area</span>
+                            <span>@lang('quickadmin.area_master.title')</span>
                         </a>
                     </li>
             </ul>

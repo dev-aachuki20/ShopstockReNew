@@ -24,19 +24,19 @@ class CategoryDataTable extends DataTable
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
-            ->editColumn('name',function($role){
-                return $role->name ?? "";
+            ->editColumn('name',function($row){
+                return $row->name ?? "";
             })
-            ->addColumn('action',function($role){
+            ->addColumn('action',function($row){
                 $action='';
-                // if (Gate::check('role_edit')) {
+                 if (Gate::check('category_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_category" data-id="'.encrypt($role->id).'" data-name="'.$role->name.'">'.$editIcon.'</a>';
-                // }
-                // if (Gate::check('role_show')) {
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_category" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
+                 }
+                 if (Gate::check('category_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_category" data-id="'.encrypt($role->id).'">  '.$deleteIcon.'</a>';
-                // }
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_category" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
+                 }
                 return $action;
             })->rawColumns(['action']);
     }
@@ -48,9 +48,6 @@ class CategoryDataTable extends DataTable
     {
         //return $model->newQuery();
         $query = $model->newQuery()->select(['product_categories.*']);
-        if (!(auth()->user()->hasRole(config('app.roleid.super_admin')))) {
-            $query->whereNotIn('id', [1]);
-        }
         return $this->applyScopes($query);
     }
 
@@ -87,7 +84,7 @@ class CategoryDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.roles.fields.list.name')),
+            Column::make('name')->title(trans('quickadmin.category_master.fields.name')),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)
@@ -101,6 +98,6 @@ class CategoryDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Role_' . date('YmdHis');
+        return 'Category_' . date('YmdHis');
     }
 }

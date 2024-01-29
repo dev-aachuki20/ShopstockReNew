@@ -1,25 +1,25 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Master;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\DataTables\AreaDataTable;
+use App\DataTables\GroupDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\Area;
+use App\Models\Group;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
-class AreaController extends Controller
+
+class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(AreaDataTable $dataTable)
+    public function index(GroupDataTable $dataTable)
     {
-        abort_if(Gate::denies('area_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return $dataTable->render('admin.master.area.index');
+        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return $dataTable->render('admin.master.group.index');
     }
 
     /**
@@ -35,17 +35,17 @@ class AreaController extends Controller
      */
     public function store(Request $request)
     {
-        abort_if(Gate::denies('area_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('group_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'address' => 'required|unique:areas,address',
+            'name' => 'required|unique:groups,name',
         ]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::create(['address' => $request->address]);  
-        return response()->json(['success' => 'Area created successfully.']);
+        Group::create(['name' => $request->name]);  
+        return response()->json(['success' => 'Group created successfully.']);
     }
 
     /**
@@ -69,20 +69,20 @@ class AreaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        abort_if(Gate::denies('area_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $id =  decrypt($id); 
+        abort_if(Gate::denies('group_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id =  decrypt($id);
         $validator = Validator::make($request->all(), [
-            'address' => [
+            'name' => [
                 'required',
-                Rule::unique('areas', 'address')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('groups', 'name')->ignore($id)->whereNull('deleted_at'),
             ]]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::where('id',$id)->update(['address' => $request->address]);  
-        return response()->json(['success' => 'Area Update successfully.']);
+        Group::where('id',$id)->update(['name' => $request->name]);  
+        return response()->json(['success' => 'Group Update successfully.']);
     }
 
     /**
@@ -90,9 +90,9 @@ class AreaController extends Controller
      */
     public function destroy(string $id)
     {
-        abort_if(Gate::denies('area_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $record = Area::find(decrypt($id));
+        abort_if(Gate::denies('group_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $record = Group::find(decrypt($id));
         $record->delete();
-        return response()->json(['success' => 'Area Deleted successfully.']);
+        return response()->json(['success' => 'Group Delete successfully.']);
     }
 }

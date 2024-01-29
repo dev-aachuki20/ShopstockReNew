@@ -13,9 +13,9 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.category.title')</h4>
-                  @can('category_create')
-                  <a href="javascript:void(0)" class="btn btn-outline-primary add_category" ><i class="fas fa-plus"></i> @lang('quickadmin.category.add')</a>
+                  <h4>@lang('quickadmin.group_master.title')</h4>
+                  @can('group_create')
+                  <a href="javascript:void(0)" class="btn btn-outline-primary add_group" ><i class="fas fa-plus"></i> @lang('quickadmin.group_master.add')</a>
                   @endcan
                 </div>
                 <div class="card-body">
@@ -30,21 +30,21 @@
   </section>
 
 <!-- Add Edit Modal -->
-  <div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalTitle" aria-hidden="true">
+  <div class="modal fade" id="groupModal" tabindex="-1" role="dialog" aria-labelledby="groupModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle"><span class="Add_edit_category">Add</span> Category</h5>
+          <h5 class="modal-title" id="exampleModalLongTitle"><span class="Add_edit_group">Add</span> Group</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form id="category_form">
+        <form id="group_form">
         <div class="modal-body">
           <div class="form-group">
             <label for="naem">Name:</label>
-            <input type="hidden" class="category_edit_id">
-            <input type="text" class="form-control category_edit_name" id="name" placeholder="Enter name" name="name">
+            <input type="hidden" class="group_edit_id">
+            <input type="text" class="form-control group_edit_name" id="name" placeholder="Enter name" name="name">
             <span class="error_name text-danger error"></span>
           </div>
         </div>
@@ -69,21 +69,21 @@
 <script type="text/javascript">
     // add or edit
       $(document).ready(function(){
-          $(document).on('click','.add_category',function(){
+          $(document).on('click','.add_group',function(){
             $('.error').html('');
-            $("#categoryModal").modal('show');
-            $(".category_edit_id").val('');
-            $(".category_edit_name").val('');
+            $("#groupModal").modal('show');
+            $(".group_edit_id").val('');
+            $(".group_edit_name").val('');
             $(".save_btn").html('Save');
-            $(".Add_edit_category").html('Add');
+            $(".Add_edit_group").html('Add');
           })
-          $(document).on('click','.edit_category',function(){
+          $(document).on('click','.edit_group',function(){
             $('.error').html('');
-            $("#categoryModal").modal('show');
-            $(".category_edit_id").val($(this).data('id'));
-            $(".category_edit_name").val($(this).data('name'));
+            $("#groupModal").modal('show');
+            $(".group_edit_id").val($(this).data('id'));
+            $(".group_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
-            $(".Add_edit_category").html('Edit');
+            $(".Add_edit_group").html('Edit');
           })
      
     
@@ -92,17 +92,17 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
-          $(document).on('submit', "#category_form", function(e) {
+          $(document).on('submit', "#group_form", function(e) {
             e.preventDefault();
             var name = $("#name").val();
-            var _id = $(".category_edit_id").val();
+            var _id = $(".group_edit_id").val();
             $('.save_btn').prop('disabled', true);
             var postType = "POST";
-            var post_url = "{{ route('admin.master.categories.store') }}"
+            var post_url = "{{ route('admin.master.groups.store') }}";
             if(_id){
-              // var post_url = "/admin/master/categories/" + _id;
-                var post_url = "{{ route('admin.master.categories.update',['category'=> ':categoryId']) }}";
-                post_url = post_url.replace(':categoryId', _id);
+              //  var post_url = "/admin/master/groups/" + _id;
+               var post_url = "{{ route('admin.master.groups.update',['group'=> ':groupId']) }}";
+                post_url = post_url.replace(':groupId', _id);
                var postType = "PUT";
             }
             $.ajax({
@@ -132,11 +132,11 @@
           }
     // add or edit
     // delete
-          $(document).on('click','.delete_category',function(){
+          $(document).on('click','.delete_group',function(){
             if (confirm('are you sure want to delete?')) {
                 var delete_id = $(this).data('id');
-                var delete_url = "{{ route('admin.master.categories.destroy',['category'=> ':categoryId']) }}";
-                  delete_url = delete_url.replace(':categoryId', delete_id);
+                var delete_url = "{{ route('admin.master.groups.destroy',['group'=> ':groupId']) }}";
+                  delete_url = delete_url.replace(':groupId', delete_id);
                 $.ajax({
                 type: "DELETE",
                 url: delete_url,              

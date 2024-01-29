@@ -14,9 +14,9 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.brand_master.title')</h4>
-                  {{-- @can('role_create') --}}
+                  @can('brand_create')
                   <a href="javascript:void(0)" class="btn btn-outline-primary add_brand" ><i class="fas fa-plus"></i> Add Brand</a>
-                  {{-- @endcan --}}
+                  @endcan
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -100,9 +100,11 @@
             var _id = $(".brand_edit_id").val();
             $('.save_btn').prop('disabled', true);
             var postType = "POST";
-            var post_url = "{{ route('brands.store') }}"
+            var post_url = "{{ route('admin.master.brands.store') }}"
             if(_id){
-               var post_url = "/brands/" + _id;
+              //  var post_url = "/admin/master/brands/" + _id;
+              var post_url = "{{ route('admin.master.brands.update',['brand'=> ':brandId']) }}";
+              post_url = post_url.replace(':brandId', _id);
                var postType = "PUT";
             }
             $.ajax({
@@ -135,12 +137,13 @@
           $(document).on('click','.delete_brand',function(){
             if (confirm('are you sure want to delete?')) {
                 var delete_id = $(this).data('id');
+                var delete_url = "{{ route('admin.master.brands.destroy',['brand'=> ':brandId']) }}";
+                  delete_url = delete_url.replace(':brandId', delete_id);
                 $.ajax({
                 type: "DELETE",
-                url: "/brands/" + delete_id,              
+                url: delete_url,              
                 success: function(data) {
                   if ($.isEmptyObject(data.error)) {
-                    alert(data.success);
                     location.reload();
                   } 
                 }

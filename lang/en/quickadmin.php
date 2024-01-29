@@ -391,15 +391,23 @@ return [
 	'brand_master'  => [
 		'title'  => 'Brand Master',
 		'fields' 	=> [
-			'name' => 'Brand Name',
+			'name' => 'Name',
 		],
 	],
 
 	'group_master'  => [
 		'title'  => 'Group Master',
+		'add'  => 'Add Group',
 		'fields' 	=> [
-			'name' => 'Group Name',
-			'products' => 'Items',
+			'name' => 'Name',
+		],
+	],
+	'area_master'  => [
+		'title'  => 'Area Master',
+		'add'  => 'Add Area',
+		'fields' 	=> [
+			'name' => 'Area Name',
+			'address' => 'Address',
 		],
 	],
 	'category_master'  => [
