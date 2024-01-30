@@ -86,7 +86,6 @@
             $(".Add_edit_group").html('Edit');
           })
      
-    
         $.ajaxSetup({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

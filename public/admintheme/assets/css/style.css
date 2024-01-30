@@ -13411,7 +13411,10 @@ button.category-product-detail:hover{
     line-height: 42px !important;
     text-align: left;
 }
-
+.widthHeigh{
+    width: 70px;
+    height: 70px;
+}
 
 @keyframes blinker {
   from {opacity: 1.0;}

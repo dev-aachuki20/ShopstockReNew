@@ -79,7 +79,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.purchase_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-            <input type="text" class="form-control " name="price" value="{{ isset($product) ? $product->price : '' }}" id="price" autocomplete="false" placeholder="@lang('admin_master.product.purchase_price_enter')">
+            <input type="text" class="form-control only_integer" name="price" value="{{ isset($product) ? $product->price : '' }}" id="price" autocomplete="false" placeholder="@lang('admin_master.product.purchase_price_enter')">
         </div>
         <div class="error_price text-danger error"></div>
     </div>
@@ -88,7 +88,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.min_sale_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-         <input type="text" class="form-control " name="min_sale_price" value="{{ isset($product) ? $product->min_sale_price :'' }}" id="min_sale_price" autocomplete="false" placeholder="@lang('admin_master.product.min_sale_price_enter')">
+         <input type="text" class="form-control only_integer" name="min_sale_price" value="{{ isset($product) ? $product->min_sale_price :'' }}" id="min_sale_price" autocomplete="false" placeholder="@lang('admin_master.product.min_sale_price_enter')">
         </div>
         <div class="error_min_sale_price text-danger error"></div>
     </div>
@@ -97,7 +97,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.wholesaler_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-            <input type="text" class="form-control " name="wholesaler_price" value="{{ isset($product) ? $product->wholesaler_price : '' }}" id="wholesaler_price" autocomplete="false" placeholder="@lang('admin_master.product.wholesaler_price_enter')">
+            <input type="text" class="form-control only_integer" name="wholesaler_price" value="{{ isset($product) ? $product->wholesaler_price : '' }}" id="wholesaler_price" autocomplete="false" placeholder="@lang('admin_master.product.wholesaler_price_enter')">
         </div>
         <div class="error_wholesaler_price text-danger error"></div>
     </div>
@@ -106,19 +106,19 @@
     <div class="form-group">
         <label>@lang('admin_master.product.retailer_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-         <input type="text" class="form-control " name="retailer_price" value="{{ isset($product) ? $product->retailer_price : '' }}" id="retailer_price" autocomplete="false" placeholder="@lang('admin_master.product.retailer_price_enter')">
+         <input type="text" class="form-control only_integer" name="retailer_price" value="{{ isset($product) ? $product->retailer_price : '' }}" id="retailer_price" autocomplete="false" placeholder="@lang('admin_master.product.retailer_price_enter')">
         </div>
         <div class="error_retailer_price text-danger error"></div>
     </div>
 </div>
-{{-- <div class="col-md-12">
+<div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.g_image') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control " name="image" value="{{ isset($product) ? $product->name : '' }}" id="name" autocomplete="false">
+            <input type="file" id="image" name="image" class="form-control">
         </div>
     </div>
-</div> --}}
+</div>
 <div class="col-md-12">  
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
 </div>

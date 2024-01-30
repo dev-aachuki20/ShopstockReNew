@@ -36,6 +36,12 @@
                 $('div.extra_option_hint').hide();
             }
         }).change();
+
+        $(document).on('input','.only_integer', function(evt) {
+            var inputValue = $(this).val();
+                $(this).val(inputValue.replace(/[^0-9.]/g, ''));
+        });
+
       
     $.ajaxSetup({
       headers: {
@@ -44,13 +50,17 @@
     });
     $(document).on('submit', "#productForm", function(e) {
           e.preventDefault();
+          $('.error').html('');
           var name = $("#name").val();
-          var formData = $("#productForm").serialize();
+          // var formData = $("#productForm").serialize();
+          var formData = new FormData($("#productForm")[0]);
           $('.save_btn').prop('disabled', true);
           $.ajax({
             type: "POST",
             url: "{{ route('admin.master.products.store') }}",
             data: formData,
+            contentType: false,
+            processData: false,
             success: function(data) {
               $('.save_btn').prop('disabled', false);
               if ($.isEmptyObject(data.error)) {
