@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use App\Models\ProductCategory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Auth;
 class CategoriesController extends Controller
 {
     /**
@@ -42,7 +43,7 @@ class CategoriesController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        ProductCategory::create(['name' => $request->name]);  
+        ProductCategory::create(['name' => $request->name,'created_by'=> Auth::id()]);  
         return response()->json(['success' => 'Category created successfully.']);
     }
 
@@ -79,7 +80,7 @@ class CategoriesController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        ProductCategory::where('id',$id)->update(['name' => $request->name]);  
+        ProductCategory::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
         return response()->json(['success' => 'Category Update successfully.']);
     }
 
@@ -90,6 +91,8 @@ class CategoriesController extends Controller
     {
         abort_if(Gate::denies('category_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = ProductCategory::find(decrypt($id));
+        $record->updated_by = Auth::id();
+        $record->save();
         $record->delete();
         return response()->json(['success' => 'Category Delete successfully.']);
     }

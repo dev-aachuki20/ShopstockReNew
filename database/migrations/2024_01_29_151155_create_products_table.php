@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('created_by')->unsigned();
+            $table->integer('updated_by')->unsigned();
             $table->string('name');
 			$table->string('unit_type',50);
             $table->string('print_name');
             $table->decimal('price',10,2);
-            $table->decimal('sale_price',10,2)->default(null)->nullable();
             $table->decimal('min_sale_price',10,2);
 			$table->decimal('wholesaler_price',10,2);
 			$table->decimal('retailer_price',10,2);

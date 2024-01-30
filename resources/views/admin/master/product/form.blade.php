@@ -2,46 +2,52 @@
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->name : old('name') }}" id="name" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+            <input type="text" class="form-control" name="name" value="{{ isset($product) ? $product->name : '' }}" id="name" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
         </div>
+        <div class="error_name text-danger error"></div>
     </div>
 </div>
 <div class="col-md-6">
     <div class="form-group">
         <label>@lang('admin_master.product.print_name') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->name : old('name') }}" id="name" autocomplete="true"  placeholder="@lang('admin_master.product.print_name_enter')">
+            <input type="text" class="form-control " name="print_name" value="{{ isset($product) ? $product->print_name : '' }}" id="print_name" autocomplete="false"  placeholder="@lang('admin_master.product.print_name_enter')">
         </div>
+        <div class="error_print_name text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.group_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('group_id', $groups, old('group_id'), ['class' => 'form-control select2', 'required' => '','id'=>'groupList']) !!}
-          </div>
+            {!! Form::select('group_id', $groups, old('group_id'), ['class' => 'form-control select2', 'id'=>'groupList']) !!}
+        </div>
+        <div class="error_group_id text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.product_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('product_category_id', $product_categories, old('product_category_id'), ['class' => 'form-control select2', 'required' => '']) !!}
+            {!! Form::select('product_category_id', $product_categories, old('product_category_id'), ['class' => 'form-control select2']) !!}
         </div>
+        <div class="error_product_category_id text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), old('measurement_type'), ['class' => 'form-control select2', 'required' => '']) !!}
+            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), old('unit_type'), ['class' => 'form-control select2']) !!}
         </div>
+        <div class="error_unit_type text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
-    <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
-    <br>
-    <label class="form-check-label" for="is_height">
+    <div>
+        <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
+    </div>
+        <label class="form-check-label" for="is_height">
         <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1">
         @lang('admin_master.g_height')
     </label>
@@ -62,7 +68,8 @@
     </label>
 
     <div class="extra_option_hint mb-5" style="display: none;">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->name : old('name') }}" id="name" autocomplete="true" placeholder="@lang('admin_master.product.enter_hint')">
+        <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
+        <span class="error_extra_option_hint text-danger error"></span>
     </div>
 </div>
 
@@ -72,42 +79,46 @@
     <div class="form-group">
         <label>@lang('admin_master.product.purchase_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->price : old('price') }}" id="price" autocomplete="true" placeholder="@lang('admin_master.product.purchase_price_enter')">
+            <input type="text" class="form-control " name="price" value="{{ isset($product) ? $product->price : '' }}" id="price" autocomplete="false" placeholder="@lang('admin_master.product.purchase_price_enter')">
         </div>
+        <div class="error_price text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.min_sale_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->min_sale_price : old('min_sale_price') }}" id="min_sale_price" autocomplete="true" placeholder="@lang('admin_master.product.min_sale_price_enter')">
+         <input type="text" class="form-control " name="min_sale_price" value="{{ isset($product) ? $product->min_sale_price :'' }}" id="min_sale_price" autocomplete="false" placeholder="@lang('admin_master.product.min_sale_price_enter')">
         </div>
+        <div class="error_min_sale_price text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.wholesaler_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->wholesaler_price : old('wholesaler_price') }}" id="wholesaler_price" autocomplete="true" placeholder="@lang('admin_master.product.wholesaler_price_enter')">
+            <input type="text" class="form-control " name="wholesaler_price" value="{{ isset($product) ? $product->wholesaler_price : '' }}" id="wholesaler_price" autocomplete="false" placeholder="@lang('admin_master.product.wholesaler_price_enter')">
         </div>
+        <div class="error_wholesaler_price text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.product.retailer_price') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->retailer_price : old('retailer_price') }}" id="retailer_price" autocomplete="true" placeholder="@lang('admin_master.product.retailer_price_enter')">
+         <input type="text" class="form-control " name="retailer_price" value="{{ isset($product) ? $product->retailer_price : '' }}" id="retailer_price" autocomplete="false" placeholder="@lang('admin_master.product.retailer_price_enter')">
         </div>
+        <div class="error_retailer_price text-danger error"></div>
     </div>
 </div>
-<div class="col-md-12">
+{{-- <div class="col-md-12">
     <div class="form-group">
         <label>@lang('admin_master.g_image') <span class="text-danger">*</span></label>
         <div class="input-group">
-        <input type="text" class="form-control phone-number" name="name" value="{{ isset($product) ? $product->name : old('name') }}" id="name" autocomplete="true">
+        <input type="text" class="form-control " name="image" value="{{ isset($product) ? $product->name : '' }}" id="name" autocomplete="false">
         </div>
     </div>
-</div>
+</div> --}}
 <div class="col-md-12">  
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
 </div>

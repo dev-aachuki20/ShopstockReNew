@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('areas', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('created_by')->unsigned();
+            $table->integer('updated_by')->unsigned();
             $table->text('address')->nullable();
             $table->timestamps();
             $table->softDeletes();

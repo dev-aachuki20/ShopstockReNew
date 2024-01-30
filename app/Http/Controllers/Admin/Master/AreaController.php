@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Area;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-
+use Auth;
 class AreaController extends Controller
 {
     /**
@@ -44,7 +44,7 @@ class AreaController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::create(['address' => $request->address]);  
+        Area::create(['address' => $request->address,'created_by'=> Auth::id()]);  
         return response()->json(['success' => 'Area created successfully.']);
     }
 
@@ -81,7 +81,7 @@ class AreaController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::where('id',$id)->update(['address' => $request->address]);  
+        Area::where('id',$id)->update(['address' => $request->address,'updated_by'=> Auth::id()]);  
         return response()->json(['success' => 'Area Update successfully.']);
     }
 
@@ -92,6 +92,8 @@ class AreaController extends Controller
     {
         abort_if(Gate::denies('area_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Area::find(decrypt($id));
+        $record->updated_by = Auth::id();
+        $record->save();
         $record->delete();
         return response()->json(['success' => 'Area Deleted successfully.']);
     }

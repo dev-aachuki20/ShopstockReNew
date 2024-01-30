@@ -10,6 +10,8 @@ class Group extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'groups';
     protected $fillable = [
-        'name'
+        'name',
+        'created_by',
+        'updated_by'
     ];
 }

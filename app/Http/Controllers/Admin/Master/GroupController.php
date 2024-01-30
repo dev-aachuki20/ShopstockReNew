@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Group;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-
+use Auth;
 
 class GroupController extends Controller
 {
@@ -44,7 +44,7 @@ class GroupController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::create(['name' => $request->name]);  
+        Group::create(['name' => $request->name,'created_by'=> Auth::id()]);  
         return response()->json(['success' => 'Group created successfully.']);
     }
 
@@ -81,7 +81,7 @@ class GroupController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::where('id',$id)->update(['name' => $request->name]);  
+        Group::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
         return response()->json(['success' => 'Group Update successfully.']);
     }
 
@@ -93,6 +93,8 @@ class GroupController extends Controller
         abort_if(Gate::denies('group_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Group::find(decrypt($id));
         $record->delete();
+        $record->updated_by = Auth::id();
+        $record->save();
         return response()->json(['success' => 'Group Delete successfully.']);
     }
 }

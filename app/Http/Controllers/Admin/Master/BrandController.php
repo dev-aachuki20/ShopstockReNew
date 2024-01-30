@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Brand;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-
+use Auth;
 class BrandController extends Controller
 {
     /**
@@ -44,7 +44,7 @@ class BrandController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Brand::create(['name' => $request->name]);  
+        Brand::create(['name' => $request->name,'created_by'=> Auth::id()]);  
         return response()->json(['success' => 'Brand created successfully.']);
     }
 
@@ -81,7 +81,7 @@ class BrandController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Brand::where('id',$id)->update(['name' => $request->name]);  
+        Brand::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
         return response()->json(['success' => 'Brand Update successfully.']);
     }
 
@@ -92,6 +92,8 @@ class BrandController extends Controller
     {
         abort_if(Gate::denies('brand_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Brand::find(decrypt($id));
+        $record->updated_by = Auth::id();
+        $record->save();
         $record->delete();
         return response()->json(['success' => 'Brand Deleted successfully.']);
     }

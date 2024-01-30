@@ -10,6 +10,8 @@ class Area extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'areas';
     protected $fillable = [
-        'address'
+        'address',
+        'created_by',
+        'updated_by'
     ];
 }
