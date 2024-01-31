@@ -45,7 +45,7 @@
            
 
 
-        <li class="dropdown {{ Request::is('admin/master*', 'admin/products*', 'admin/areas*') ? 'active' : '' }}">
+        <li class="dropdown {{ Request::is('admin/master*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.master-management.title')</span>
@@ -81,7 +81,7 @@
                 @endif
 
                 @if (Gate::check('product_edit'))
-                    <li class="{{ Request::is('admin/master/products*') ? 'active' : '' }}">
+                    <li class="{{ Request::is('admin/master/product-price*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.update-prices') }}">
                             @lang('admin_master.product.update_product_price')
                         </a>

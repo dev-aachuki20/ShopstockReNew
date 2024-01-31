@@ -36,9 +36,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::resource('/areas', AreaController::class);	
         Route::resource('/groups', GroupController::class);		
         Route::resource('/products', ProductController::class);	
-        Route::get('/product/update-prices',[ProductController::class,'viewUpdateProductPrice'])->name('update-prices');	
-        Route::get('/product/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
-        Route::post('/product/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
+        Route::get('/product-price/update-prices',[ProductController::class,'viewUpdateProductPrice'])->name('update-prices');	
+        Route::get('/product-price/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
+        Route::post('/product-price/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
     });
 });
 
