@@ -115,8 +115,9 @@
     <div class="form-group">
         <label>@lang('admin_master.g_image') @if(!isset($product)) <span class="text-danger">*</span> @endif</label>
         <div class="input-group">
-            <input type="file" id="image" name="image"  onchange="previewFile()" class="form-control">
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewFile()" class="form-control">
         </div>
+        <div class="error_image text-danger error"></div>
         <div>
             @if(isset($product->image))
                 <img alt="image" src="{{isset($product->image)? asset('storage/'.$product->image):""}}" alt="profile" class="widthHeigh mt-2 profile-image" id="profile-image1" >
