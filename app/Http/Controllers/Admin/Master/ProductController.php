@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-use Auth;
-
+use Auth, DataTables;
 class ProductController extends Controller
 {
     /**
@@ -173,4 +172,74 @@ class ProductController extends Controller
         $record->delete();
         return response()->json(['success' => 'Product Delete successfully.']);
     }
+
+    public function viewUpdateProductPrice(Request $request)
+    {
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $product_groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.update_product_prices',compact('product_groups'));
+    }
+
+
+    public function productPriceList(Request $request){
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if($request->ajax()){
+            $searchValue = $request->search['value'];
+            $paginationValue = $request->length;
+              $products = Product::select(['products.*']);
+              $products->leftJoin('product_categories', 'product_categories.id', '=', 'products.product_category_id');
+              $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
+              $products->whereNull('product_categories.deleted_at')->whereNull('groups.deleted_at')->orderBy('name','asc');
+            
+
+            if(isset($request->product_type) && $request->product_type != ''){
+                $products = $products->where('group_id',$request->product_type);
+            }            
+            if(!empty($searchValue)){
+                $products = $products->where(function($query) use($searchValue){
+                    $query->where('products.name','like','%'.$searchValue.'%')
+                    ->orWhere('products.price','like',$searchValue.'%')
+                    ->orWhere('products.min_sale_price','like',$searchValue.'%')
+                    ->orWhere('products.wholesaler_price','like',$searchValue.'%')
+                    ->orWhere('products.retailer_price','like',$searchValue.'%');
+                });
+            }            
+            $products =  $products->get();
+
+            return DataTables::of($products)
+                ->editColumn('price', function ($row) {
+                    return '<i class="fa fa-inr"></i> <span data-field="price" data-product="'.$row->id.'">'.$row->price ?? 0.00.'</span>';
+                })
+                ->editColumn('min_sale_price', function ($row) {
+                    return '<i class="fa fa-inr"></i> <span data-field="min_sale_price" data-product="'.$row->id.'">'.$row->min_sale_price ?? 0.00.'</span>';
+                })
+                ->editColumn('wholesaler_price', function ($row) {
+                    return '<i class="fa fa-inr"></i> <span data-field="wholesaler_price" data-product="'.$row->id.'">'.$row->wholesaler_price ?? 0.00.'</span>';
+                })
+                ->editColumn('retailer_price', function ($row) {
+                    return '<i class="fa fa-inr"></i> <span data-field="retailer_price" data-product="'.$row->id.'">'.$row->retailer_price ?? 0.00.'</span>';
+                })
+                ->rawColumns(['price','min_sale_price','wholesaler_price','retailer_price'])->toJson();
+        }
+    }
+
+
+    public function updateProductPrice(Request $request){
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if($request->ajax()){
+            $rowId = $request->input('rowId');
+            $fieldName = $request->input('fieldName');
+            $newValue = $request->input('newValue');
+            try {            
+                $product = Product::findOrFail($rowId);            
+                $product->$fieldName = $newValue;           
+                $product->save();
+                return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Error updating product price']);
+            }
+        }
+
+    }
+
 }

@@ -1,4 +1,3 @@
-@inject('request', 'Illuminate\Http\Request')
 @extends('layouts.app')
 @section('title')@lang('admin_master.product.seo_title') @endsection
 @section('customCss')

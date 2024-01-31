@@ -1,4 +1,3 @@
-@inject('request', 'Illuminate\Http\Request')
 @extends('layouts.app')
 @section('title')@lang('quickadmin.roles.title') @endsection
 @section('customCss')
@@ -6,7 +5,6 @@
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
 @endsection
 @section('main-content')
-
 <section class="section roles" style="z-index: unset">
   <div class="section-body">
     <div class="row">

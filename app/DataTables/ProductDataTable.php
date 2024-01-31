@@ -39,19 +39,20 @@ class ProductDataTable extends DataTable
                 return $row->group_name ?? "";
             })
             ->editColumn('unit_type',function($row){
-                return $row->unit_type ?? "";
+               
+                return $row->unit_type ??'';
             })
             ->editColumn('price',function($row){
-                return $row->price ?? "";
+                return  '<i class="fa fa-inr"></i> '. $row->price ?? 0;
             })
             ->editColumn('min_sale_price',function($row){
-                return $row->min_sale_price ?? "";
+                return  '<i class="fa fa-inr"></i> '.$row->min_sale_price ?? "";
             })
             ->editColumn('wholesaler_price',function($row){
-                return $row->wholesaler_price ?? "";
+                return '<i class="fa fa-inr"></i> '.$row->wholesaler_price ?? "";
             })
             ->editColumn('retailer_price',function($row){
-                return $row->retailer_price ?? "";
+                return '<i class="fa fa-inr"></i> '.$row->retailer_price ?? "";
             })
             ->editColumn('extra_option',function($row){
                 $html = "";
@@ -78,7 +79,7 @@ class ProductDataTable extends DataTable
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_product" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                  }
                 return $action;
-            })->rawColumns(['action','image','extra_option']);
+            })->rawColumns(['action','image','extra_option','price','min_sale_price','wholesaler_price','retailer_price']);
     }
 
     /**

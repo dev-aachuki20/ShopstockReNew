@@ -27,6 +27,9 @@ class GroupDataTable extends DataTable
             ->editColumn('name',function($row){
                 return $row->name ?? "";
             })
+            ->editColumn('products_count',function($row){
+                return $row->products_count ?? 0;
+            })
             ->addColumn('action',function($row){
                 $action='';
                  if (Gate::check('group_edit')) {
@@ -47,7 +50,7 @@ class GroupDataTable extends DataTable
     public function query(Group $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['groups.*']);
+        $query = $model->newQuery()->select(['groups.*'])->withCount('products');
         return $this->applyScopes($query);
     }
 
@@ -82,9 +85,9 @@ class GroupDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
+            Column::make('products_count')->title(trans('admin_master.product.products')),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

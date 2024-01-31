@@ -9,8 +9,10 @@ return [
     'g_length'                => 'Length',
     'product' => [
         'seo_title_product_master'             => 'Product Master',
+        'seo_title_product_price_master'             => 'Update Product Price',
         'seo_title'             => 'Add Product',
         'add'             => 'Add Product',
+        'products'             => 'Products',
         'name'          => 'Name',
         'product_name'          => 'Product Name',
         'product_name_enter'          => 'Enter Product Name',
@@ -32,6 +34,7 @@ return [
         'wholesaler_price_enter'        => 'Enter Wholesaler price',
         'retailer_price'        => 'Retailer price',
         'retailer_price_enter'        => 'Enter Retailer price',
+        'update_product_price'        => 'Update Products Prices',
     ]
 ]
 ?>

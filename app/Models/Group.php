@@ -14,4 +14,8 @@ class Group extends Model
         'created_by',
         'updated_by'
     ];
+
+    public function products(){
+        return $this->hasMany(Product::class, 'group_id');
+    }
 }

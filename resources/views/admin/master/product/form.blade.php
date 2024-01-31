@@ -173,15 +173,15 @@
         data: formData,
         contentType: false,
         processData: false,
-        success: function(data) {
-            $('.save_btn').prop('disabled', false);
+        success: function(data) {            
             if ($.isEmptyObject(data.error)) {
-            $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
-            setTimeout(() => {
-                 window.location.replace("{{route('admin.master.products.index')}}");
-            }, 1500);                  
+                $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
+                setTimeout(() => {
+                    window.location.replace("{{route('admin.master.products.index')}}");
+                }, 1500);                  
             } else {
-            printErrorMsg(data.error);
+                $('.save_btn').prop('disabled', false);
+                printErrorMsg(data.error);
             }
         },
         error: function(data){

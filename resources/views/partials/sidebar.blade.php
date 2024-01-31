@@ -79,6 +79,15 @@
                         </a>
                     </li>
                 @endif
+
+                @if (Gate::check('product_edit'))
+                    <li class="{{ Request::is('admin/master/products*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.update-prices') }}">
+                            @lang('admin_master.product.update_product_price')
+                        </a>
+                    </li>
+                @endif
+
                 @if (Gate::check('area_access'))
                     <li class="{{ Request::is('admin/master/areas*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.areas.index') }}">

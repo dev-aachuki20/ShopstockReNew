@@ -1,4 +1,3 @@
-@inject('request', 'Illuminate\Http\Request')
 @extends('layouts.app')
 @section('title')@lang('quickadmin.roles.title') @endsection
 @section('customCss')
