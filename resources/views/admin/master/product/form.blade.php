@@ -115,16 +115,19 @@
     <div class="form-group">
         <label>@lang('admin_master.g_image') @if(!isset($product)) <span class="text-danger">*</span> @endif</label>
         <div class="input-group">
-            <input type="file" id="image" name="image" class="form-control">
+            <input type="file" id="image" name="image"  onchange="previewFile()" class="form-control">
         </div>
         <div>
             @if(isset($product->image))
-                <img alt="image" src="{{isset($product->image)? asset('storage/'.$product->image):""}}" alt="profile" class="widthHeigh rounded-circle profile-image" >
-            @endif
+                <img alt="image" src="{{isset($product->image)? asset('storage/'.$product->image):""}}" alt="profile" class="widthHeigh mt-2 profile-image" id="profile-image1" >
+           @else
+                <img alt="" src="{{asset('admintheme/assets/img/default-img.jpg')}}" alt="profile" class="widthHeigh   mt-2 profile-image" id="profile-image1" >
+           @endif
         </div>
     </div>
 </div>
 <div class="col-md-12">  
+    <div class="success_error_message"></div>
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
   
 </div>
@@ -157,6 +160,7 @@
     $(document).on('submit', "#productForm", function(e) {
         e.preventDefault();
         $('.error').html('');
+        $('.success_error_message').html('');
         var action = $(this).attr('action');
         var method = $(this).attr('method');
         var formData = new FormData($("#productForm")[0]);
@@ -173,9 +177,9 @@
             $('.save_btn').prop('disabled', false);
             if ($.isEmptyObject(data.error)) {
             $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
-            // setTimeout(() => {
-            //   location.reload();
-            // }, 1500);                  
+            setTimeout(() => {
+                 window.location.replace("{{route('admin.master.products.index')}}");
+            }, 1500);                  
             } else {
             printErrorMsg(data.error);
             }
@@ -192,6 +196,21 @@ function printErrorMsg(msg) {
     $(`.error_${key}`).html(value);
   });
 }
-        
+  
+function previewFile() {
+    var preview = document.querySelector("img.profile-image");
+    var file = document.querySelector("input[type=file]").files[0];
+    var reader = new FileReader();
+    reader.addEventListener(
+      "load",
+      function () {
+        preview.src = reader.result;
+      },
+      false,
+    );
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
 </script>
 @endsection

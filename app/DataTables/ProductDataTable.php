@@ -25,7 +25,7 @@ class ProductDataTable extends DataTable
         ->eloquent($query)
             ->addIndexColumn()
             ->editColumn('image',function($row){
-                $imageUrl = $row->image? asset('storage/'.$row->image):asset('admintheme/assets/img/user.png');
+                $imageUrl = $row->image? asset('storage/'.$row->image):asset('admintheme/assets/img/default-img.jpg');
                 $image = '<img alt="image" src="'.$imageUrl.'" alt="profile" class="widthHeigh rounded-circle profile-image" >';
                 return $image ?? "";
             })
@@ -37,6 +37,34 @@ class ProductDataTable extends DataTable
             })
             ->editColumn('group_id',function($row){
                 return $row->group_name ?? "";
+            })
+            ->editColumn('unit_type',function($row){
+                return $row->unit_type ?? "";
+            })
+            ->editColumn('price',function($row){
+                return $row->price ?? "";
+            })
+            ->editColumn('min_sale_price',function($row){
+                return $row->min_sale_price ?? "";
+            })
+            ->editColumn('wholesaler_price',function($row){
+                return $row->wholesaler_price ?? "";
+            })
+            ->editColumn('retailer_price',function($row){
+                return $row->retailer_price ?? "";
+            })
+            ->editColumn('extra_option',function($row){
+                $html = "";
+                $html .= $row->is_height == 1 ? trans('quickadmin.product2.fields.height_h'):'';
+                $html .= $row->is_height == 1 && ($row->is_width == 1 || $row->is_length == 1) ? '*':'';
+                $html .= $row->is_width == 1 ? trans('quickadmin.product2.fields.width_w'):'';
+                $html .= $row->is_width == 1 && $row->is_length == 1 ? '*':'';
+                $html .= $row->is_length == 1 ? trans('quickadmin.product2.fields.length_l'):'';              
+
+                return $html ?? "";
+            })
+            ->editColumn('qa_created_at',function($row){
+                return $row->created_at ?? "";
             })
             ->addColumn('action',function($row){
                 $action='';
@@ -50,7 +78,7 @@ class ProductDataTable extends DataTable
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_product" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                  }
                 return $action;
-            })->rawColumns(['action','image']);
+            })->rawColumns(['action','image','extra_option']);
     }
 
     /**
@@ -99,10 +127,19 @@ class ProductDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('image')->title(trans('admin_master.g_image')),
-            Column::make('name')->title(trans('admin_master.product.name')),
-            Column::make('product_category_id')->title(trans('admin_master.product.category_name')),
-            Column::make('group_id')->title(trans('admin_master.product.group_type_name')),
+            Column::make('name')->title(trans('quickadmin.product2.fields.name')),
+            Column::make('print_name')->title(trans('quickadmin.product2.fields.print_name')),
+            Column::make('image')->title(trans('quickadmin.product2.fields.image')),
+            Column::make('product_category_id')->title(trans('quickadmin.product2.fields.product_type')),
+            Column::make('group_id')->title(trans('quickadmin.product2.fields.group_type')),
+            Column::make('unit_type')->title(trans('quickadmin.product2.fields.unit_type')),
+            Column::make('price')->title(trans('quickadmin.product2.fields.price')),
+            Column::make('min_sale_price')->title(trans('quickadmin.product2.fields.min_sale_price')),
+            Column::make('wholesaler_price')->title(trans('quickadmin.product2.fields.wholesaler_price')),
+            Column::make('retailer_price')->title(trans('quickadmin.product2.fields.retailer_price')),
+            Column::make('extra_option')->title(trans('quickadmin.product2.fields.extra_option')),
+            Column::make('qa_created_at')->title(trans('quickadmin.qa_created_at')),
+
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

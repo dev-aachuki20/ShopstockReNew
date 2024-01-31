@@ -65,12 +65,12 @@
 <script src="{{ asset('admintheme/assets/bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('admintheme/assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
-
 <script type="text/javascript">
 
 
     // add or edit
       $(document).ready(function(){
+        var DataaTable = $('#brand-table').DataTable();
           $(document).on('click','.add_brand',function(){
             $('.error').html('');
             $("#brandModal").modal('show');
@@ -102,7 +102,6 @@
             var postType = "POST";
             var post_url = "{{ route('admin.master.brands.store') }}"
             if(_id){
-              //  var post_url = "/admin/master/brands/" + _id;
               var post_url = "{{ route('admin.master.brands.update',['brand'=> ':brandId']) }}";
               post_url = post_url.replace(':brandId', _id);
                var postType = "PUT";
@@ -117,10 +116,12 @@
               success: function(data) {
                 $('.save_btn').prop('disabled', false);
                 if ($.isEmptyObject(data.error)) {
-                  $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
-                  setTimeout(() => {
-                    location.reload();
-                  }, 1500);                  
+                    $("#brandModal").modal('hide');
+                    DataaTable.ajax.reload();
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Brand";
+                    showToaster(title,alertType,message);                   
                 } else {
                   printErrorMsg(data.error);
                 }
@@ -135,23 +136,44 @@
     // add or edit
     // delete
           $(document).on('click','.delete_brand',function(){
-            if (confirm('are you sure want to delete?')) {
-                var delete_id = $(this).data('id');
-                var delete_url = "{{ route('admin.master.brands.destroy',['brand'=> ':brandId']) }}";
-                  delete_url = delete_url.replace(':brandId', delete_id);
+            var delete_id = $(this).data('id');
+            var delete_url = "{{ route('admin.master.brands.destroy',['brand'=> ':brandId']) }}";
+            delete_url = delete_url.replace(':brandId', delete_id);
+            swal({
+            title: "Are  you sure?",
+            text: "are you sure want to delete?",
+            icon: 'warning',
+            buttons: {
+              confirm: 'Yes, delete',
+              cancel: 'No, cancel',
+            },
+            dangerMode: true,
+            }).then(function(willDelete) {
+            if(willDelete) {  
                 $.ajax({
                 type: "DELETE",
                 url: delete_url,              
                 success: function(data) {
                   if ($.isEmptyObject(data.error)) {
-                    location.reload();
+                    DataaTable.ajax.reload();
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = "{{ trans('messages.crud.delete_record') }}";
+                    var title = "Brand";
+                    showToaster(title,alertType,message);                    
                   } 
+                },
+                error: function (xhr) {
+                  swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
                 }
               });
             }
+
+            })
           });
     // delete
 })
+
+
 </script>
 
 @endsection

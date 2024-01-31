@@ -57,7 +57,7 @@ class AreaDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('brand-table')
+                    ->setTableId('area-table')
                     ->parameters([
                         'responsive' => true,
                         'pageLength' => 70,

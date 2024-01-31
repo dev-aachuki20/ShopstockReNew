@@ -22,6 +22,7 @@ class ProductController extends Controller
      */
     public function index(ProductDataTable $dataTable)
     {
+        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.master.product.index');
     }
 
@@ -30,6 +31,7 @@ class ProductController extends Controller
      */
     public function create()
     {
+        abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product_categories = ProductCategory::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
 		$groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         return view('admin.master.product.create',compact('product_categories','groups'));
@@ -40,6 +42,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:250',
             'print_name' => 'required|string|max:120',
@@ -99,6 +102,7 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {   
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product = Product::findOrFail($id);
         $product_categories = ProductCategory::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
 		$groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
@@ -110,6 +114,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:250',
             'print_name' => 'required|string|max:120',
@@ -161,6 +166,7 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
+        abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Product::find(decrypt($id));
         $record->updated_by = Auth::id();
         $record->save();

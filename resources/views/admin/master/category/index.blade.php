@@ -69,6 +69,7 @@
 <script type="text/javascript">
     // add or edit
       $(document).ready(function(){
+        var DataaTable = $('#category-table').DataTable();
           $(document).on('click','.add_category',function(){
             $('.error').html('');
             $("#categoryModal").modal('show');
@@ -100,7 +101,6 @@
             var postType = "POST";
             var post_url = "{{ route('admin.master.categories.store') }}"
             if(_id){
-              // var post_url = "/admin/master/categories/" + _id;
                 var post_url = "{{ route('admin.master.categories.update',['category'=> ':categoryId']) }}";
                 post_url = post_url.replace(':categoryId', _id);
                var postType = "PUT";
@@ -115,10 +115,12 @@
               success: function(data) {
                 $('.save_btn').prop('disabled', false);
                 if ($.isEmptyObject(data.error)) {
-                  $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
-                  setTimeout(() => {
-                    location.reload();
-                  }, 1500);                  
+                    $("#categoryModal").modal('hide');
+                    DataaTable.ajax.reload();
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Category";
+                    showToaster(title,alertType,message);                   
                 } else {
                   printErrorMsg(data.error);
                 }
@@ -132,21 +134,42 @@
           }
     // add or edit
     // delete
-          $(document).on('click','.delete_category',function(){
-            if (confirm('are you sure want to delete?')) {
-                var delete_id = $(this).data('id');
-                var delete_url = "{{ route('admin.master.categories.destroy',['category'=> ':categoryId']) }}";
-                  delete_url = delete_url.replace(':categoryId', delete_id);
-                $.ajax({
-                type: "DELETE",
-                url: delete_url,              
-                success: function(data) {
-                  if ($.isEmptyObject(data.error)) {
-                    location.reload();
-                  } 
+          $(document).on('click','.delete_category',function(){            
+            var delete_id = $(this).data('id');
+            var delete_url = "{{ route('admin.master.categories.destroy',['category'=> ':categoryId']) }}";
+            delete_url = delete_url.replace(':categoryId', delete_id);
+            swal({
+            title: "Are  you sure?",
+            text: "are you sure want to delete?",
+            icon: 'warning',
+            buttons: {
+              confirm: 'Yes, delete',
+              cancel: 'No, cancel',
+            },
+            dangerMode: true,
+            }).then(function(willDelete) {
+              if(willDelete) {  
+                  $.ajax({
+                  type: "DELETE",
+                  url: delete_url,              
+                  success: function(data) {
+                    if ($.isEmptyObject(data.error)) {
+                      DataaTable.ajax.reload();
+                      var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                      var message = "{{ trans('messages.crud.delete_record') }}";
+                      var title = "Category";
+                      showToaster(title,alertType,message);   
+                    } 
+                  },
+                error: function (xhr) {
+                  swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
                 }
-              });
-            }
+                });
+              
+              }
+
+})
+
           });
     // delete
 })

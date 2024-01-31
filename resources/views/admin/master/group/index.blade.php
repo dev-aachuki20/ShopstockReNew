@@ -69,6 +69,7 @@
 <script type="text/javascript">
     // add or edit
       $(document).ready(function(){
+        var DataaTable = $('#group-table').DataTable();
           $(document).on('click','.add_group',function(){
             $('.error').html('');
             $("#groupModal").modal('show');
@@ -114,10 +115,12 @@
               success: function(data) {
                 $('.save_btn').prop('disabled', false);
                 if ($.isEmptyObject(data.error)) {
-                  $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
-                  setTimeout(() => {
-                    location.reload();
-                  }, 1500);                  
+                   $("#groupModal").modal('hide');
+                    DataaTable.ajax.reload();
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Group";
+                    showToaster(title,alertType,message);              
                 } else {
                   printErrorMsg(data.error);
                 }
@@ -132,20 +135,38 @@
     // add or edit
     // delete
           $(document).on('click','.delete_group',function(){
-            if (confirm('are you sure want to delete?')) {
-                var delete_id = $(this).data('id');
-                var delete_url = "{{ route('admin.master.groups.destroy',['group'=> ':groupId']) }}";
-                  delete_url = delete_url.replace(':groupId', delete_id);
-                $.ajax({
-                type: "DELETE",
-                url: delete_url,              
-                success: function(data) {
-                  if ($.isEmptyObject(data.error)) {
-                    location.reload();
-                  } 
-                }
-              });
-            }
+            var delete_id = $(this).data('id');
+            var delete_url = "{{ route('admin.master.groups.destroy',['group'=> ':groupId']) }}";
+            delete_url = delete_url.replace(':groupId', delete_id);
+          swal({
+            title: "Are  you sure?",
+            text: "are you sure want to delete?",
+            icon: 'warning',
+            buttons: {
+              confirm: 'Yes, delete',
+              cancel: 'No, cancel',
+            },
+            dangerMode: true,
+            }).then(function(willDelete) {
+                if(willDelete) {  
+                    $.ajax({
+                    type: "DELETE",
+                    url: delete_url,              
+                    success: function(data) {
+                      if ($.isEmptyObject(data.error)) {
+                        DataaTable.ajax.reload();
+                        var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                        var message = "{{ trans('messages.crud.delete_record') }}";
+                        var title = "Group";
+                        showToaster(title,alertType,message);   
+                      } 
+                    },
+                    error: function (xhr) {
+                      swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
+                    }
+                  });
+                } 
+              })              
           });
     // delete
 })

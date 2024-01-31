@@ -14,7 +14,7 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('admin_master.product.seo_title_product_master')</h4>
-                  @can('group_create')
+                  @can('product_create')
                   <a href="{{route('admin.master.products.create')}}" class="btn btn-outline-primary" ><i class="fas fa-plus"></i> @lang('admin_master.product.add')</a>
                   @endcan
                 </div>
@@ -38,27 +38,50 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
+  var DataaTable = $('#product-table').DataTable();
     $.ajaxSetup({
         headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    $(document).on('click','.delete_product',function(){
-        if (confirm('are you sure want to delete?')) {
-            var delete_id = $(this).data('id');
-            var delete_url = "{{ route('admin.master.products.destroy',['product'=> ':productId']) }}";
-                delete_url = delete_url.replace(':productId', delete_id);
+    $(document).on('click','.delete_product',function(){       
+      var delete_id = $(this).data('id');
+      var delete_url = "{{ route('admin.master.products.destroy',['product'=> ':productId']) }}";
+          delete_url = delete_url.replace(':productId', delete_id);
+      swal({
+        title: "Are  you sure?",
+        text: "are you sure want to delete?",
+        icon: 'warning',
+        buttons: {
+          confirm: 'Yes, delete',
+          cancel: 'No, cancel',
+        },
+        dangerMode: true,
+        }).then(function(willDelete) {
+        if(willDelete) {  
             $.ajax({
             type: "DELETE",
             url: delete_url,              
             success: function(data) {
-                if ($.isEmptyObject(data.error)) {
-                location.reload();
-                } 
-            }
+              if ($.isEmptyObject(data.error)) {
+                  DataaTable.ajax.reload();
+                  var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                  var message = "{{ trans('messages.crud.delete_record') }}";
+                  var title = "Product";
+                  showToaster(title,alertType,message); 
+              } 
+            },
+                error: function (xhr) {
+                  swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
+                }
             });
-        }
+
+          }
+
+})
+
+
     });
 });
 </script>
