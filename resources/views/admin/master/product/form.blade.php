@@ -20,7 +20,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.group_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('group_id', $groups, old('group_id'), ['class' => 'form-control select2', 'id'=>'groupList']) !!}
+            {!! Form::select('group_id', $groups, $product->group_id??'', ['class' => 'form-control select2', 'id'=>'groupList']) !!}
         </div>
         <div class="error_group_id text-danger error"></div>
     </div>
@@ -29,7 +29,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.product_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('product_category_id', $product_categories, old('product_category_id'), ['class' => 'form-control select2']) !!}
+            {!! Form::select('product_category_id', $product_categories, $product->product_category_id??'', ['class' => 'form-control select2']) !!}
         </div>
         <div class="error_product_category_id text-danger error"></div>
     </div>
@@ -38,7 +38,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), old('unit_type'), ['class' => 'form-control select2']) !!}
+            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), $product->unit_type??'', ['class' => 'form-control select2']) !!}
         </div>
         <div class="error_unit_type text-danger error"></div>
     </div>
@@ -48,22 +48,22 @@
         <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
     </div>
         <label class="form-check-label" for="is_height">
-        <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1">
+        <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}}>
         @lang('admin_master.g_height')
     </label>
     
     <label class="form-check-label pl-5" for="is_width">
-        <input class="form-check-input extra_option" name="is_width" type="checkbox" id="is_width" value="1">
+        <input class="form-check-input extra_option" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}}>
         @lang('admin_master.g_width')
     </label>
     
     <label class="form-check-label pl-5" for="is_length">
-        <input class="form-check-input extra_option" name="is_length" type="checkbox" id="is_length" value="1">
+        <input class="form-check-input extra_option" name="is_length" type="checkbox" id="is_length" value="1" {{(($product->is_length??'') == 1)?'checked':''}}>
         @lang('admin_master.g_length')
     </label>
     
     <label class="form-check-label pl-5" for="is_sub_product">
-        <input class="form-check-input is_sub_product" name="is_sub_product" type="checkbox" id="is_sub_product" value="1">
+        <input class="form-check-input is_sub_product" name="is_sub_product" type="checkbox" id="is_sub_product" value="1" {{(($product->is_sub_product ??'') == 1)?'checked':''}}>
         @lang('admin_master.product.is_sub_product')
     </label>
 
@@ -113,14 +113,85 @@
 </div>
 <div class="col-md-3">
     <div class="form-group">
-        <label>@lang('admin_master.g_image') <span class="text-danger">*</span></label>
+        <label>@lang('admin_master.g_image') @if(!isset($product)) <span class="text-danger">*</span> @endif</label>
         <div class="input-group">
             <input type="file" id="image" name="image" class="form-control">
+        </div>
+        <div>
+            @if(isset($product->image))
+                <img alt="image" src="{{isset($product->image)? asset('storage/'.$product->image):""}}" alt="profile" class="widthHeigh rounded-circle profile-image" >
+            @endif
         </div>
     </div>
 </div>
 <div class="col-md-12">  
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+  
 </div>
 
 
+@section('customJS')
+<script type="text/javascript">         
+  $(document).ready(function(){
+      $('input.extra_option').change(function(){
+            if($('.extra_option').filter(':checked').length >= 1){
+                $('div.extra_option_hint').show();
+                $('.extra_option_hint input').attr("required", true);
+            }else{
+                $('.extra_option_hint input').attr("required", false);
+                $('div.extra_option_hint').hide();
+            }
+        }).change();
+
+        $(document).on('input','.only_integer', function(evt) {
+            var inputValue = $(this).val();
+                $(this).val(inputValue.replace(/[^0-9.]/g, ''));
+        });   
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $(document).on('submit', "#productForm", function(e) {
+        e.preventDefault();
+        $('.error').html('');
+        var action = $(this).attr('action');
+        var method = $(this).attr('method');
+        var formData = new FormData($("#productForm")[0]);
+        $('.save_btn').prop('disabled', true);
+        formData.append('_method', method);
+
+        $.ajax({
+        type: "POST",
+        url: action,
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+            $('.save_btn').prop('disabled', false);
+            if ($.isEmptyObject(data.error)) {
+            $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
+            // setTimeout(() => {
+            //   location.reload();
+            // }, 1500);                  
+            } else {
+            printErrorMsg(data.error);
+            }
+        },
+        error: function(data){
+            $('.save_btn').prop('disabled', false);
+        }
+        });
+    });
+ })
+
+function printErrorMsg(msg) {
+  $.each(msg, function(key, value) {
+    $(`.error_${key}`).html(value);
+  });
+}
+        
+</script>
+@endsection

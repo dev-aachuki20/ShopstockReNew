@@ -33,6 +33,57 @@
         @endcan
 
 
+       
+
+
+
+
+
+
+      
+            
+           
+
+
+        <li class="dropdown {{ Request::is('admin/master*', 'admin/products*', 'admin/areas*') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.master-management.title')</span>
+            </a> 
+            <ul class="dropdown-menu">
+                @if (Gate::check('brand_access'))  
+                    <li class="{{ Request::is('admin/master/brands*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.brands.index') }}">
+                            @lang('quickadmin.brand_master.title')
+                        </a>
+                    </li>
+                @endif
+                @if (Gate::check('group_access'))
+                    <li class="{{ Request::is('admin/master/groups*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
+                            @lang('quickadmin.group_master.title')
+                        </a>
+                    </li>
+                @endif
+                @if (Gate::check('category_access'))
+                    <li class="{{ Request::is('admin/master/categories*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.categories.index') }}">
+                            @lang('quickadmin.category_master.title')
+                        </a>
+                    </li>
+                @endif
+                @if (Gate::check('area_access'))
+                    <li class="{{ Request::is('admin/master/areas*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.areas.index') }}">
+                            @lang('quickadmin.area_master.title')
+                        </a>
+                    </li>
+                @endif
+            </ul>
+        </li>
+
+
+
         @can('setting_access')
         <li class="{{ Request::is('settings*') ? 'active' : '' }}">
             <a href="{{ route('settings') }}" class="nav-link">
@@ -41,53 +92,6 @@
             </a>
         </li>
         @endcan
-
-
-
-
-
-
-        <li class="treeview {{ request()->is('admin/master*') || request()->is('admin/products*') || request()->is('admin/areas*') ? 'active' : '' }}">
-            <a href="#">
-                <i class="fa fa-asterisk"></i>
-                <span>@lang('quickadmin.master-management.title')</span>
-                <span class="pull-right-container">
-                    <i class="fa  fa-angle-left pull-right"></i>
-                </span>
-            </a> 
-            <ul class="treeview-menu {{ request()->is('admin/master*') ? 'menu-open' : '' }}">
-                    <li class="{{ request()->is('admin/master/brands*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('admin.master.brands.index') }}">
-                            <i class="fa fa-user"></i>
-                            <span>@lang('quickadmin.brand_master.title')</span>
-                        </a>
-                    </li>
-                    <li class="{{ request()->is('admin/master/groups*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('admin.master.groups.index') }}">
-                            <i class="fa fa-user"></i>
-                            <span>@lang('quickadmin.group_master.title')</span>
-                        </a>
-                    </li>
-
-                    @if (Gate::check('category_access'))
-                    <li class="{{ request()->is('admin/master/categories*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('admin.master.categories.index') }}">
-                            <i class="fa fa-list"></i>
-                            <span>@lang('quickadmin.category_master.title')</span>
-                        </a>
-                    </li>
-                    @endif
-
-                    <li class="{{ request()->is('admin/master/areas*') ? 'active menu-open' : '' }}">
-                        <a href="{{ route('admin.master.areas.index') }}">
-                            <i class="fa fa-list"></i>
-                            <span>@lang('quickadmin.area_master.title')</span>
-                        </a>
-                    </li>
-            </ul>
-        </li>
-
-
 
 
 

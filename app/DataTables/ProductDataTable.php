@@ -42,7 +42,7 @@ class ProductDataTable extends DataTable
                 $action='';
                  if (Gate::check('product_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $editUrl = route("admin.master.products.edit",$row->id);
+                    $editUrl = route("admin.master.products.edit",['product' => $row->id] );
                     $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1 edit_product" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
                  }
                  if (Gate::check('product_delete')) {

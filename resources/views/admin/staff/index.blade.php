@@ -36,7 +36,7 @@
                                             <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn"  id="print-button"><x-svg-icon icon="print" /></a>
                                             @endcan
                                         </div>
-                                        <div class="col-auto pl-1">
+                                        {{-- <div class="col-auto pl-1">
                                             @can('staff_export')
                                             <a href="{{ route('staff.export')}}" class="excelbtn btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="excel" /></a>
                                             @endcan
@@ -45,7 +45,7 @@
                                             @can('staff_rejoin')
                                             <a href="{{ route('staff.typeindex',['type'=> 'deleted'])}}" class="recycleicon btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
                                             @endcan
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     @endif
                                 </div>
