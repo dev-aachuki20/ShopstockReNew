@@ -51,7 +51,7 @@
                     <th style="padding: 8px;border: 1px solid #000;border-right: none;" align="center">@lang('quickadmin.users.fields.role')</th>
                     <th style="padding: 8px;border: 1px solid #000;border-right: none;" align="center">@lang('quickadmin.users.fields.usernameid')</th>
                     {{-- <th style="padding: 8px;border: 1px solid #000;border-right: none;" align="center">@lang('quickadmin.users.fields.email')</th> --}}
-                    <th style="padding: 8px;border: 1px solid #000;" align="center">@lang('quickadmin.users.fields.phone')</th>
+                    <th style="padding: 8px;border: 1px solid #000;" align="center">@lang('quickadmin.qa_created_at')</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,7 +65,7 @@
                     <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $role ? $role->name : '' }}</td>
                     <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $staff->username ?? '' }}</td>
                     {{-- <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $staff->email ?? '' }}</td> --}}
-                    <td style="padding: 8px;border: 1px solid #000;border-top: none;" align="center">{{ $staff->phone ?? '' }}</td>
+                    <td style="padding: 8px;border: 1px solid #000;border-top: none;" align="center">{{ $staff->created_at ?? '' }}</td>
                 </tr>
                 @empty
                 <tr>
