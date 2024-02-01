@@ -8,10 +8,12 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\Master\CategoriesController;
-use App\Http\Controllers\Admin\Master\BrandController;
 use App\Http\Controllers\Admin\Master\AreaController;
 use App\Http\Controllers\Admin\Master\GroupController;
 use App\Http\Controllers\Admin\Master\ProductController;
+use App\Http\Controllers\Admin\Master\LogActivitiesController;
+use App\Http\Controllers\Admin\Master\SplitsController;
+use App\Http\Controllers\Admin\Master\ProductUnitController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -29,17 +31,23 @@ Route::group(['middleware' => 'guest'], function () {
 });
 
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
+Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
-        Route::resource('/categories', CategoriesController::class);
-        Route::resource('/brands', BrandController::class);	
+        // Route::resource('/categories', CategoriesController::class);
         Route::resource('/areas', AreaController::class);	
         Route::resource('/groups', GroupController::class);		
+        Route::get('/group-parent', [GroupController::class,'getGroupParent'])->name('get_group_parent');		
         Route::resource('/products', ProductController::class);	
         Route::get('/product-price/update-prices',[ProductController::class,'viewUpdateProductPrice'])->name('update-prices');	
         Route::get('/product-price/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
         Route::post('/product-price/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
+        
+        Route::resource('/log-activity', LogActivitiesController::class);
+        Route::resource('/product-unit', ProductUnitController::class);
+        Route::resource('/split', SplitsController::class);       
+        
     });
+
 });
 
 
@@ -47,6 +55,7 @@ Route::middleware(['auth','PreventBackHistory'])->group(function () {
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
     Route::get('/logout',[LoginController::class,'logout'])->name('logout');
     Route::resource('/roles',RoleController::class);
+    Route::post('/user-status-change',[UserController::class,'userStatusChange'])->name('user_status_change');
     Route::get('/profiles',[UserController::class,'showprofile'])->name('user.profile');
     Route::post('/profile-update', [UserController::class,'updateprofile'])->name('profile.update');
     Route::post('/profile-image', [UserController::class,'updateprofileImage'])->name('profile-image.update');

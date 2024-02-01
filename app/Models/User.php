@@ -35,6 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'address_id',
         'password',
         'created_by',
+        'updated_by',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -102,5 +103,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function routeNotificationForMail()
     {
         return $this->email;
+    }
+
+    public function userLogs(){
+        return $this->hasMany(LogActivity::class, 'user_id');
     }
 }

@@ -44,7 +44,11 @@ return [
     'success'=>'Success',
 
     'invoice_mail'=>'Mail has been successfully Sent !',
-    'blank_mailid' => 'This Party Does not have Email Address !'
+    'blank_mailid' => 'This Party Does not have Email Address !',
+
+    'are_you_sure' => 'Are you sure!',
+    'are_you_sure_change_status' => 'Are you sure want to Active this user!',
+    'are_you_sure_change_instatus' => 'Are you sure want to Inactive this user!',
 ];
 
 ?>

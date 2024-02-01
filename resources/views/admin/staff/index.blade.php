@@ -342,6 +342,50 @@ $(document).ready(function () {
         });
     });
 
+// active inactive user
+ // rejoin or restore
+ $(document).on('click', '.active_inactive_user', function(e) {
+        e.preventDefault();
+        var active_inactive = $(this).data('active_inactive');
+        var _id = $(this).data('id');
+        var active_inactive_msg = "{{ trans('messages.are_you_sure_change_status') }}";
+        if(active_inactive == "Inactive"){
+            var active_inactive_msg = "{{ trans('messages.are_you_sure_change_instatus') }}";
+        }
+        swal({
+            title: "{{ trans('messages.are_you_sure') }}",
+            text: active_inactive_msg,
+            icon: 'warning',
+            buttons: {
+            confirm: 'Yes',
+            cancel: 'No',
+        },
+        dangerMode: true,
+        }).then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+            type: 'POST',
+            url: "{{ route('user_status_change')}}",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data:{active_inactive:active_inactive,_id:_id},
+            success: function (response) {
+                var alertType = response['alert-type'];
+                var message = 'Status Successfully changed';
+                var title = "{{ trans('quickadmin.users.users') }}";
+                showToaster(title,alertType,message);
+                DataaTable.ajax.reload();
+            },
+            error: function (xhr) {
+                swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
+            }
+            });
+        }
+        });
+    });
+// active inactive user
+
 
 
 

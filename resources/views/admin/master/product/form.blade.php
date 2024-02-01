@@ -29,7 +29,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.product_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('product_category_id', $product_categories, $product->product_category_id??'', ['class' => 'form-control select2']) !!}
+            {!! Form::select('product_category_id', $product_categories, $product->product_category_id??'', ['class' => 'form-control select2', 'id'=>'product_category_id']) !!}
         </div>
         <div class="error_product_category_id text-danger error"></div>
     </div>
@@ -38,7 +38,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), $product->unit_type??'', ['class' => 'form-control select2']) !!}
+            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), $product->unit_type??'', ['class' => 'form-control select2', 'id'=>'unit_type']) !!}
         </div>
         <div class="error_unit_type text-danger error"></div>
     </div>
@@ -113,7 +113,7 @@
 </div>
 <div class="col-md-3">
     <div class="form-group">
-        <label>@lang('admin_master.g_image') @if(!isset($product)) <span class="text-danger">*</span> @endif</label>
+        <label>@lang('admin_master.g_image')</label>
         <div class="input-group">
             <input type="file" id="image" name="image" accept="image/*" onchange="previewFile()" class="form-control">
         </div>
@@ -130,8 +130,34 @@
 <div class="col-md-12">  
     <div class="success_error_message"></div>
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
-  
 </div>
+
+
+<!-- Add Edit Modal -->
+<div class="modal fade" id="add_newModal" tabindex="-1" role="dialog" aria-labelledby="add_newModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Add <span class="add_new_drop"></span></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="naem">Name:</label>
+            <input type="text" class="form-control" id="add_new_name" placeholder="Enter name">
+            <span class="error_new_name text-danger error"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="success_error_message_add)new"></div>
+          <button type="button" class="btn btn-primary save_add_new">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Add Edit Modal -->
 
 
 @section('customJS')
@@ -213,5 +239,96 @@ function previewFile() {
       reader.readAsDataURL(file);
     }
   }
+// add new dropdown
+  $("#groupList").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-group_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewgroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
+  $("#product_category_id").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-product_category_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-product_category_add select_2_add_btn"><button class="btns addNewCategoryBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
+  $("#unit_type").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-unit_type_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewCustomerBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
+$(document).ready(function(){
+    $(document).on('click',".addNewgroupBtn",function(){
+        $('.add_new_drop').html('Group');
+        $("#add_newModal").modal('show');
+        $("#groupList").select2('close');
+        $(".save_add_new").removeClass('add_category_btn');
+        $(".save_add_new").addClass('add_group_btn');
+    }); 
+    $(document).on('click','.add_group_btn',function(e){
+        e.preventDefault();
+        var name = $("#add_new_name").val();
+        $('.save_add_new').prop('disabled', true);
+        $.ajax({
+            type: "POST",
+            url: "{{ route('admin.master.groups.store') }}",
+            data: {name: name, id: ""},
+            success: function(data) {
+            $('.save_add_new').prop('disabled', false);
+            if ($.isEmptyObject(data.error)) {
+                $("#add_newModal").modal('hide');
+                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                var message = data.success;
+                var title = "Group";
+                showToaster(title,alertType,message);              
+            } else {
+                printErrorMsgAdd(data.error);
+            }
+            }
+        });          
+    })
+
+    $(document).on('click',".addNewCategoryBtn",function(){
+        $('.add_new_drop').html('Category');
+        $("#add_newModal").modal('show');
+        $("#product_category_id").select2('close');
+        $(".save_add_new").removeClass('add_group_btn');
+        $(".save_add_new").addClass('add_category_btn');
+    });
+
+    $(document).on('click','.add_category_btn',function(e){
+        e.preventDefault();
+        var name = $("#add_new_name").val();
+        $('.save_add_new').prop('disabled', true);
+        $.ajax({
+            type: "POST",
+            url: "{{ route('admin.master.categories.store') }}",
+            data: { name: name,id: ""},
+            success: function(data) {
+                $('.save_add_new').prop('disabled', false);
+                if ($.isEmptyObject(data.error)) {
+                    $("#add_newModal").modal('hide');
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Category";
+                    showToaster(title,alertType,message);                   
+                } else {
+                    printErrorMsgAdd(data.error);
+                }
+            }
+        });
+        });
+
+    function printErrorMsgAdd(msg) {
+            $.each(msg, function(key, value) {
+              $(`.error_new_${key}`).html(value);
+            });
+          }
+});
+
 </script>
 @endsection

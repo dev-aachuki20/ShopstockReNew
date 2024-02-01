@@ -425,6 +425,12 @@ return [
 			'name' => 'Name',
 		],
 	],
+	'product_unint_master'  => [
+		'title'  => 'Unit Master',
+		'fields' 	=> [
+			'name' => 'Name',
+		],
+	],
 
 	'group_master'  => [
 		'title'  => 'Group Master',
@@ -449,15 +455,24 @@ return [
 	],
 	'logActivities'  => [
 		'title'  => 'Log Activities',
+		'title_log'  => 'Log Activity',
 		'fields' 	=> [
 			'name' => 'Staff Name',
 			'subject' => 'Subject',
 			'url' => 'Url',
 			'method' => 'Method',
 			'agent' => 'User Browser',
+			'ip' => 'Ip',
 		],
 	],
 
+	'split'  => [
+		'title'  => 'Split Estimate',
+		'fields' 	=> [
+			'from_date' => 'From Date',
+			'to_date' => 'To Date',
+		],
+	],
 
 	'report'  => [
 		'title'  => 'Reports',

@@ -36,6 +36,7 @@ class RoleController extends Controller
      */
     public function create()
     {
+        return redirect()->route('roles.index');
         //
         $permissions = Permission::get()->groupBy('route_name');
         return view('admin.roles.create', ['permissions' => $permissions]);
@@ -46,6 +47,7 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
+        return redirect()->route('roles.index');
         // dd($request->all());
         $validatedData =$request->validate([
             'name' => ['required','string','unique:roles,name', new TitleValidationRule],
@@ -68,6 +70,7 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
+        return redirect()->route('roles.index');
         $role = Role::find($id);
         $permissions = $role->permissions;
         $groupedPermissions = $permissions->groupBy('route_name');
@@ -80,7 +83,8 @@ class RoleController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return redirect()->route('roles.index');
+        return redirect()->route('roles.index');
         $role = Role::find($id);
         $permissions = Permission::get()->groupBy('route_name');
         $selectedPermissions = $role->getAllPermissions();
@@ -92,6 +96,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        return redirect()->route('roles.index');
         $role = Role::find($id);
         $validatedData = $request->validate([
             'name' => ['required','string','unique:roles,name,'.$role->id, new TitleValidationRule],
@@ -123,5 +128,7 @@ class RoleController extends Controller
         'redirecturl'=>route('roles.index'),
         'title' => trans('quickadmin.roles.role')], 200);
     }
+
+   
 
 }

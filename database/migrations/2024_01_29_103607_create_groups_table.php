@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('created_by')->unsigned();
-            $table->integer('updated_by')->unsigned();
+            $table->integer('created_by')->unsigned()->default(0);
+            $table->integer('updated_by')->unsigned()->default(0);
             $table->string('name');   				
+            $table->integer('parent_id')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

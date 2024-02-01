@@ -47,6 +47,7 @@ class LoginController extends Controller
                         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.unauthorize')])->withInput($request->only('username', 'password'));
                     }
                     //return redirect()->route('dashboard')->with('success',trans('quickadmin.qa_login_success'));
+                    addToLog($request,'Login successfully');
                     return redirect()->route('dashboard')->with(['success' => true,
                     'message' => trans('quickadmin.qa_login_success'),
                     'title'=> trans('quickadmin.qa_login'),
@@ -65,10 +66,11 @@ class LoginController extends Controller
 
     }
 
-    public function logout()
+    public function logout(Request $request)
         {
             Auth::guard('web')->logout();
             // Redirect to the login page
+            addToLog($request,'Logout successfully');
             return redirect()->route('login');
         }
 

@@ -4,6 +4,9 @@
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
+<style>
+  .dataTables_length, #roles-table_filter{display: none;}
+</style>
 @endsection
 
 @section('main-content')

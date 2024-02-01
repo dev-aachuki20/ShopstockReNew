@@ -3,6 +3,7 @@
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Uploads;
+use App\Models\LogActivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str as Str;
@@ -23,6 +24,19 @@ if (!function_exists('getCommonValidationRuleMsgs')) {
             'email.exists' => "Please Enter Valid Registered Email!",
             'password_confirmation.same' => 'The confirm password and new password must match.'
 		];
+	}
+}
+
+if (!function_exists('addToLog')) {
+	/**
+	 * Create log activity
+	 *
+	 * @return string
+	 */
+	function addToLog($request, $subject){
+		$inputs = $request->all();
+		$inputs['subject'] = $subject;
+		LogActivity::create($inputs);
 	}
 }
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Gate;
 use Auth;
 class CategoriesController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */

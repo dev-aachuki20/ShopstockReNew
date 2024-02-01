@@ -4,22 +4,22 @@ namespace App\Http\Controllers\Admin\Master;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\DataTables\BrandDataTable;
+use App\DataTables\ProductUnitDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\Brand;
+use App\Models\ProductUnit;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Auth;
-class BrandController extends Controller
+
+class ProductUnitController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(BrandDataTable $dataTable)
+    public function index(ProductUnitDataTable $dataTable)
     {
-        abort_if(Gate::denies('brand_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return $dataTable->render('admin.master.brand.index');
+        return $dataTable->render('admin.master.product_unit.index');
     }
 
     /**
@@ -35,17 +35,16 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        abort_if(Gate::denies('brand_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:brands,name',
+            'name' => 'required|unique:product_units,name',
         ]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Brand::create(['name' => $request->name,'created_by'=> Auth::id()]);  
-        return response()->json(['success' => 'Brand created successfully.']);
+        ProductUnit::create(['name' => $request->name,'created_by'=> Auth::id()]);  
+        return response()->json(['success' => 'Unit created successfully.']);
     }
 
     /**
@@ -69,20 +68,19 @@ class BrandController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        abort_if(Gate::denies('brand_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
         $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                Rule::unique('brands', 'name')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('product_units', 'name')->ignore($id)->whereNull('deleted_at'),
             ]]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Brand::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
-        return response()->json(['success' => 'Brand Update successfully.']);
+        ProductUnit::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
+        return response()->json(['success' => 'Unit Update successfully.']);
     }
 
     /**
@@ -90,11 +88,10 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        abort_if(Gate::denies('brand_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $record = Brand::find(decrypt($id));
+        $record = ProductUnit::find(decrypt($id));
         $record->updated_by = Auth::id();
         $record->save();
         $record->delete();
-        return response()->json(['success' => 'Brand Deleted successfully.']);
+        return response()->json(['success' => 'Unit Deleted successfully.']);
     }
 }

@@ -13,9 +13,34 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.group_master.title')</h4>
-                  @can('group_create')
-                  <a href="javascript:void(0)" class="btn btn-outline-primary add_group" ><i class="fas fa-plus"></i> @lang('quickadmin.group_master.add')</a>
-                  @endcan
+
+                  <div class="col-auto  mt-md-0 mt-3 ml-auto">
+                    <div class="row align-items-center">
+                        <div class="col-auto px-1">
+                            @can('group_create')
+                              <button type="button" class="addnew-btn add_group sm_btn circlebtn" ><x-svg-icon icon="add" /></button>
+                            @endcan
+                        </div>
+                        {{-- <div class="col-auto px-1">
+                            @can('group_print')
+                            <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn"  id="print-button"><x-svg-icon icon="print" /></a>
+                            @endcan
+                        </div> --}}
+                        <div class="col-auto pl-1">
+                            @can('group_export')
+                            <a href="{{ route('staff.export')}}" class="excelbtn btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="excel" /></a>
+                            @endcan
+                        </div>
+                        {{-- <div class="col-auto pl-1">
+                            @can('group_rejoin')
+                            <a href="{{ route('staff.typeindex',['type'=> 'deleted'])}}" class="recycleicon btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
+                            @endcan
+                        </div> --}}
+                    </div>
+                </div>
+
+
+
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -41,6 +66,12 @@
         <form id="group_form">
         <div class="modal-body">
           <div class="form-group">
+            <div class="parent_group">
+              <label>@lang('admin_master.product.group_type')</label>
+              <div class="parent_group_list">
+
+              </div>
+            </div>
             <label for="naem">Name:</label>
             <input type="hidden" class="group_edit_id">
             <input type="text" class="form-control group_edit_name" id="name" placeholder="Enter name" name="name">
@@ -76,6 +107,7 @@
             $(".group_edit_name").val('');
             $(".save_btn").html('Save');
             $(".Add_edit_group").html('Add');
+            getParentGroup();
           })
           $(document).on('click','.edit_group',function(){
             $('.error').html('');
@@ -84,6 +116,7 @@
             $(".group_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
             $(".Add_edit_group").html('Edit');
+            getParentGroup();
           })
      
         $.ajaxSetup({
@@ -93,6 +126,7 @@
         });
           $(document).on('submit', "#group_form", function(e) {
             e.preventDefault();
+            var parent_id = $("#parent_id").val();
             var name = $("#name").val();
             var _id = $(".group_edit_id").val();
             $('.save_btn').prop('disabled', true);
@@ -110,6 +144,7 @@
               data: {
                 name: name,
                 id: _id,
+                parent_id: parent_id,
               },
               success: function(data) {
                 $('.save_btn').prop('disabled', false);
@@ -169,6 +204,16 @@
           });
     // delete
 })
+
+ function getParentGroup(){
+      $.ajax({
+            type: "GET",
+            url: "{{ route('admin.master.get_group_parent')}}",
+            success: function(data) {
+                $('.parent_group_list').html(data.html);
+            }
+          });
+}
 </script>
 
 @endsection

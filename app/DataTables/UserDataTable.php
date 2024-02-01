@@ -36,12 +36,12 @@ class UserDataTable extends DataTable
             ->editColumn('username',function($staff){
                 return $staff->username  ?? "";
             })
-            ->editColumn('email',function($staff){
-                return $staff->email  ?? "";
-            })
-            ->editColumn('phone',function($staff){
-                return $staff->phone  ?? "";
-            })
+            // ->editColumn('email',function($staff){
+            //     return $staff->email  ?? "";
+            // })
+            // ->editColumn('phone',function($staff){
+            //     return $staff->phone  ?? "";
+            // })
             ->editColumn('created_at', function ($staff) {
                 return $staff->created_at->format('d-m-Y h:i A');
             })
@@ -56,15 +56,24 @@ class UserDataTable extends DataTable
                 if (Gate::check('staff_edit')) {
                 $lockIcon = view('components.svg-icon', ['icon' => 'lock'])->render();
                 $action .= '<button class="btn btn-icon btn-dark edit-password-btn p-1 " data-toggle="modal" data-target="#passwordModal" data-id="'.encrypt($staff->id).'" data-href="'.route('staff.password', $staff->id).'">'.$lockIcon.'</button>';
-                }
-                if (Gate::check('staff_delete')) {
-                    $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    if (!($staff->hasRole(1))) {
-                    $action .= '<form action="'.route('staff.destroy', $staff->id).'" method="POST" class="deleteForm m-1">
-                    <button title="'.trans('quickadmin.qa_delete').'" class="btn btn-icon btn-danger record_delete_btn btn-sm">'.$deleteIcon.'</button>
-                    </form>';
+                
+                if (!($staff->hasRole(1))) {
+                    if($staff->is_active === 1){
+                        $action .= "<a href='javascript:void(0)'  class='active_inactive_user' data-active_inactive='Inactive' data-id='".encrypt($staff->id)."'><i class='fa fa-lock text-success' aria-hidden='true'></i></a>";
+                    }else{
+                        $action .= "<a href='javascript:void(0)' class='active_inactive_user' data-active_inactive='Active' data-id='".encrypt($staff->id)."'><i class='fa fa-lock text-danger' aria-hidden='true'></i></a>";
                     }
                 }
+                }
+                // if (Gate::check('staff_delete')) {
+                //     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
+                //     if (!($staff->hasRole(1))) {
+                //     $action .= '<form action="'.route('staff.destroy', $staff->id).'" method="POST" class="deleteForm m-1">
+                //     <button title="'.trans('quickadmin.qa_delete').'" class="btn btn-icon btn-danger record_delete_btn btn-sm">'.$deleteIcon.'</button>
+                //     </form>';
+                //     }
+                // }
+                
                 return $action;
             })
             ->filterColumn('created_at', function ($query, $keyword) {
@@ -126,8 +135,8 @@ class UserDataTable extends DataTable
             Column::make('name')->title(trans('quickadmin.users.fields.name')),
             Column::make('role')->title(trans('quickadmin.users.fields.role')),
             Column::make('username')->title(trans('quickadmin.users.fields.usernameid')),
-            Column::make('email')->title(trans('quickadmin.users.fields.email')),
-            Column::make('phone')->title(trans('quickadmin.users.fields.phone')),
+            //Column::make('email')->title(trans('quickadmin.users.fields.email')),
+           // Column::make('phone')->title(trans('quickadmin.users.fields.phone')),
             Column::make('created_at')->title(trans('quickadmin.users.fields.created_at')),
             Column::computed('action')
             ->exportable(false)

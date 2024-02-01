@@ -53,7 +53,7 @@ class ProductController extends Controller
             'min_sale_price' => 'required|numeric',
             'wholesaler_price' => 'required|numeric',
             'retailer_price' => 'required|numeric',
-            'image' => 'required|image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
+            'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
         ]); 
         if ($validator->fails()) {
             return response()->json([

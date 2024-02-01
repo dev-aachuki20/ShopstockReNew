@@ -1,6 +1,6 @@
 
 @extends('layouts.app')
-@section('title')@lang('quickadmin.roles.title') @endsection
+@section('title')@lang('quickadmin.product_unint_master.title') @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
@@ -13,10 +13,10 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.brand_master.title')</h4>
-                  @can('brand_create')
-                  <a href="javascript:void(0)" class="btn btn-outline-primary add_brand" ><i class="fas fa-plus"></i> Add Brand</a>
-                  @endcan
+                  <h4>@lang('quickadmin.product_unint_master.title')</h4>
+                  {{-- @can('unit_create') --}}
+                  <a href="javascript:void(0)" class="btn btn-outline-primary add_unit" ><i class="fas fa-plus"></i> Add Unit</a>
+                  {{-- @endcan --}}
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -30,21 +30,21 @@
   </section>
 
 <!-- Add Edit Modal -->
-  <div class="modal fade" id="brandModal" tabindex="-1" role="dialog" aria-labelledby="brandModalTitle" aria-hidden="true">
+  <div class="modal fade" id="unitModal" tabindex="-1" role="dialog" aria-labelledby="unitModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle"><span class="Add_edit_brand">Add</span> Brand</h5>
+          <h5 class="modal-title" id="exampleModalLongTitle"><span class="Add_edit_unit">Add</span> unit</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form id="brand_form">
+        <form id="unit_form">
         <div class="modal-body">
           <div class="form-group">
             <label for="naem">Name:</label>
-            <input type="hidden" class="brand_edit_id">
-            <input type="text" class="form-control brand_edit_name" id="name" placeholder="Enter name" name="name">
+            <input type="hidden" class="unit_edit_id">
+            <input type="text" class="form-control unit_edit_name" id="name" placeholder="Enter name" name="name">
             <span class="error_name text-danger error"></span>
           </div>
         </div>
@@ -70,22 +70,22 @@
 
     // add or edit
       $(document).ready(function(){
-        var DataaTable = $('#brand-table').DataTable();
-          $(document).on('click','.add_brand',function(){
+        var DataaTable = $('#unit-table').DataTable();
+          $(document).on('click','.add_unit',function(){
             $('.error').html('');
-            $("#brandModal").modal('show');
-            $(".brand_edit_id").val('');
-            $(".brand_edit_name").val('');
+            $("#unitModal").modal('show');
+            $(".unit_edit_id").val('');
+            $(".unit_edit_name").val('');
             $(".save_btn").html('Save');
-            $(".Add_edit_brand").html('Add');
+            $(".Add_edit_unit").html('Add');
           })
-          $(document).on('click','.edit_brand',function(){
+          $(document).on('click','.edit_unit',function(){
             $('.error').html('');
-            $("#brandModal").modal('show');
-            $(".brand_edit_id").val($(this).data('id'));
-            $(".brand_edit_name").val($(this).data('name'));
+            $("#unitModal").modal('show');
+            $(".unit_edit_id").val($(this).data('id'));
+            $(".unit_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
-            $(".Add_edit_brand").html('Edit');
+            $(".Add_edit_unit").html('Edit');
           })
      
     
@@ -94,16 +94,16 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
-          $(document).on('submit', "#brand_form", function(e) {
+          $(document).on('submit', "#unit_form", function(e) {
             e.preventDefault();
             var name = $("#name").val();
-            var _id = $(".brand_edit_id").val();
+            var _id = $(".unit_edit_id").val();
             $('.save_btn').prop('disabled', true);
             var postType = "POST";
-            var post_url = "{{ route('admin.master.brands.store') }}"
+            var post_url = "{{ route('admin.master.product-unit.store') }}"
             if(_id){
-              var post_url = "{{ route('admin.master.brands.update',['brand'=> ':brandId']) }}";
-              post_url = post_url.replace(':brandId', _id);
+              var post_url = "{{ route('admin.master.product-unit.update',['product_unit'=> ':unitId']) }}";
+              post_url = post_url.replace(':unitId', _id);
                var postType = "PUT";
             }
             $.ajax({
@@ -116,11 +116,11 @@
               success: function(data) {
                 $('.save_btn').prop('disabled', false);
                 if ($.isEmptyObject(data.error)) {
-                    $("#brandModal").modal('hide');
+                    $("#unitModal").modal('hide');
                     DataaTable.ajax.reload();
                     var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                     var message = data.success;
-                    var title = "Brand";
+                    var title = "Unit";
                     showToaster(title,alertType,message);                   
                 } else {
                   printErrorMsg(data.error);
@@ -135,10 +135,10 @@
           }
     // add or edit
     // delete
-          $(document).on('click','.delete_brand',function(){
+          $(document).on('click','.delete_unit',function(){
             var delete_id = $(this).data('id');
-            var delete_url = "{{ route('admin.master.brands.destroy',['brand'=> ':brandId']) }}";
-            delete_url = delete_url.replace(':brandId', delete_id);
+            var delete_url = "{{ route('admin.master.product-unit.destroy',['product_unit'=> ':unitId']) }}";
+            delete_url = delete_url.replace(':unitId', delete_id);
             swal({
             title: "Are  you sure?",
             text: "are you sure want to delete?",
@@ -158,7 +158,7 @@
                     DataaTable.ajax.reload();
                     var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                     var message = "{{ trans('messages.crud.delete_record') }}";
-                    var title = "Brand";
+                    var title = "Unit";
                     showToaster(title,alertType,message);                    
                   } 
                 },

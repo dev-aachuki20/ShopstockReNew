@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Master;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use App\DataTables\GroupDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -37,14 +38,14 @@ class GroupController extends Controller
     {
         abort_if(Gate::denies('group_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:groups,name',
+            'name' => 'required',
         ]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::create(['name' => $request->name,'created_by'=> Auth::id()]);  
+        Group::create(['name' => $request->name,'parent_id' => $request->parent_id ?? 0 ,'created_by'=> Auth::id()]);  
         return response()->json(['success' => 'Group created successfully.']);
     }
 
@@ -96,5 +97,13 @@ class GroupController extends Controller
         $record->updated_by = Auth::id();
         $record->save();
         return response()->json(['success' => 'Group Delete successfully.']);
+    }
+
+    public function getGroupParent(Request $request){
+        if($request->ajax()){
+            $groups = Group::get()->pluck('name', 'id')->where('parent_id',0)->prepend(trans('admin_master.g_please_select'), '');
+            $html = View::make('admin.master.group.parent_form',compact('groups'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
+        }
     }
 }

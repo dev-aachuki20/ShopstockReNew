@@ -17,7 +17,7 @@
 
    {{-- <link rel="stylesheet" href="{{ asset('admintheme/assets/bundles/flag-icon-css/css/flag-icon.min.css') }}"> --}}
    <!-- Custom style CSS -->
-
+   <link rel="stylesheet" href="{{ asset('admintheme/assets/css/custom_new.css') }}">
    <link rel='shortcut icon' type='image/x-icon' href="{{ asset('admintheme/assets/img/favicon.ico') }}" />
 
 

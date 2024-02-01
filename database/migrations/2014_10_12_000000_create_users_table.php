@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('password')->nullable()->default(null);
             $table->tinyInteger('is_active')->default(1)->comment('1=> active, 0=>deactive');
             $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

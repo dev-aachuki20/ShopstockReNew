@@ -4,19 +4,19 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
 <style>
-  div.table-responsive>div.dataTables_wrapper>div.row {
-    width: 100%;
-  }
+  .select2-results {
+    padding-top: 0px !important;
+}
 </style>
 @endsection
 @section('main-content')
 
-<section class="section roles" style="z-index: unset">
+<section class="section roles update_product" style="z-index: unset">
   <div class="section-body">
     <div class="row">
-      <div class="col-md-12 form-group">
+      <div class="col-md-12 form-group ">
         {!! Form::label('name', trans('admin_master.product.group_type').'*', ['class' => 'control-label']) !!}
-        {!! Form::select('product_group', $product_groups, old('product_group'), ['class' => 'form-control select2', 'id'=>'product_group', 'required' => '']) !!}
+        {!! Form::select('product_group', $product_groups, old('product_group'), ['class' => 'form-control select2 ', 'id'=>'product_group', 'required' => '']) !!}
         @if($errors->has('name'))
             <p class="help-block red">
                 {{ $errors->first('name') }}

@@ -250,4 +250,16 @@ class UserController extends Controller
          'title' => trans('quickadmin.users.users')
         ], 200);
     }
+
+    public function userStatusChange(Request $request){
+        abort_if(Gate::denies('staff_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        $id =  decrypt($request->_id);
+        $active_inactive =  $request->active_inactive;
+        $is_active = 0;
+        if($active_inactive == "Active"){
+            $is_active = 1;
+        }
+        User::where('id',$id)->update(['is_active' => $is_active,'updated_by'=> Auth::id()]);  
+        return response()->json(['success' => 'Status Update successfully.']);
+    }
 }

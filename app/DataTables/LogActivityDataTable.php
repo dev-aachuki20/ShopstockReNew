@@ -2,10 +2,9 @@
 
 namespace App\DataTables;
 
-use App\Models\Role;
+use App\Models\LogActivity;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Gate;
-use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -13,7 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class RoleDataTable extends DataTable
+class LogActivityDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -25,34 +24,32 @@ class RoleDataTable extends DataTable
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
-            ->editColumn('name',function($role){
-                return $role->name ?? "";
+            ->editColumn('user_id',function($row){
+                return $row->user->name ?? "";
             })
-            // ->addColumn('action',function($role){
-            //     $action='';
-            //     if (Gate::check('role_edit')) {
-            //         $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-            //         $action .= '<a href="'.route('roles.edit', $role->id).'" class="btn btn-icon btn-info m-1">'.$editIcon.'</a>';
-            //     }
-            //     if (Gate::check('role_show')) {
-            //         $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-            //         $action .= '<a href="'.route('roles.show',$role->id).'" class="btn btn-icon btn-danger m-1">'.$viewIcon.'</a>';
-            //     }
-            //     return $action;
-            // })
-            ->rawColumns([]);
+            ->editColumn('subject',function($row){
+                return $row->subject ?? "";
+            })
+            ->editColumn('created_at',function($row){
+                return $row->created_at ?? "";
+            })
+            ->addColumn('action',function($row){
+                $action='';
+                //  if (Gate::check('brand_edit')) {
+                    $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_active_log" data-id="'.encrypt($row->id).'" >'.$editIcon.'</a>';
+                //  }
+                return $action;
+            })->rawColumns(['action']);
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(Role $model): QueryBuilder
+    public function query(LogActivity $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['roles.*']);
-        if (!(auth()->user()->hasRole(config('app.roleid.super_admin')))) {
-            $query->whereNotIn('id', [1]);
-        }
+        $query = $model->newQuery()->select(['log_activities.*']);
         return $this->applyScopes($query);
     }
 
@@ -62,7 +59,7 @@ class RoleDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('roles-table')
+                    ->setTableId('log_activities-table')
                     ->parameters([
                         'responsive' => true,
                         'pageLength' => 70,
@@ -89,12 +86,14 @@ class RoleDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.roles.fields.list.name')),
-            // Column::computed('action')
-            // ->exportable(false)
-            // ->printable(false)
-            // ->width(60)
-            // ->addClass('text-center')->title(trans('quickadmin.qa_action')),
+            Column::make('user_id')->title(trans('quickadmin.logActivities.fields.name')),
+            Column::make('subject')->title(trans('quickadmin.logActivities.fields.subject')),
+            Column::make('created_at')->title(trans('quickadmin.qa_created_at')),
+            Column::computed('action')
+            ->exportable(false)
+            ->printable(false)
+            ->width(60)
+            ->addClass('text-center')->title(trans('quickadmin.qa_action')),
         ];
     }
 
@@ -103,6 +102,6 @@ class RoleDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Role_' . date('YmdHis');
+        return 'Log_activity_' . date('YmdHis');
     }
 }
