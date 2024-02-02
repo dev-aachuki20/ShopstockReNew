@@ -271,6 +271,8 @@ return [
 		'title' => 'Products',
 		'fields' => [
 			'name' 				=> 'Product Name',
+			'calculation_unit' 		=> 'Calculation Type / Unit Type',
+			'group_sub_group' 		=> 'Group / Sub Group',
 			'print_name' 		=> 'Print Name',
 			'product_type' 		=> 'Product Type',
 			'group_type' 		=> 'Group Type',
@@ -434,9 +436,11 @@ return [
 
 	'group_master'  => [
 		'title'  => 'Group Master',
+		'recycle'  => 'Group Recycle Master',
 		'add'  => 'Add Group',
 		'fields' 	=> [
 			'name' => 'Name',
+			'sub_group' => 'Sub Group',
 		],
 	],
 	'area_master'  => [

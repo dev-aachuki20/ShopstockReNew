@@ -10,7 +10,9 @@ use Illuminate\Validation\Rule;
 use App\Models\Group;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
 use Auth;
+use App\Exports\GroupExport;
 
 class GroupController extends Controller
 {
@@ -19,8 +21,14 @@ class GroupController extends Controller
      */
     public function index(GroupDataTable $dataTable)
     {
-        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');        
         return $dataTable->render('admin.master.group.index');
+    }
+    public function recycleIndex(GroupDataTable $dataTable)
+    {
+        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $recycle = 'isRecycle';
+        return $dataTable->withParam1($recycle)->render('admin.master.group.index');
     }
 
     /**
@@ -37,9 +45,19 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         abort_if(Gate::denies('group_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-        ]);  
+        if($request->parent_id > 0){
+            $validator = Validator::make($request->all(), [
+                'name' => [
+                    'required',
+                    Rule::unique('groups', 'name')->where('parent_id',$request->parent_id)
+                ]]);
+        }else{
+            $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                Rule::unique('groups', 'name')->where('parent_id',0)
+            ]]); 
+        }          
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -72,17 +90,26 @@ class GroupController extends Controller
     {
         abort_if(Gate::denies('group_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
-        $validator = Validator::make($request->all(), [
+        if($request->parent_id > 0){
+            $validator = Validator::make($request->all(), [
+                'name' => [
+                    'required',
+                    Rule::unique('groups', 'name')->where('parent_id',$request->parent_id)->ignore($id)
+                ]]);
+        }else{
+            $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
-                Rule::unique('groups', 'name')->ignore($id)->whereNull('deleted_at'),
-            ]]);  
+                Rule::unique('groups', 'name')->where('parent_id',0)->ignore($id)
+            ]]); 
+        }         
+
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
+        Group::where('id',$id)->update(['name' => $request->name,'parent_id' => $request->parent_id ?? 0 ,'updated_by'=> Auth::id()]);  
         return response()->json(['success' => 'Group Update successfully.']);
     }
 
@@ -101,9 +128,31 @@ class GroupController extends Controller
 
     public function getGroupParent(Request $request){
         if($request->ajax()){
-            $groups = Group::get()->pluck('name', 'id')->where('parent_id',0)->prepend(trans('admin_master.g_please_select'), '');
-            $html = View::make('admin.master.group.parent_form',compact('groups'))->render();
+            $parent_id = $request->parent_id;
+            $groups = Group::where('parent_id',0)->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+            $html = View::make('admin.master.group.parent_form',compact('groups','parent_id'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
+    }
+    public function getSubGroup(Request $request){
+        if($request->ajax()){
+            $parent_id = $request->parent_id;
+            $selected_id = $request->selected_id??'';
+            $groups = Group::where('parent_id',$parent_id)->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+            $html = View::make('admin.master.group.child_form',compact('groups','selected_id'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
+        }
+    }
+
+    public function export($group_id = null){
+        abort_if(Gate::denies('group_export'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return Excel::download(new GroupExport($group_id), 'group-list.xlsx');
+    }
+
+    public function undoGroup(Request $request){
+        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        $id =  decrypt($request->recycle_id);      
+        Group::withTrashed()->where('id',$id)->update(['deleted_at' => null,'updated_by'=> Auth::id()]);  
+        return response()->json(['success' => 'Undo successfully.']);
     }
 }

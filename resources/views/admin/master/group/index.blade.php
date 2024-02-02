@@ -6,41 +6,47 @@
 @endsection
 @section('main-content')
 
+@php $isRecycle = ""; @endphp
+@if(Request::is('admin/master/group-recycle*'))
+  @php  $isRecycle = "Yes"; @endphp
+@endif
+
+
 <section class="section roles" style="z-index: unset">
     <div class="section-body">
           <div class="row">
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.group_master.title')</h4>
-
-                  <div class="col-auto  mt-md-0 mt-3 ml-auto">
-                    <div class="row align-items-center">
-                        <div class="col-auto px-1">
-                            @can('group_create')
-                              <button type="button" class="addnew-btn add_group sm_btn circlebtn" ><x-svg-icon icon="add" /></button>
-                            @endcan
-                        </div>
-                        {{-- <div class="col-auto px-1">
-                            @can('group_print')
-                            <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn"  id="print-button"><x-svg-icon icon="print" /></a>
-                            @endcan
-                        </div> --}}
-                        <div class="col-auto pl-1">
-                            @can('group_export')
-                            <a href="{{ route('staff.export')}}" class="excelbtn btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="excel" /></a>
-                            @endcan
-                        </div>
-                        {{-- <div class="col-auto pl-1">
-                            @can('group_rejoin')
-                            <a href="{{ route('staff.typeindex',['type'=> 'deleted'])}}" class="recycleicon btn h-10 col circlebtn"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
-                            @endcan
-                        </div> --}}
-                    </div>
-                </div>
-
-
-
+                  @if($isRecycle == "Yes")
+                  <h4>@lang('quickadmin.group_master.recycle')</h4>
+                  @else               
+                  <h4>@lang('quickadmin.group_master.title')</h4> 
+                    <div class="col-auto  mt-md-0 mt-3 ml-auto">
+                      <div class="row align-items-center">
+                          <div class="col-auto px-1">
+                              @can('group_create')
+                                <button type="button" class="addnew-btn add_group sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
+                              @endcan
+                          </div>
+                          {{-- <div class="col-auto px-1">
+                              @can('group_print')
+                              <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn"  id="print-button"><x-svg-icon icon="print" /></a>
+                              @endcan
+                          </div> --}}
+                          <div class="col-auto pl-1">
+                              @can('group_export')
+                              <a href="{{ route('admin.master.group.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
+                              @endcan
+                          </div>
+                          <div class="col-auto pl-1">
+                              {{-- @can('group_rejoin') --}}
+                              <a href="{{ route('admin.master.groups.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
+                              {{-- @endcan --}}
+                          </div>
+                      </div>
+                  </div>
+                @endif
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -116,7 +122,7 @@
             $(".group_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
             $(".Add_edit_group").html('Edit');
-            getParentGroup();
+            getParentGroup($(this).data('parent_id'));
           })
      
         $.ajaxSetup({
@@ -203,12 +209,48 @@
               })              
           });
     // delete
+    // recycle
+          $(document).on('click','.recycle_group',function(){
+            var recycle_id = $(this).data('id');
+          swal({
+            title: "Are  you sure?",
+            text: "are you sure want to Undo?",
+            icon: 'warning',
+            buttons: {
+              confirm: 'Yes, Undo',
+              cancel: 'No, cancel',
+            },
+            dangerMode: true,
+            }).then(function(willDelete) {
+                if(willDelete) {  
+                    $.ajax({
+                    type: "POST",
+                    url: "{{ route('admin.master.groups.undo')}}", 
+                    data:{recycle_id:recycle_id},             
+                    success: function(data) {
+                      if ($.isEmptyObject(data.error)) {
+                        DataaTable.ajax.reload();
+                        var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                        var message = "{{ trans('messages.crud.delete_record') }}";
+                        var title = "Group";
+                        showToaster(title,alertType,message);   
+                      } 
+                    },
+                    error: function (xhr) {
+                      swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
+                    }
+                  });
+                } 
+              })              
+          });
+    // recycle
 })
 
- function getParentGroup(){
+ function getParentGroup(parent_id){
       $.ajax({
             type: "GET",
-            url: "{{ route('admin.master.get_group_parent')}}",
+            url: "{{ route('admin.master.get_group_child')}}",
+            data:{parent_id:parent_id},
             success: function(data) {
                 $('.parent_group_list').html(data.html);
             }

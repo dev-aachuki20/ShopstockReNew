@@ -59,9 +59,9 @@ class UserDataTable extends DataTable
                 
                 if (!($staff->hasRole(1))) {
                     if($staff->is_active === 1){
-                        $action .= "<a href='javascript:void(0)'  class='active_inactive_user' data-active_inactive='Inactive' data-id='".encrypt($staff->id)."'><i class='fa fa-lock text-success' aria-hidden='true'></i></a>";
+                        $action .= "<a href='javascript:void(0)'  class='active_inactive_user' data-active_inactive='Inactive' data-id='".encrypt($staff->id)."'><i class='fa-solid fa-circle-check user_icon text-success' aria-hidden='true'></i></a>";
                     }else{
-                        $action .= "<a href='javascript:void(0)' class='active_inactive_user' data-active_inactive='Active' data-id='".encrypt($staff->id)."'><i class='fa fa-lock text-danger' aria-hidden='true'></i></a>";
+                        $action .= "<a href='javascript:void(0)' class='active_inactive_user' data-active_inactive='Active' data-id='".encrypt($staff->id)."'><i class='fa-solid fa-ban text-danger' aria-hidden='true'></i></a>";
                     }
                 }
                 }

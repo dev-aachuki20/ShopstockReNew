@@ -6,13 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\DataTables\ProductDataTable;
-use App\Models\ProductCategory;
+use App\Models\ProductUnit;
 use App\Models\Group;
 use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductExport;
 use Auth, DataTables;
 class ProductController extends Controller
 {
@@ -25,15 +27,22 @@ class ProductController extends Controller
         return $dataTable->render('admin.master.product.index');
     }
 
+    public function recycleIndex(ProductDataTable $dataTable)
+    {
+        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $recycle = 'isRecycle';
+        return $dataTable->withParam1($recycle)->render('admin.master.product.index');
+    }
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $product_categories = ProductCategory::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-		$groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.create',compact('product_categories','groups'));
+        $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+		$groups = Group::where('parent_id',0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.create',compact('groups','product_unit'));
     }
 
     /**
@@ -42,17 +51,17 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $validator = Validator::make($request->all(), [
+       $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:250',
-            'print_name' => 'required|string|max:120',
             'group_id' => 'required|numeric',
-            'product_category_id' => 'required|numeric',
+            'sub_group_id' => 'required|numeric',
+            'calculation_type' => 'required|numeric',
             'unit_type' => 'required|string|max:50',
-            'extra_option_hint' => 'required|string|max:50',
             'price' => 'required|numeric',
             'min_sale_price' => 'required|numeric',
             'wholesaler_price' => 'required|numeric',
             'retailer_price' => 'required|numeric',
+            'extra_option_hint' => 'required|string|max:50',
             'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
         ]); 
         if ($validator->fails()) {
@@ -63,9 +72,9 @@ class ProductController extends Controller
 
         $data = [
             'name' => $request->name,
-            'print_name' => $request->print_name,
             'group_id' => $request->group_id,
-            'product_category_id' => $request->product_category_id,
+            'sub_group_id' => $request->sub_group_id,
+            'calculation_type' => $request->calculation_type,
             'unit_type' => $request->unit_type,            
             'is_height' => $request->is_height ?? 0,
             'is_width' => $request->is_width ?? 0,
@@ -103,9 +112,9 @@ class ProductController extends Controller
     {   
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product = Product::findOrFail($id);
-        $product_categories = ProductCategory::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-		$groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.edit', compact('product_categories','groups','product'));
+        $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+		$groups = Group::where('parent_id',0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.edit', compact('product_unit','groups','product'));
     }
 
     /**
@@ -116,29 +125,27 @@ class ProductController extends Controller
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:250',
-            'print_name' => 'required|string|max:120',
             'group_id' => 'required|numeric',
-            'product_category_id' => 'required|numeric',
+            'sub_group_id' => 'required|numeric',            
+            'calculation_type' => 'required|numeric',
             'unit_type' => 'required|string|max:50',
-            'extra_option_hint' => 'required|string|max:50',
             'price' => 'required|numeric',
             'min_sale_price' => 'required|numeric',
             'wholesaler_price' => 'required|numeric',
             'retailer_price' => 'required|numeric',
+            'extra_option_hint' => 'required|string|max:50',
             'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
-        ]); 
+        ]);
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-
         $product = Product::findOrFail($id);
-
         $product->name = $request->name; 
-        $product->print_name = $request->print_name; 
         $product->group_id = $request->group_id; 
-        $product->product_category_id = $request->product_category_id; 
+        $product->sub_group_id = $request->sub_group_id; 
+        $product->calculation_type = $request->calculation_type; 
         $product->unit_type = $request->unit_type; 
         $product->is_height =  $request->is_height ?? 0; 
         $product->is_width = $request->is_width ?? 0; 
@@ -239,7 +246,18 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Error updating product price']);
             }
         }
+    }
 
+    public function export($product_id = null){
+        abort_if(Gate::denies('product_export'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return Excel::download(new ProductExport($product_id), 'product-list.xlsx');
+    }
+
+    public function undoGroup(Request $request){
+        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        $id =  decrypt($request->recycle_id);      
+        Product::withTrashed()->where('id',$id)->update(['deleted_at' => null,'updated_by'=> Auth::id()]);  
+        return response()->json(['success' => 'Undo successfully.']);
     }
 
 }

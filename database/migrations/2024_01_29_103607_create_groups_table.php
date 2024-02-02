@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('groups', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('created_by')->unsigned()->default(0);
-            $table->integer('updated_by')->unsigned()->default(0);
+            $table->bigIncrements('id');            
             $table->string('name');   				
             $table->integer('parent_id')->unsigned()->default(0);
+            $table->integer('created_by')->unsigned()->default(0);
+            $table->integer('updated_by')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

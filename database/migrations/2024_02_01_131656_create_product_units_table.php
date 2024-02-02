@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_units', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');   				
             $table->integer('created_by')->unsigned()->default(0);
             $table->integer('updated_by')->unsigned()->default(0);
-            $table->string('name');   				
             $table->timestamps();
             $table->softDeletes();
         });

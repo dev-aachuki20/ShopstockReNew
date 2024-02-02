@@ -1,4 +1,4 @@
-<div class="col-md-6">
+<div class="col-md-12">
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
         <div class="input-group">
@@ -7,18 +7,9 @@
         <div class="error_name text-danger error"></div>
     </div>
 </div>
-<div class="col-md-6">
-    <div class="form-group">
-        <label>@lang('admin_master.product.print_name') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <input type="text" class="form-control " name="print_name" value="{{ isset($product) ? $product->print_name : '' }}" id="print_name" autocomplete="false"  placeholder="@lang('admin_master.product.print_name_enter')">
-        </div>
-        <div class="error_print_name text-danger error"></div>
-    </div>
-</div>
 <div class="col-md-3">
     <div class="form-group">
-        <label>@lang('admin_master.product.group_type') <span class="text-danger">*</span></label>
+        <label>@lang('admin_master.product.group_type_name') <span class="text-danger">*</span></label>
         <div class="input-group">
             {!! Form::select('group_id', $groups, $product->group_id??'', ['class' => 'form-control select2', 'id'=>'groupList']) !!}
         </div>
@@ -27,9 +18,20 @@
 </div>
 <div class="col-md-3">
     <div class="form-group">
+        <label>@lang('admin_master.product.sub_group_type_name') <span class="text-danger">*</span></label>
+        <div class="sub_group_list">
+            <div class="input-group">
+                {!! Form::select('sub_group_id', [], $product->sub_group_id??'', ['class' => 'form-control select2', 'id'=>'sub_group_list']) !!}
+            </div>
+            <div class="error_sub_group_id text-danger error"></div>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="form-group">
         <label>@lang('admin_master.product.product_type') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            {!! Form::select('product_category_id', $product_categories, $product->product_category_id??'', ['class' => 'form-control select2', 'id'=>'product_category_id']) !!}
+        <div class="input-group">           
+            {!! Form::select('calculation_type',['' => trans('admin_master.g_please_select')]+ config('constant.calculationType'), $product->calculation_type??'', ['class' => 'form-control select2', 'id'=>'calculation_type']) !!}
         </div>
         <div class="error_product_category_id text-danger error"></div>
     </div>
@@ -38,42 +40,11 @@
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
         <div class="input-group">
-            {!! Form::select('unit_type',['' => trans('admin_master.g_please_select')]+ config('constant.unitTypes'), $product->unit_type??'', ['class' => 'form-control select2', 'id'=>'unit_type']) !!}
+            {!! Form::select('unit_type', $product_unit, $product->unit_type ??'', ['class' => 'form-control select2', 'id'=>'unit_type']) !!}
         </div>
         <div class="error_unit_type text-danger error"></div>
     </div>
 </div>
-<div class="col-md-3">
-    <div>
-        <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
-    </div>
-        <label class="form-check-label" for="is_height">
-        <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}}>
-        @lang('admin_master.g_height')
-    </label>
-    
-    <label class="form-check-label pl-5" for="is_width">
-        <input class="form-check-input extra_option" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}}>
-        @lang('admin_master.g_width')
-    </label>
-    
-    <label class="form-check-label pl-5" for="is_length">
-        <input class="form-check-input extra_option" name="is_length" type="checkbox" id="is_length" value="1" {{(($product->is_length??'') == 1)?'checked':''}}>
-        @lang('admin_master.g_length')
-    </label>
-    
-    <label class="form-check-label pl-5" for="is_sub_product">
-        <input class="form-check-input is_sub_product" name="is_sub_product" type="checkbox" id="is_sub_product" value="1" {{(($product->is_sub_product ??'') == 1)?'checked':''}}>
-        @lang('admin_master.product.is_sub_product')
-    </label>
-
-    <div class="extra_option_hint mb-5" style="display: none;">
-        <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
-        <span class="error_extra_option_hint text-danger error"></span>
-    </div>
-</div>
-
-
 
 <div class="col-md-3">
     <div class="form-group">
@@ -110,6 +81,37 @@
         </div>
         <div class="error_retailer_price text-danger error"></div>
     </div>
+</div>
+<div class="col-md-3">
+    <div >
+        <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
+    </div>
+    <div class="ml-3">
+        <label class="form-check-label" for="is_height">
+        <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}}>
+        @lang('admin_master.g_height')
+        </label>
+    
+    <label class="form-check-label pl-5" for="is_width">
+        <input class="form-check-input extra_option" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}}>
+        @lang('admin_master.g_width')
+    </label>
+    
+    <label class="form-check-label pl-5" for="is_length">
+        <input class="form-check-input extra_option" name="is_length" type="checkbox" id="is_length" value="1" {{(($product->is_length??'') == 1)?'checked':''}}>
+        @lang('admin_master.g_length')
+    </label>
+    
+    <label class="form-check-label pl-5" for="is_sub_product">
+        <input class="form-check-input is_sub_product" name="is_sub_product" type="checkbox" id="is_sub_product" value="1" {{(($product->is_sub_product ??'') == 1)?'checked':''}}>
+        @lang('admin_master.product.is_sub_product')
+    </label>
+</div>
+    <div class="extra_option_hint mb-5" style="display: none;">
+        <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
+        <span class="error_extra_option_hint text-danger error"></span>
+    </div>
+    
 </div>
 <div class="col-md-3">
     <div class="form-group">
@@ -184,6 +186,21 @@
       }
     });
 
+// get sub Group
+    $(document).on('change','#groupList', function() {
+        var group_list_id = $(this).val();
+        $('.sub_group_list').html('');
+        if(group_list_id > 0){
+           getSubGroup(group_list_id);
+        }
+    });
+    var ifProductGroupId = "{{$product->group_id??''}}";
+    var ifProductSubGroupId = "{{$product->sub_group_id??''}}";
+    if(ifProductGroupId && ifProductSubGroupId){        
+        getSubGroup(ifProductGroupId, ifProductSubGroupId);
+    }
+// get sub Group
+
     $(document).on('submit', "#productForm", function(e) {
         e.preventDefault();
         $('.error').html('');
@@ -223,6 +240,17 @@ function printErrorMsg(msg) {
     $(`.error_${key}`).html(value);
   });
 }
+
+function getSubGroup(group_list_id,selected_id=""){
+    $.ajax({
+                type: "GET",
+                url: "{{ route('admin.master.get_group_child')}}",
+                data:{parent_id:group_list_id,selected_id:selected_id},
+                success: function(data) {
+                    $('.sub_group_list').html(data.html);
+                }
+            });
+   }
   
 function previewFile() {
     var preview = document.querySelector("img.profile-image");
@@ -240,27 +268,27 @@ function previewFile() {
     }
   }
 // add new dropdown
-  $("#groupList").select2({
-    }).on('select2:open', function () {
-        let a = $(this).data('select2');
-        if (!$('.select2-group_add').length) {
-            a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewgroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-        }
-    });
-  $("#product_category_id").select2({
-    }).on('select2:open', function () {
-        let a = $(this).data('select2');
-        if (!$('.select2-product_category_add').length) {
-            a.$results.parents('.select2-results').append('<div class="select2-product_category_add select_2_add_btn"><button class="btns addNewCategoryBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-        }
-    });
-  $("#unit_type").select2({
-    }).on('select2:open', function () {
-        let a = $(this).data('select2');
-        if (!$('.select2-unit_type_add').length) {
-            a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewCustomerBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-        }
-    });
+//   $("#groupList").select2({
+//     }).on('select2:open', function () {
+//         let a = $(this).data('select2');
+//         if (!$('.select2-group_add').length) {
+//             a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewgroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+//         }
+//     });
+//   $("#product_category_id").select2({
+//     }).on('select2:open', function () {
+//         let a = $(this).data('select2');
+//         if (!$('.select2-product_category_add').length) {
+//             a.$results.parents('.select2-results').append('<div class="select2-product_category_add select_2_add_btn"><button class="btns addNewCategoryBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+//         }
+//     });
+//   $("#unit_type").select2({
+//     }).on('select2:open', function () {
+//         let a = $(this).data('select2');
+//         if (!$('.select2-unit_type_add').length) {
+//             a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewCustomerBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+//         }
+//     });
 $(document).ready(function(){
     $(document).on('click',".addNewgroupBtn",function(){
         $('.add_new_drop').html('Group');
@@ -306,7 +334,7 @@ $(document).ready(function(){
         $('.save_add_new').prop('disabled', true);
         $.ajax({
             type: "POST",
-            url: "{{ route('admin.master.categories.store') }}",
+            url: "",
             data: { name: name,id: ""},
             success: function(data) {
                 $('.save_add_new').prop('disabled', false);

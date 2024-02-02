@@ -19,27 +19,49 @@ class GroupDataTable extends DataTable
      *
      * @param QueryBuilder $query Results from query() method.
      */
+    protected $isRecycle;
+    public function withParam1($recycle)
+    {
+        $this->isRecycle = $recycle;
+        return $this;
+    }
+
     public function dataTable(QueryBuilder $query)
     {
+        
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
             ->editColumn('name',function($row){
-                return $row->name ?? "";
+                if($row->parent_id == 0){
+                    return $row->name ?? "";
+                }else{
+                    return $row->parent->name ?? "";
+                }                
+            })
+            ->editColumn('parent_id',function($row){
+                return ($row->parent_id > 0)?$row->name ?? "":"";
             })
             ->editColumn('products_count',function($row){
-                return $row->products_count ?? 0;
+                return $row->products_count ??'';
             })
             ->addColumn('action',function($row){
                 $action='';
-                 if (Gate::check('group_edit')) {
-                    $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_group" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
-                 }
-                 if (Gate::check('group_delete')) {
-                    $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_group" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                 }
+                if($this->isRecycle == "isRecycle"){            
+                    if (Gate::check('group_edit')) {
+                        $editIcon = '<i class="fa fa-undo" aria-hidden="true"></i>';
+                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 recycle_group" data-id="'.encrypt($row->id).'">'.$editIcon.'</a>';
+                    }    
+                }else{                    
+                    if (Gate::check('group_edit')) {
+                        $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
+                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_group" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'" data-parent_id="'.$row->parent_id.'">'.$editIcon.'</a>';
+                    }
+                    if (Gate::check('group_delete')) {
+                        $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
+                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_group" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
+                    }
+                }
                 return $action;
             })->rawColumns(['action']);
     }
@@ -49,9 +71,12 @@ class GroupDataTable extends DataTable
      */
     public function query(Group $model): QueryBuilder
     {
-        //return $model->newQuery();
         $query = $model->newQuery()->select(['groups.*'])->withCount('products');
-        return $this->applyScopes($query);
+        $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END ASC');
+        if($this->isRecycle == "isRecycle"){            
+            $query->onlyTrashed();           
+        }
+        return $this->applyScopes($query);       
     }
 
     /**
@@ -69,7 +94,7 @@ class GroupDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom('lBfrtip')
-                    ->orderBy(1)
+                    //->orderBy(1)
                     // ->selectStyleSingle()
                     ->buttons([
                         // Button::make('excel'),
@@ -87,6 +112,7 @@ class GroupDataTable extends DataTable
         return [
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
+            Column::make('parent_id')->title(trans('quickadmin.group_master.fields.sub_group')),
             Column::make('products_count')->title(trans('admin_master.product.products')),
             Column::computed('action')
             ->exportable(false)
@@ -101,6 +127,8 @@ class GroupDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Group' . date('YmdHis');
+        return 'group-list' . date('YmdHis');
     }
+
+
 }

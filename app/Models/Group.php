@@ -11,12 +11,21 @@ class Group extends Model
     protected $table = 'groups';
     protected $fillable = [
         'name',
+        'parent_id',
         'created_by',
-        'updated_by',
-        'parent_id'
+        'updated_by'        
     ];
 
     public function products(){
         return $this->hasMany(Product::class, 'group_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Group::class, 'parent_id');
+    }
+    public function children()
+    {
+        return $this->hasMany(Group::class, 'parent_id');
     }
 }

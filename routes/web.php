@@ -36,18 +36,26 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         // Route::resource('/categories', CategoriesController::class);
         Route::resource('/areas', AreaController::class);	
         Route::resource('/groups', GroupController::class);		
-        Route::get('/group-parent', [GroupController::class,'getGroupParent'])->name('get_group_parent');		
+        Route::get('/group-recycle', [GroupController::class,'recycleIndex'])->name('groups.recycle');        
+        Route::post('/group-undo',[GroupController::class,'undoGroup'])->name('groups.undo');        
+        Route::get('/group-parent', [GroupController::class,'getGroupParent'])->name('get_group_parent');
+        Route::get('/group-child', [GroupController::class,'getSubGroup'])->name('get_group_child');
+        Route::get('group-export/',[GroupController::class,'export'])->name('group.export');
+
         Route::resource('/products', ProductController::class);	
+        Route::get('product-export/',[ProductController::class,'export'])->name('product.export');
+        Route::get('/product-recycle', [ProductController::class,'recycleIndex'])->name('product.recycle');
+        Route::post('/product-undo',[ProductController::class,'undoGroup'])->name('product.undo');   
+          
+
         Route::get('/product-price/update-prices',[ProductController::class,'viewUpdateProductPrice'])->name('update-prices');	
         Route::get('/product-price/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
         Route::post('/product-price/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
         
         Route::resource('/log-activity', LogActivitiesController::class);
         Route::resource('/product-unit', ProductUnitController::class);
-        Route::resource('/split', SplitsController::class);       
-        
+        Route::resource('/split', SplitsController::class);      
     });
-
 });
 
 

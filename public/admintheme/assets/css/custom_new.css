@@ -22,3 +22,18 @@
   text-align: left;
   padding-left: 6px !important;
 }
+
+.fa-circle-check.user_icon{font-size: 19px;}
+.active_inactive_user{
+  margin-top: 4px;
+  margin-left: 5px;
+}
+
+.active_inactive_user i{
+  font-size: 18px;
+}
+#roles-table tbody tr td:last-child{
+  justify-content: left;
+    padding-left: 7px;
+}
+

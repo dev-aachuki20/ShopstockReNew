@@ -53,7 +53,7 @@
             <ul class="dropdown-menu">
                
                 @if (Gate::check('group_access'))
-                    <li class="{{ Request::is('admin/master/groups*') ? 'active' : '' }}">
+                    <li class="{{ Request::is('admin/master/groups*') || Request::is('admin/master/group-recycle*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
                             @lang('quickadmin.group_master.title')
                         </a>
