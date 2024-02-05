@@ -28,14 +28,14 @@ class GroupExport implements FromCollection , WithHeadings
 
         $query->select(['groups.*']);
         $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END ASC');
-        $groups = $query->withCount('products')->get();
+        $groups = $query->withCount('products')->withCount('subproducts')->get();
 
         return $groups->map(function ($group, $key) {
               return [
                 'Sn.' => $key + 1,
                 'Name' => ($group->parent_id == 0)?$group->name ?? "":$group->parent->name,
                 'Sub Group' => ($group->parent_id > 0)?$group->name ?? "":"",
-                'Product' => $group->products_count ?? 0,
+                'Product' => ($group->products_count > 0)? $group->products_count :$group->subproducts_count,
                 'Created At' => $group->created_at->format('d-m-Y'),
             ];
         });

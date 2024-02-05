@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RoleIpController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\Master\CategoriesController;
@@ -54,7 +55,9 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         
         Route::resource('/log-activity', LogActivitiesController::class);
         Route::resource('/product-unit', ProductUnitController::class);
-        Route::resource('/split', SplitsController::class);      
+        Route::resource('/split', SplitsController::class);   
+        
+        //Route::resource('/log-activit', LogActivitiesController::class);
     });
 });
 
@@ -62,7 +65,10 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
 Route::middleware(['auth','PreventBackHistory'])->group(function () {
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
     Route::get('/logout',[LoginController::class,'logout'])->name('logout');
+
     Route::resource('/roles',RoleController::class);
+    Route::resource('/role_ip',RoleIpController::class);
+
     Route::post('/user-status-change',[UserController::class,'userStatusChange'])->name('user_status_change');
     Route::get('/profiles',[UserController::class,'showprofile'])->name('user.profile');
     Route::post('/profile-update', [UserController::class,'updateprofile'])->name('profile.update');

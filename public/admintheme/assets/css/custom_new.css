@@ -36,4 +36,10 @@
   justify-content: left;
     padding-left: 7px;
 }
+#select2-calculation_type-results{
+  margin-top: -34px;
+}
+.add_group.circlebtn:hover{
+  background: #2159d7 !important;
+}
 

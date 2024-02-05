@@ -43,8 +43,9 @@ class ProductUnitController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        ProductUnit::create(['name' => $request->name,'created_by'=> Auth::id()]);  
-        return response()->json(['success' => 'Unit created successfully.']);
+        $unit_data = ProductUnit::create(['name' => $request->name,'created_by'=> Auth::id()]); 
+        addToLog($request,'ProductUnit','Create', $unit_data);
+        return response()->json(['success' => 'Unit created successfully.', 'unitData' => $unit_data]);
     }
 
     /**
@@ -79,18 +80,27 @@ class ProductUnitController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        ProductUnit::where('id',$id)->update(['name' => $request->name,'updated_by'=> Auth::id()]);  
+        $unitData =  ProductUnit::find($id);
+        $oldvalue = $unitData->getOriginal();         
+        $unitData->name = $request->name;
+        $unitData->updated_by = Auth::id();
+        $unitData->save();       
+        $newValue = $unitData->refresh();
+        addToLog($request,'ProductUnit','Edit', $newValue ,$oldvalue);        
         return response()->json(['success' => 'Unit Update successfully.']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $record = ProductUnit::find(decrypt($id));
+        $oldvalue = $record->getOriginal(); 
         $record->updated_by = Auth::id();
         $record->save();
+        $newValue = $record->refresh();
+        addToLog($request,'ProductUnit','Delete', $newValue ,$oldvalue);
         $record->delete();
         return response()->json(['success' => 'Unit Deleted successfully.']);
     }

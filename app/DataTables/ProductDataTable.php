@@ -61,11 +61,15 @@ class ProductDataTable extends DataTable
             ->addColumn('action',function($row){
                 $action='';
                 if($this->isRecycle == "isRecycle"){            
-                    if (Gate::check('group_edit')) {
+                    if (Gate::check('product_edit')) {
                         $editIcon = '<i class="fa fa-undo" aria-hidden="true"></i>';
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 recycle_group" data-id="'.encrypt($row->id).'">'.$editIcon.'</a>';
                     }    
                 }else{ 
+                    if (Gate::check('product_access')) {
+                        $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
+                       $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-id="'.encrypt($row->id).'" >'.$editIcon.'</a>';
+                   }
                     if (Gate::check('product_edit')) {
                         $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                         $editUrl = route("admin.master.products.edit",['product' => $row->id] );
@@ -74,7 +78,7 @@ class ProductDataTable extends DataTable
                     if (Gate::check('product_delete')) {
                         $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_product" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                    }
+                    }                    
                 }
                 return $action;
             })->rawColumns(['action','calculation_type','group_id','price','min_sale_price','wholesaler_price','retailer_price']);

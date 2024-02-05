@@ -467,6 +467,10 @@ return [
 			'method' => 'Method',
 			'agent' => 'User Browser',
 			'ip' => 'Ip',
+			'model_type' => 'Type',
+			'activity' => 'Activity',
+			'old' => 'Old Value',
+			'new' => 'New Value',
 		],
 	],
 
@@ -475,6 +479,13 @@ return [
 		'fields' 	=> [
 			'from_date' => 'From Date',
 			'to_date' => 'To Date',
+		],
+	],
+	'ip'  => [
+		'title'  => 'IP Address',
+		'fields' 	=> [
+			'addIp' => 'IP Name',
+			'roles' => 'Roles',
 		],
 	],
 

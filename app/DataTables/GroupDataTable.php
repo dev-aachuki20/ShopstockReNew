@@ -43,7 +43,7 @@ class GroupDataTable extends DataTable
                 return ($row->parent_id > 0)?$row->name ?? "":"";
             })
             ->editColumn('products_count',function($row){
-                return $row->products_count ??'';
+                return ($row->products_count > 0)? $row->products_count :$row->subproducts_count;
             })
             ->addColumn('action',function($row){
                 $action='';
@@ -71,7 +71,7 @@ class GroupDataTable extends DataTable
      */
     public function query(Group $model): QueryBuilder
     {
-        $query = $model->newQuery()->select(['groups.*'])->withCount('products');
+        $query = $model->newQuery()->select(['groups.*'])->withCount('products')->withCount('subproducts');
         $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END ASC');
         if($this->isRecycle == "isRecycle"){            
             $query->onlyTrashed();           

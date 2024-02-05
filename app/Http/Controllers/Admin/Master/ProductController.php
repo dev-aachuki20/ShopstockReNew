@@ -15,6 +15,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductExport;
+use Illuminate\Support\Facades\View;
 use Auth, DataTables;
 class ProductController extends Controller
 {
@@ -93,16 +94,22 @@ class ProductController extends Controller
             $filename = $image->store('product','public');
             $data['image'] = $filename;
         } 
-        Product::create($data);
+        $product =  Product::create($data);
+        addToLog($request,'Product','Create', $product);
         return response()->json(['success' => 'Product Created successfully.']);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        //
+        if($request->ajax()){
+            $id = decrypt($id);
+            $product = Product::where('id',$id)->first();
+            $html = View::make('admin.master.product.show',compact('product'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
+        }
     }
 
     /**
@@ -142,6 +149,7 @@ class ProductController extends Controller
             ]);
         }
         $product = Product::findOrFail($id);
+        $oldvalue = $product->getOriginal();   
         $product->name = $request->name; 
         $product->group_id = $request->group_id; 
         $product->sub_group_id = $request->sub_group_id; 
@@ -164,18 +172,23 @@ class ProductController extends Controller
             $product->image = $filename;
         } 
         $product->save();
+        $newValue = $product->refresh();
+        addToLog($request,'Product','Edit', $newValue ,$oldvalue);  
         return response()->json(['success' => 'Product Update successfully.']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         abort_if(Gate::denies('product_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Product::find(decrypt($id));
+        $oldvalue = $record->getOriginal(); 
         $record->updated_by = Auth::id();
         $record->save();
+        $newValue = $record->refresh();
+        addToLog($request,'Product','Delete', $newValue ,$oldvalue); 
         $record->delete();
         return response()->json(['success' => 'Product Delete successfully.']);
     }
@@ -183,7 +196,7 @@ class ProductController extends Controller
     public function viewUpdateProductPrice(Request $request)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $product_groups = Group::get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        $product_groups = Group::Where('parent_id','0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         return view('admin.master.product.update_product_prices',compact('product_groups'));
     }
 
@@ -194,9 +207,8 @@ class ProductController extends Controller
             $searchValue = $request->search['value'];
             $paginationValue = $request->length;
               $products = Product::select(['products.*']);
-              $products->leftJoin('product_categories', 'product_categories.id', '=', 'products.product_category_id');
               $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
-              $products->whereNull('product_categories.deleted_at')->whereNull('groups.deleted_at')->orderBy('name','asc');
+              $products->whereNull('groups.deleted_at')->orderBy('name','asc');
             
 
             if(isset($request->product_type) && $request->product_type != ''){
@@ -256,7 +268,14 @@ class ProductController extends Controller
     public function undoGroup(Request $request){
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
         $id =  decrypt($request->recycle_id);      
-        Product::withTrashed()->where('id',$id)->update(['deleted_at' => null,'updated_by'=> Auth::id()]);  
+        
+        $deletedData =  Product::withTrashed()->find($id);
+        $oldvalue = $deletedData->getOriginal(); 
+        $deletedData->deleted_at = null; 
+        $deletedData->updated_by =  Auth::id(); 
+        $deletedData->save();
+        $newValue = $deletedData->refresh();
+        addToLog($request,'Product','Undo', $newValue ,$oldvalue);       
         return response()->json(['success' => 'Undo successfully.']);
     }
 

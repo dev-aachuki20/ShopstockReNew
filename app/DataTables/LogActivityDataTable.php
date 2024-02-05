@@ -27,8 +27,11 @@ class LogActivityDataTable extends DataTable
             ->editColumn('user_id',function($row){
                 return $row->user->name ?? "";
             })
-            ->editColumn('subject',function($row){
-                return $row->subject ?? "";
+            ->editColumn('model_type',function($row){
+                return $row->model_name ?? "";
+            })
+            ->editColumn('activity',function($row){
+                return $row->activity ?? "";
             })
             ->editColumn('created_at',function($row){
                 return $row->created_at ?? "";
@@ -87,7 +90,8 @@ class LogActivityDataTable extends DataTable
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('user_id')->title(trans('quickadmin.logActivities.fields.name')),
-            Column::make('subject')->title(trans('quickadmin.logActivities.fields.subject')),
+            Column::make('model_type')->title(trans('quickadmin.logActivities.fields.model_type')),
+            Column::make('activity')->title(trans('quickadmin.logActivities.fields.activity')),
             Column::make('created_at')->title(trans('quickadmin.qa_created_at')),
             Column::computed('action')
             ->exportable(false)

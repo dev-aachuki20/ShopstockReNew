@@ -30,4 +30,16 @@ class Product extends Model
         'created_by',
         'updated_by'
     ];
+
+
+
+    public function group(){
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+    public function sub_group(){
+        return $this->belongsTo(Group::class, 'sub_group_id');
+    }
+    public function product_unit(){
+        return $this->belongsTo(ProductUnit::class, 'unit_type');
+    }
 }

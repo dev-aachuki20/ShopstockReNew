@@ -22,7 +22,18 @@ class LogActivity extends Model
     }
 
     protected $fillable = [
-        'created_by','updated_by','subject', 'url', 'method', 'ip', 'agent', 'user_id'
+        'created_by',
+        'updated_by',
+        'description', 
+        'url', 
+        'method', 
+        'ip', 
+        'agent', 
+        'user_id',
+        'model_name',
+        'activity',
+        'old_value',
+        'new_value'
     ];
 
     public function user(){

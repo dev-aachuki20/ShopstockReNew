@@ -35,9 +35,14 @@
                         </div>
                         <div class="col-auto pl-1">
                             {{-- @can('product_rejoin') --}}
-                            <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
+                            <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  ><x-svg-icon icon="rejoin-btn" /></a>
                             {{-- @endcan --}}
                         </div>
+                        @if (Gate::check('product_edit'))
+                          <div class="col-auto pl-1">
+                              <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
+                          </div>
+                        @endcan
                     </div>
                   @endif
                 </div>
@@ -54,6 +59,24 @@
           </div>
         </div>
   </section>
+
+  
+<!-- Add Edit Modal -->
+<div class="modal fade" id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">@lang('admin_master.product.product_view') </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body show_html">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Edit Modal -->
 @endsection
 
 @section('customJS')
@@ -70,6 +93,24 @@ $(document).ready(function(){
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
+    $(document).on('click','.view_detail',function(){
+      $("#view_model_Modal").modal('show');
+      $('.show_html').html('');
+      var _id = $(this).data('id');
+      if(_id){
+        var post_url = "{{ route('admin.master.products.show',['product'=> ':viewId']) }}";
+        post_url = post_url.replace(':viewId', _id);
+        $.ajax({
+              type: "GET",
+              url: post_url,
+              data: {id: _id},
+              success: function(data) {
+                  $('.show_html').html(data.html);
+              }
+            });
+         }
+      });
 
     $(document).on('click','.delete_product',function(){       
       var delete_id = $(this).data('id');

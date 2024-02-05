@@ -33,9 +33,13 @@ if (!function_exists('addToLog')) {
 	 *
 	 * @return string
 	 */
-	function addToLog($request, $subject){
+	function addToLog($request,$modelName="", $activity="",$new_value="",$old_value=""){
 		$inputs = $request->all();
-		$inputs['subject'] = $subject;
+		$inputs['model_name'] = $modelName;
+		$inputs['activity'] = $activity;
+		$inputs['created_by'] = auth()->check() ? auth()->user()->id : 0;
+		$inputs['old_value'] = $old_value?json_encode($old_value):'';
+		$inputs['new_value'] = $new_value?json_encode($new_value):'';
 		LogActivity::create($inputs);
 	}
 }

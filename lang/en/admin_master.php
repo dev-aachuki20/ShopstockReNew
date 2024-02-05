@@ -13,6 +13,7 @@ return [
         'seo_title_product_price_master'             => 'Update Product Price',
         'seo_title'             => 'Add Product',
         'add'             => 'Add Product',
+        'product_view'             => 'View Product',
         'products'             => 'Products',
         'name'          => 'Name',
         'product_name'          => 'Product Name',
@@ -36,7 +37,7 @@ return [
         'wholesaler_price_enter'        => 'Enter Wholesaler price',
         'retailer_price'        => 'Retailer price',
         'retailer_price_enter'        => 'Enter Retailer price',
-        'update_product_price'        => 'Update Products Prices',
+        'update_product_price'        => 'Update Products Prices'
     ]
 ]
 ?>

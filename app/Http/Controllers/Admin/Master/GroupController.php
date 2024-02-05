@@ -63,8 +63,9 @@ class GroupController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::create(['name' => $request->name,'parent_id' => $request->parent_id ?? 0 ,'created_by'=> Auth::id()]);  
-        return response()->json(['success' => 'Group created successfully.']);
+        $group =  Group::create(['name' => $request->name,'parent_id' => $request->parent_id ?? 0 ,'created_by'=> Auth::id()]);  
+        addToLog($request,'Group','Create', $group);
+        return response()->json(['success' => 'Group created successfully.', 'group' => $group]);
     }
 
     /**
@@ -90,11 +91,12 @@ class GroupController extends Controller
     {
         abort_if(Gate::denies('group_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
-        if($request->parent_id > 0){
+        $checkParentGroup = Group::Where('id',$id)->first(); 
+        if($checkParentGroup->parent_id > 0){
             $validator = Validator::make($request->all(), [
                 'name' => [
                     'required',
-                    Rule::unique('groups', 'name')->where('parent_id',$request->parent_id)->ignore($id)
+                    Rule::unique('groups', 'name')->where('parent_id',$checkParentGroup->parent_id)->ignore($id)
                 ]]);
         }else{
             $validator = Validator::make($request->all(), [
@@ -102,27 +104,37 @@ class GroupController extends Controller
                 'required',
                 Rule::unique('groups', 'name')->where('parent_id',0)->ignore($id)
             ]]); 
-        }         
+        }  
 
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Group::where('id',$id)->update(['name' => $request->name,'parent_id' => $request->parent_id ?? 0 ,'updated_by'=> Auth::id()]);  
+        $groupData =  Group::find($id);
+        $oldvalue = $groupData->getOriginal();         
+        $groupData->name = $request->name;
+        $groupData->updated_by = Auth::id();
+        $groupData->save();       
+        $newValue = $groupData->refresh();
+        addToLog($request,'Group','Edit', $newValue ,$oldvalue);  
         return response()->json(['success' => 'Group Update successfully.']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         abort_if(Gate::denies('group_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Group::find(decrypt($id));
+        $oldvalue = $record->getOriginal(); 
         $record->delete();
         $record->updated_by = Auth::id();
-        $record->save();
+        $record->save();       
+       
+        $newValue = $record->refresh();
+        addToLog($request,'Group','Delete', $newValue ,$oldvalue); 
         return response()->json(['success' => 'Group Delete successfully.']);
     }
 
@@ -152,7 +164,14 @@ class GroupController extends Controller
     public function undoGroup(Request $request){
         abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
         $id =  decrypt($request->recycle_id);      
-        Group::withTrashed()->where('id',$id)->update(['deleted_at' => null,'updated_by'=> Auth::id()]);  
+
+       $deletedData =  Group::withTrashed()->find($id);
+       $oldvalue = $deletedData->getOriginal(); 
+       $deletedData->deleted_at = null; 
+       $deletedData->updated_by =  Auth::id(); 
+       $deletedData->save();
+       $newValue = $deletedData->refresh();
+       addToLog($request,'Group','Undo', $newValue ,$oldvalue); 
         return response()->json(['success' => 'Undo successfully.']);
     }
 }

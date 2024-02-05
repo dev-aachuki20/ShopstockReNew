@@ -81,13 +81,6 @@
                     </li>
                 @endif
 
-                @if (Gate::check('product_edit'))
-                    <li class="{{ Request::is('admin/master/product-price*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('admin.master.update-prices') }}">
-                            @lang('admin_master.product.update_product_price')
-                        </a>
-                    </li>
-                @endif
 
                 @if (Gate::check('area_access'))
                     <li class="{{ Request::is('admin/master/areas*') ? 'active' : '' }}">
@@ -107,8 +100,15 @@
                         @lang('quickadmin.logActivities.title')
                     </a>
                 </li>
+                
             </ul>
         </li>
+
+        {{-- <li class="{{ Request::is('role_ip*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('role_ip.index') }}">
+                @lang('quickadmin.ip.title')
+            </a>
+        </li> --}}
 
 
 

@@ -51,7 +51,7 @@ return [
     'are_you_sure_change_instatus' => 'Are you sure want to Inactive this user!',
     'add' => 'Add New',
     'excel' => 'Export Excel',
-    'undo' => 'Undo List',
+    'undo' => 'Undo List'
 ];
 
 ?>

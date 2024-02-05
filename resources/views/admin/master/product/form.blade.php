@@ -189,14 +189,15 @@
 // get sub Group
     $(document).on('change','#groupList', function() {
         var group_list_id = $(this).val();
-        $('.sub_group_list').html('');
         if(group_list_id > 0){
+            $('#sub_group_list').prop('disabled', true);
            getSubGroup(group_list_id);
         }
     });
     var ifProductGroupId = "{{$product->group_id??''}}";
     var ifProductSubGroupId = "{{$product->sub_group_id??''}}";
-    if(ifProductGroupId && ifProductSubGroupId){        
+    if(ifProductGroupId && ifProductSubGroupId){ 
+        $('#sub_group_list').prop('disabled', true);       
         getSubGroup(ifProductGroupId, ifProductSubGroupId);
     }
 // get sub Group
@@ -243,13 +244,22 @@ function printErrorMsg(msg) {
 
 function getSubGroup(group_list_id,selected_id=""){
     $.ajax({
-                type: "GET",
-                url: "{{ route('admin.master.get_group_child')}}",
-                data:{parent_id:group_list_id,selected_id:selected_id},
-                success: function(data) {
-                    $('.sub_group_list').html(data.html);
-                }
-            });
+            type: "GET",
+            url: "{{ route('admin.master.get_group_child')}}",
+            data:{parent_id:group_list_id,selected_id:selected_id},
+            success: function(data) {
+                $('#sub_group_list').prop('disabled', false);               
+                $('.sub_group_list').html('');
+                $('.sub_group_list').html(data.html);
+                $('#sub_group_list').select2({
+                    }).on('select2:open', function () {
+                        let a = $(this).data('select2');
+                        if (!$('.select2-sub_group_add').length) {
+                            a.$results.parents('.select2-results').append('<div class="select2-sub_group_add select_2_add_btn"><button class="btns addNewSubGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+                        }
+                    });
+            }
+        });
    }
   
 function previewFile() {
@@ -267,34 +277,38 @@ function previewFile() {
       reader.readAsDataURL(file);
     }
   }
+
 // add new dropdown
-//   $("#groupList").select2({
-//     }).on('select2:open', function () {
-//         let a = $(this).data('select2');
-//         if (!$('.select2-group_add').length) {
-//             a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewgroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-//         }
-//     });
-//   $("#product_category_id").select2({
-//     }).on('select2:open', function () {
-//         let a = $(this).data('select2');
-//         if (!$('.select2-product_category_add').length) {
-//             a.$results.parents('.select2-results').append('<div class="select2-product_category_add select_2_add_btn"><button class="btns addNewCategoryBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-//         }
-//     });
-//   $("#unit_type").select2({
-//     }).on('select2:open', function () {
-//         let a = $(this).data('select2');
-//         if (!$('.select2-unit_type_add').length) {
-//             a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewCustomerBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-//         }
-//     });
+  $("#groupList").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-group_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewgroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
+  $("#sub_group_list").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-sub_group_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-sub_group_add select_2_add_btn"><button class="btns addNewSubGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
+  $("#unit_type").select2({
+    }).on('select2:open', function () {
+        let a = $(this).data('select2');
+        if (!$('.select2-unit_type_add').length) {
+            a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewUnitTypeBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+        }
+    });
 $(document).ready(function(){
     $(document).on('click',".addNewgroupBtn",function(){
+        $("#add_new_name").val('');
+        $('.save_add_new').prop('disabled', false);
         $('.add_new_drop').html('Group');
         $("#add_newModal").modal('show');
         $("#groupList").select2('close');
-        $(".save_add_new").removeClass('add_category_btn');
+        $(".save_add_new").removeClass('add_unittype_btn');
+        $(".save_add_new").removeClass('add_sub_group_btn');
         $(".save_add_new").addClass('add_group_btn');
     }); 
     $(document).on('click','.add_group_btn',function(e){
@@ -304,10 +318,12 @@ $(document).ready(function(){
         $.ajax({
             type: "POST",
             url: "{{ route('admin.master.groups.store') }}",
-            data: {name: name, id: ""},
+            data: {name: name, parent_id: ""},
             success: function(data) {
             $('.save_add_new').prop('disabled', false);
             if ($.isEmptyObject(data.error)) {
+                var newOption = new Option(data.group.name, data.group.id, true, true);
+                    $('#groupList').append(newOption).trigger('change');
                 $("#add_newModal").modal('hide');
                 var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                 var message = data.success;
@@ -320,43 +336,86 @@ $(document).ready(function(){
         });          
     })
 
-    $(document).on('click',".addNewCategoryBtn",function(){
-        $('.add_new_drop').html('Category');
+    $(document).on('click',".addNewSubGroupBtn",function(){
+        $("#add_new_name").val('');
+        $('.save_add_new').prop('disabled', false);
+        $('.add_new_drop').html('Sub Group');
         $("#add_newModal").modal('show');
-        $("#product_category_id").select2('close');
+        $("#sub_group_list").select2('close');
         $(".save_add_new").removeClass('add_group_btn');
-        $(".save_add_new").addClass('add_category_btn');
+        $(".save_add_new").removeClass('add_unittype_btn');
+        $(".save_add_new").addClass('add_sub_group_btn');
     });
-
-    $(document).on('click','.add_category_btn',function(e){
+    $(document).on('click','.add_sub_group_btn',function(e){
         e.preventDefault();
         var name = $("#add_new_name").val();
+        var parent_id = parseInt($("#groupList").val());
+        if(parent_id > 0){
         $('.save_add_new').prop('disabled', true);
         $.ajax({
             type: "POST",
-            url: "",
-            data: { name: name,id: ""},
+            url: "{{ route('admin.master.groups.store') }}",
+            data: { name: name,parent_id: parent_id},
             success: function(data) {
                 $('.save_add_new').prop('disabled', false);
                 if ($.isEmptyObject(data.error)) {
                     $("#add_newModal").modal('hide');
+                    var newOption = new Option(data.group.name, data.group.id, true, true);
+                    $('#sub_group_list').append(newOption).trigger('change');
                     var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                     var message = data.success;
-                    var title = "Category";
+                    var title = "Sub Group";
                     showToaster(title,alertType,message);                   
                 } else {
                     printErrorMsgAdd(data.error);
                 }
             }
         });
+        }else{
+            swal("Error", 'Please select group first.', 'error');  
+        }
+    });
+
+    $(document).on('click',".addNewUnitTypeBtn",function(){
+        $("#add_new_name").val('');
+        $('.save_add_new').prop('disabled', false);
+        $('.add_new_drop').html('UNIT TYPE');
+        $("#add_newModal").modal('show');
+        $("#unit_type").select2('close');
+        $(".save_add_new").removeClass('add_group_btn');
+        $(".save_add_new").removeClass('add_sub_group_btn');
+        $(".save_add_new").addClass('add_unittype_btn');
+    });
+    $(document).on('click','.add_unittype_btn',function(e){
+        e.preventDefault();
+        var name = $("#add_new_name").val();
+        $('.save_add_new').prop('disabled', true);
+        $.ajax({
+            type: "POST",
+            url: "{{ route('admin.master.product-unit.store') }}",
+            data: { name: name,id: ""},
+            success: function(data) {
+                $('.save_add_new').prop('disabled', false);
+                if($.isEmptyObject(data.error)) {
+                    var newOption = new Option(data.unitData.name, data.unitData.id, true, true);
+                    $('#unit_type').append(newOption).trigger('change');
+                    $("#add_newModal").modal('hide');
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "UNIT";
+                    showToaster(title,alertType,message);                   
+                }else {
+                    printErrorMsgAdd(data.error);
+                }
+            }
         });
-
-    function printErrorMsgAdd(msg) {
-            $.each(msg, function(key, value) {
-              $(`.error_new_${key}`).html(value);
-            });
-          }
+    });   
 });
-
+function printErrorMsgAdd(msg) {
+    $.each(msg, function(key, value) {
+        $(`.error_new_${key}`).html(value);
+    });
+}
+// add new dropdown
 </script>
 @endsection

@@ -1,6 +1,6 @@
 
 @extends('layouts.app')
-@section('title')@lang('quickadmin.product_unint_master.title') @endsection
+@section('title')@lang('quickadmin.ip.title')  @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
@@ -13,9 +13,9 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.product_unint_master.title')</h4>
+                  <h4>@lang('quickadmin.ip.title') </h4>
                   {{-- @can('unit_create') --}}
-                   <button type="button" class="addnew-btn add_unit sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
+                  <a href="{{route('role_ip.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add" /></a>
                   {{-- @endcan --}}
                 </div>
                 <div class="card-body">

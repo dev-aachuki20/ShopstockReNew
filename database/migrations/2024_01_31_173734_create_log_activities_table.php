@@ -12,15 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('log_activities', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id');           
+            $table->integer('user_id')->nullable();            
+            $table->string('model_name');
+            $table->string('activity');
+            $table->string('old_value')->nullable();
+            $table->string('new_value')->nullable();
+            $table->string('ip')->nullable();
+            $table->string('description')->nullable();
+            $table->string('url')->nullable();
+            $table->string('method')->nullable();
+            $table->string('agent')->nullable();
             $table->integer('created_by')->default(0)->unsigned();
-            $table->integer('updated_by')->default(0)->unsigned();
-            $table->integer('user_id')->nullable();
-            $table->string('ip');
-            $table->string('subject');
-            $table->string('url');
-            $table->string('method');
-            $table->string('agent')->nullable();   				
+            $table->integer('updated_by')->default(0)->unsigned();   				
             $table->timestamps();
             $table->softDeletes();
         });

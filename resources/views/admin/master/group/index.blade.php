@@ -3,6 +3,11 @@
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
+<style>
+  #select2-parent_id-results{
+    margin-top: -34px;
+  }
+</style>
 @endsection
 @section('main-content')
 
@@ -107,6 +112,7 @@
       $(document).ready(function(){
         var DataaTable = $('#group-table').DataTable();
           $(document).on('click','.add_group',function(){
+            $('.parent_group').css('display','block');
             $('.error').html('');
             $("#groupModal").modal('show');
             $(".group_edit_id").val('');
@@ -116,13 +122,14 @@
             getParentGroup();
           })
           $(document).on('click','.edit_group',function(){
+            $('.parent_group').css('display','none');
             $('.error').html('');
             $("#groupModal").modal('show');
             $(".group_edit_id").val($(this).data('id'));
             $(".group_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
             $(".Add_edit_group").html('Edit');
-            getParentGroup($(this).data('parent_id'));
+           // getParentGroup($(this).data('parent_id'));
           })
      
         $.ajaxSetup({
@@ -132,7 +139,7 @@
         });
           $(document).on('submit', "#group_form", function(e) {
             e.preventDefault();
-            var parent_id = $("#parent_id").val();
+            var parent_id = $("#parent_id").val() ?? 0;
             var name = $("#name").val();
             var _id = $(".group_edit_id").val();
             $('.save_btn').prop('disabled', true);
@@ -249,12 +256,13 @@
  function getParentGroup(parent_id){
       $.ajax({
             type: "GET",
-            url: "{{ route('admin.master.get_group_child')}}",
+            url: "{{ route('admin.master.get_group_parent')}}",
             data:{parent_id:parent_id},
             success: function(data) {
                 $('.parent_group_list').html(data.html);
+                $('#parent_id').select2();
             }
-          });
+        });
 }
 </script>
 

@@ -19,6 +19,9 @@ class Group extends Model
     public function products(){
         return $this->hasMany(Product::class, 'group_id');
     }
+    public function subproducts(){
+        return $this->hasMany(Product::class, 'sub_group_id');
+    }
 
     public function parent()
     {
