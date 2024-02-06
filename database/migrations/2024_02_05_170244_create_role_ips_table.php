@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('role_ips', function (Blueprint $table) {
             $table->bigIncrements('id');            
-            $table->string('ip_address');   				
-            $table->integer('user_id')->unsigned()->default(0);
-            $table->tinyInteger('is_active')->default(0);   				
+            $table->string('ip_address');   								
             $table->integer('created_by')->unsigned()->default(0);
             $table->integer('updated_by')->unsigned()->default(0);
             $table->timestamps();

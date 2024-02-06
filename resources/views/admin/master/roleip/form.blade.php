@@ -1,10 +1,11 @@
+<?php use Illuminate\Support\Collection; ?>
 <div class="col-md-12">
     <div class="form-group">
         <label>@lang('quickadmin.ip.fields.addIp')  <span class="text-danger">*</span></label>
         <div class="input-group">
-            <input type="text" class="form-control" name="name" value="{{ isset($product) ? $product->name : '' }}" id="name" autocomplete="true" placeholder="@lang('quickadmin.ip.fields.addIp')">
+            <input type="text" class="form-control" name="ip_address" value="{{ isset($role_ip) ? $role_ip->ip_address : '' }}" id="ip_address" autocomplete="true" placeholder="@lang('quickadmin.ip.fields.addIp')">
         </div>
-        <div class="error_name text-danger error"></div>
+        <div class="error_ip_address text-danger error"></div>
     </div>
 
     <div class="form-group">
@@ -13,7 +14,18 @@
             @foreach($allRoles as  $role)
                 <div class="col-md-3">
                     <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input permission-checkbox" name="roles[]" value="{{ $role->id }}" id="permission{{ $role->id }}">
+                            @php $isChecked = ""; @endphp    
+                            @if(isset($RoleIpPermission))
+                                @php 
+                                        $values = collect($RoleIpPermission);
+                                        $searchValue = $role->id;                                        
+                                @endphp
+                                @if ($values->contains($searchValue))
+                                    @php   $isChecked = "checked"; @endphp
+                                @endif
+                            @endif
+                            <input type="checkbox" class="custom-control-input permission-checkbox" name="roles[]" value="{{ $role->id }}" id="permission{{ $role->id }}"
+                                {{$isChecked}} >
                             <label class="custom-control-label" for="permission{{ $role->id }}">{{ $role->name }}</label>
                     </div>
                 </div>
@@ -38,7 +50,6 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
-
 
     $(document).on('submit', "#roleForm", function(e) {
         e.preventDefault();

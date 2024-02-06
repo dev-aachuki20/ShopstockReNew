@@ -12,9 +12,7 @@ class RoleIp extends Model
 
     protected $table = 'role_ips';
     protected $fillable = [
-        'role_ips',
-        'user_id',
-        'is_active',
+        'ip_address',
         'created_by',
         'updated_by'
     ];

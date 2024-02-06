@@ -70,75 +70,18 @@
 
     // add or edit
       $(document).ready(function(){
-        var DataaTable = $('#unit-table').DataTable();
-          $(document).on('click','.add_unit',function(){
-            $('.error').html('');
-            $("#unitModal").modal('show');
-            $(".unit_edit_id").val('');
-            $(".unit_edit_name").val('');
-            $(".save_btn").html('Save');
-            $(".Add_edit_unit").html('Add');
-          })
-          $(document).on('click','.edit_unit',function(){
-            $('.error').html('');
-            $("#unitModal").modal('show');
-            $(".unit_edit_id").val($(this).data('id'));
-            $(".unit_edit_name").val($(this).data('name'));
-            $(".save_btn").html('Update');
-            $(".Add_edit_unit").html('Edit');
-          })
-     
-    
-        $.ajaxSetup({
+        var DataaTable = $('#role_ip-table').DataTable();
+          $.ajaxSetup({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
-          $(document).on('submit', "#unit_form", function(e) {
-            e.preventDefault();
-            var name = $("#name").val();
-            var _id = $(".unit_edit_id").val();
-            $('.save_btn').prop('disabled', true);
-            var postType = "POST";
-            var post_url = "{{ route('admin.master.product-unit.store') }}"
-            if(_id){
-              var post_url = "{{ route('admin.master.product-unit.update',['product_unit'=> ':unitId']) }}";
-              post_url = post_url.replace(':unitId', _id);
-               var postType = "PUT";
-            }
-            $.ajax({
-              type: postType,
-              url: post_url,
-              data: {
-                name: name,
-                id: _id,
-              },
-              success: function(data) {
-                $('.save_btn').prop('disabled', false);
-                if ($.isEmptyObject(data.error)) {
-                    $("#unitModal").modal('hide');
-                    DataaTable.ajax.reload();
-                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                    var message = data.success;
-                    var title = "Unit";
-                    showToaster(title,alertType,message);                   
-                } else {
-                  printErrorMsg(data.error);
-                }
-              }
-            });
-          });
-          function printErrorMsg(msg) {
-            $.each(msg, function(key, value) {
-              $(`.error_${key}`).html(value);
-            });
-          }
-    // add or edit
+         
     // delete
-          $(document).on('click','.delete_unit',function(){
+          $(document).on('click','.delete_role_ip',function(){
             var delete_id = $(this).data('id');
-            var delete_url = "{{ route('admin.master.product-unit.destroy',['product_unit'=> ':unitId']) }}";
-            delete_url = delete_url.replace(':unitId', delete_id);
+            var delete_url = "{{ route('role_ip.update',['role_ip'=> ':roleipId']) }}";
+            delete_url = delete_url.replace(':roleipId', delete_id);
             swal({
             title: "Are  you sure?",
             text: "are you sure want to delete?",
@@ -158,7 +101,7 @@
                     DataaTable.ajax.reload();
                     var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                     var message = "{{ trans('messages.crud.delete_record') }}";
-                    var title = "Unit";
+                    var title = "Role Ip";
                     showToaster(title,alertType,message);                    
                   } 
                 },

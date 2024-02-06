@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\DataTables\RoleDataTable;
+use App\DataTables\RolePermissionDataTable;
 use Illuminate\Http\Response;
 use App\Models\Role;
 use App\Models\RoleIp;
@@ -17,7 +17,7 @@ class RoleIpController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(RoleDataTable $dataTable)
+    public function index(RolePermissionDataTable $dataTable)
     {
         abort_if(Gate::denies('role_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.master.roleip.index');
@@ -36,24 +36,27 @@ class RoleIpController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    { 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:role_ips,ip_address',
-        ]);  
+            'ip_address' => [
+            'required',
+            'ip',
+            Rule::unique('role_ips', 'ip_address')->whereNull('deleted_at')
+        ]]);
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        $roledata =  RoleIp::create(['name' => $request->name,'created_by'=> Auth::id()]); 
+       
+        $roledata =  RoleIp::create(['ip_address' => $request->ip_address,'created_by'=> Auth::id()]); 
         if($request->has('roles')){
             foreach($request->roles as $row){
                 RoleIpPermission::create(['role_id' => $row,'role_ip_id'=> $roledata->id]);   
             }
-        }
-        
+        }        
         addToLog($request,'RoleIp','Create', $roledata);
-        return response()->json(['success' => 'Role created successfully.']);
+        return response()->json(['success' => 'Role Ip created successfully.']);
 
     }
 
@@ -62,7 +65,7 @@ class RoleIpController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -70,7 +73,10 @@ class RoleIpController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $allRoles = Role::all();
+        $role_ip = RoleIp::findOrFail($id);     
+        $RoleIpPermission = RoleIpPermission::where('role_ip_id',$id)->pluck('role_id')->toArray();
+        return view('admin.master.roleip.edit',compact('allRoles','role_ip','RoleIpPermission'));
     }
 
     /**
@@ -78,14 +84,48 @@ class RoleIpController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'ip_address' => [
+                'required',
+                'ip',
+                Rule::unique('role_ips', 'ip_address')->whereNull('deleted_at')->ignore($id)
+            ]]);        
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors()->toArray()
+            ]);
+        }
+        $role_ip = RoleIp::findOrFail($id);
+        $oldvalue = $role_ip->getOriginal();   
+        $role_ip->ip_address = $request->ip_address;
+        $role_ip->updated_by = Auth::id();  
+         $role_ip->save();
+        $newValue = $role_ip->refresh();
+
+        RoleIpPermission::where('role_ip_id',$id)->delete();
+        if($request->has('roles')){
+            foreach($request->roles as $row){
+                RoleIpPermission::create(['role_id' => $row,'role_ip_id'=> $id]);   
+            }
+        } 
+
+        addToLog($request,'RoleIp','Edit', $newValue ,$oldvalue);      
+        return response()->json(['success' => 'Role Ip  Update successfully.']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        //
+        $record = RoleIp::find(decrypt($id));
+        $oldvalue = $record->getOriginal(); 
+        $record->delete();
+        $record->updated_by = Auth::id();
+        $record->save();       
+       
+        $newValue = $record->refresh();
+        addToLog($request,'RoleIp','Delete', $newValue ,$oldvalue); 
+        return response()->json(['success' => 'Role Ip Delete successfully.']);
     }
 }

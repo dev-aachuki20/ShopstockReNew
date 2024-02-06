@@ -37,8 +37,10 @@ class AreaController extends Controller
     {
         abort_if(Gate::denies('area_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'address' => 'required|unique:areas,address',
-        ]);  
+        'address' => [
+            'required',
+            Rule::unique('areas', 'address')->whereNull('deleted_at'),
+        ]]);  
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()

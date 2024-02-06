@@ -484,7 +484,7 @@ return [
 	'ip'  => [
 		'title'  => 'IP Address',
 		'fields' 	=> [
-			'addIp' => 'IP Name',
+			'addIp' => 'IP Address',
 			'roles' => 'Roles',
 		],
 	],

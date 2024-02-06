@@ -104,11 +104,11 @@
             </ul>
         </li>
 
-        {{-- <li class="{{ Request::is('role_ip*') ? 'active' : '' }}">
+        <li class="{{ Request::is('role_ip*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('role_ip.index') }}">
                 @lang('quickadmin.ip.title')
             </a>
-        </li> --}}
+        </li>
 
 
 
