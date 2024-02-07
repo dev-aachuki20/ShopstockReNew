@@ -29,7 +29,7 @@ class RoleIpController extends Controller
     public function create()
     {
         abort_if(Gate::denies('ip_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $allRoles = Role::all();
+        $allRoles = Role::where('id','<>',1)->get();
         return view('admin.master.roleip.create',compact('allRoles'));
     }
 
@@ -76,7 +76,7 @@ class RoleIpController extends Controller
     public function edit(string $id)
     {
         abort_if(Gate::denies('ip_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $allRoles = Role::all();
+        $allRoles = Role::where('id','<>',1)->get();
         $role_ip = RoleIp::findOrFail($id);     
         $RoleIpPermission = RoleIpPermission::where('role_ip_id',$id)->pluck('role_id')->toArray();
         return view('admin.master.roleip.edit',compact('allRoles','role_ip','RoleIpPermission'));
