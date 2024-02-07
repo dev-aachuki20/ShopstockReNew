@@ -29,16 +29,15 @@ class RolePermissionDataTable extends DataTable
             })
             ->addColumn('action',function($row){
                 $action='';
-                //  if (Gate::check('brand_edit')) {
+                  if (Gate::check('ip_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                     $editUrl = route("role_ip.edit",['role_ip' => $row->id] );
                     $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1 edit_product">'.$editIcon.'</a>';
-                    
-                    //  }
-                //  if (Gate::check('brand_delete')) {
+                 }
+                  if (Gate::check('ip_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_role_ip" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                //  }
+                  }
                 return $action;
             })->rawColumns(['action']);
     }

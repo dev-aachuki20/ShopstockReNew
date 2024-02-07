@@ -38,10 +38,10 @@ class LogActivityDataTable extends DataTable
             })
             ->addColumn('action',function($row){
                 $action='';
-                //  if (Gate::check('brand_edit')) {
+                  if (Gate::check('log_view')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_active_log" data-id="'.encrypt($row->id).'" >'.$editIcon.'</a>';
-                //  }
+                  }
                 return $action;
             })->rawColumns(['action']);
     }

@@ -29,14 +29,14 @@ class ProductUnitDataTable extends DataTable
             })
             ->addColumn('action',function($row){
                 $action='';
-                //  if (Gate::check('brand_edit')) {
+                  if (Gate::check('unit_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_unit" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'">'.$editIcon.'</a>';
-                //  }
-                //  if (Gate::check('brand_delete')) {
+                  }
+                  if (Gate::check('unit_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_unit" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                //  }
+                  }
                 return $action;
             })->rawColumns(['action']);
     }

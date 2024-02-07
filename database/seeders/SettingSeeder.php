@@ -41,7 +41,7 @@ class SettingSeeder extends Seeder
             [
 
                 'key'    => 'company_name',
-                'value'  => 'Invoice',
+                'value'  => 'Music Stock',
                 'type'   => 'text',
                 'display_name'  => 'Company Name [Login Page,Sidebar Top Title]',
                 'group'  => 'web',

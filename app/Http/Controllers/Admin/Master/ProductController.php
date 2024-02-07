@@ -30,7 +30,7 @@ class ProductController extends Controller
 
     public function recycleIndex(ProductDataTable $dataTable)
     {
-        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('product_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $recycle = 'isRecycle';
         return $dataTable->withParam1($recycle)->render('admin.master.product.index');
     }
@@ -104,6 +104,7 @@ class ProductController extends Controller
      */
     public function show(Request $request, string $id)
     {
+        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if($request->ajax()){
             $id = decrypt($id);
             $product = Product::where('id',$id)->first();
@@ -266,7 +267,7 @@ class ProductController extends Controller
     }
 
     public function undoGroup(Request $request){
-        abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        abort_if(Gate::denies('product_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');      
         $id =  decrypt($request->recycle_id);      
         
         $deletedData =  Product::withTrashed()->find($id);

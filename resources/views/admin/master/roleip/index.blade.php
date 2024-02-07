@@ -14,9 +14,9 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.ip.title') </h4>
-                  {{-- @can('unit_create') --}}
-                  <a href="{{route('role_ip.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add" /></a>
-                  {{-- @endcan --}}
+                  @can('ip_create')
+                    <a href="{{route('role_ip.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add" /></a>
+                  @endcan
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">

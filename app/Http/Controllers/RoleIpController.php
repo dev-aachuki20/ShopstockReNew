@@ -19,7 +19,7 @@ class RoleIpController extends Controller
      */
     public function index(RolePermissionDataTable $dataTable)
     {
-        abort_if(Gate::denies('role_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('ip_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.master.roleip.index');
     }
 
@@ -28,6 +28,7 @@ class RoleIpController extends Controller
      */
     public function create()
     {
+        abort_if(Gate::denies('ip_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $allRoles = Role::all();
         return view('admin.master.roleip.create',compact('allRoles'));
     }
@@ -37,6 +38,7 @@ class RoleIpController extends Controller
      */
     public function store(Request $request)
     { 
+        abort_if(Gate::denies('ip_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'ip_address' => [
             'required',
@@ -73,6 +75,7 @@ class RoleIpController extends Controller
      */
     public function edit(string $id)
     {
+        abort_if(Gate::denies('ip_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $allRoles = Role::all();
         $role_ip = RoleIp::findOrFail($id);     
         $RoleIpPermission = RoleIpPermission::where('role_ip_id',$id)->pluck('role_id')->toArray();
@@ -84,6 +87,7 @@ class RoleIpController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_if(Gate::denies('ip_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'ip_address' => [
                 'required',
@@ -118,6 +122,7 @@ class RoleIpController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
+        abort_if(Gate::denies('ip_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = RoleIp::find(decrypt($id));
         $oldvalue = $record->getOriginal(); 
         $record->delete();

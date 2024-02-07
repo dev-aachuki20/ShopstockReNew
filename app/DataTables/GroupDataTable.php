@@ -48,7 +48,7 @@ class GroupDataTable extends DataTable
             ->addColumn('action',function($row){
                 $action='';
                 if($this->isRecycle == "isRecycle"){            
-                    if (Gate::check('group_edit')) {
+                    if (Gate::check('group_undo')) {
                         $editIcon = '<i class="fa fa-undo" aria-hidden="true"></i>';
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 recycle_group" data-id="'.encrypt($row->id).'">'.$editIcon.'</a>';
                     }    

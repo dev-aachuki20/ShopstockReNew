@@ -19,6 +19,7 @@ class ProductUnitController extends Controller
      */
     public function index(ProductUnitDataTable $dataTable)
     {
+        abort_if(Gate::denies('unit_access'), Response::HTTP_FORBIDDEN, '403 Forbidden'); 
         return $dataTable->render('admin.master.product_unit.index');
     }
 
@@ -34,10 +35,13 @@ class ProductUnitController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    {  
+        abort_if(Gate::denies('unit_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:product_units,name',
-        ]);  
+            'name' => [
+                'required',
+                Rule::unique('product_units', 'name')->whereNull('deleted_at'),
+            ]]); 
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -69,6 +73,7 @@ class ProductUnitController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_if(Gate::denies('unit_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
         $validator = Validator::make($request->all(), [
             'name' => [
@@ -95,6 +100,7 @@ class ProductUnitController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
+        abort_if(Gate::denies('unit_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = ProductUnit::find(decrypt($id));
         $oldvalue = $record->getOriginal(); 
         $record->updated_by = Auth::id();

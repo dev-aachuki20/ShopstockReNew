@@ -40,7 +40,7 @@ class AreaController extends Controller
         'address' => [
             'required',
             Rule::unique('areas', 'address')->whereNull('deleted_at'),
-        ]]);  
+        ]]);         
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()

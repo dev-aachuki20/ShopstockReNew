@@ -19,14 +19,17 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(GroupDataTable $dataTable)
+    // public function index(GroupDataTable $dataTable)
+    public function index(Request $request)
     {
+        $ip = $request->ip();
+        dd($ip);
         abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');        
         return $dataTable->render('admin.master.group.index');
     }
     public function recycleIndex(GroupDataTable $dataTable)
     {
-        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('group_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $recycle = 'isRecycle';
         return $dataTable->withParam1($recycle)->render('admin.master.group.index');
     }
@@ -162,7 +165,7 @@ class GroupController extends Controller
     }
 
     public function undoGroup(Request $request){
-        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        abort_if(Gate::denies('group_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
         $id =  decrypt($request->recycle_id);      
 
        $deletedData =  Group::withTrashed()->find($id);

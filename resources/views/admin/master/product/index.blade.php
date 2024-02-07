@@ -18,7 +18,7 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   @if($isRecycle == "Yes")
-                  <h4>@lang('admin_master.product.product_recycle_master')</h4>
+                    <h4>@lang('admin_master.product.product_recycle_master')</h4>
                   @else               
                   <h4>@lang('admin_master.product.seo_title_product_master')</h4>                 
                       <div class="col-auto  mt-md-0 mt-3 ml-auto">
@@ -34,11 +34,11 @@
                             @endcan
                         </div>
                         <div class="col-auto pl-1">
-                            {{-- @can('product_rejoin') --}}
+                            @can('product_undo')
                             <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  ><x-svg-icon icon="rejoin-btn" /></a>
-                            {{-- @endcan --}}
+                            @endcan
                         </div>
-                        @if (Gate::check('product_edit'))
+                        @can('product_undo')
                           <div class="col-auto pl-1">
                               <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
                           </div>

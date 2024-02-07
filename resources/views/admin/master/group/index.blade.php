@@ -34,20 +34,15 @@
                                 <button type="button" class="addnew-btn add_group sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
                               @endcan
                           </div>
-                          {{-- <div class="col-auto px-1">
-                              @can('group_print')
-                              <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn"  id="print-button"><x-svg-icon icon="print" /></a>
-                              @endcan
-                          </div> --}}
                           <div class="col-auto pl-1">
                               @can('group_export')
                               <a href="{{ route('admin.master.group.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
                               @endcan
                           </div>
                           <div class="col-auto pl-1">
-                              {{-- @can('group_rejoin') --}}
+                              @can('group_undo')
                               <a href="{{ route('admin.master.groups.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
-                              {{-- @endcan --}}
+                              @endcan
                           </div>
                       </div>
                   </div>
@@ -146,7 +141,6 @@
             var postType = "POST";
             var post_url = "{{ route('admin.master.groups.store') }}";
             if(_id){
-              //  var post_url = "/admin/master/groups/" + _id;
                var post_url = "{{ route('admin.master.groups.update',['group'=> ':groupId']) }}";
                 post_url = post_url.replace(':groupId', _id);
                var postType = "PUT";

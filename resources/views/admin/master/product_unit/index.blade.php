@@ -14,9 +14,9 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.product_unint_master.title')</h4>
-                  {{-- @can('unit_create') --}}
+                  @can('unit_create')
                    <button type="button" class="addnew-btn add_unit sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
-                  {{-- @endcan --}}
+                  @endcan
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">

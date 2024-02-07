@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Models\PaymentTransaction;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Auth;
 
@@ -17,6 +18,7 @@ class SplitsController extends Controller
      */
     public function index()
     {
+        abort_if(Gate::denies('split_access'), Response::HTTP_FORBIDDEN, '403 Forbidden'); 
         return view('admin.master.splits.index');
     }
 
@@ -33,6 +35,7 @@ class SplitsController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(Gate::denies('split_create'), Response::HTTP_FORBIDDEN, '403 Forbidden'); 
         $request->validate([
             'from_date' => 'required|date|before_or_equal:'.now()->format('d-m-Y'),
         ]);

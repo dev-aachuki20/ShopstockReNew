@@ -12,10 +12,15 @@
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4>@lang('quickadmin.area_master.title')</h4>
-            @can('area_create')
-            <a href="javascript:void(0)" class="btn btn-outline-primary add_area"><i
-                class="fas fa-plus"></i>@lang('quickadmin.area_master.add')</a>
-            @endcan
+            <div class="col-auto  mt-md-0 mt-3 ml-auto">
+              <div class="row align-items-center">
+                  <div class="col-auto px-1">
+                      @can('area_create')
+                        <button type="button" class="addnew-btn add_area sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
+                      @endcan
+                  </div>
+              </div>
+            </div>
           </div>
           <div class="card-body">
             <div class="table-responsive fixed_Search">

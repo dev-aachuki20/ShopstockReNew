@@ -84,7 +84,6 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         return redirect()->route('roles.index');
-        return redirect()->route('roles.index');
         $role = Role::find($id);
         $permissions = Permission::get()->groupBy('route_name');
         $selectedPermissions = $role->getAllPermissions();

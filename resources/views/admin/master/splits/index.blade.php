@@ -19,6 +19,7 @@
                             <div class="panel-heading">
                                     @lang('quickadmin.qa_filter')
                             </div>
+                            @can('split_create')
                             <div class="panel-body">
                                 <div class="">
                                     {!! Form::open(['method' => 'POST', 'class'=>"row", 'id'=>'split-form','route' => ['admin.master.split.store'], 'onsubmit'=>"return confirm('Are you sure, You want to split ?')"]) !!}
@@ -34,6 +35,8 @@
                                     {!! Form::close() !!}
                                 </div>
                             </div>
+                            @endcan
+
                         </div>
                     </div>
               </div>

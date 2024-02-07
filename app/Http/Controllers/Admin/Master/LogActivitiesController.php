@@ -17,6 +17,7 @@ class LogActivitiesController extends Controller
      */
     public function index(LogActivityDataTable $dataTable)
     {
+        abort_if(Gate::denies('log_access'), Response::HTTP_FORBIDDEN, '403 Forbidden'); 
         return $dataTable->render('admin.master.log_activity.index');
     }
 
@@ -41,6 +42,7 @@ class LogActivitiesController extends Controller
      */
     public function show(Request $request, string $id)
     {
+        abort_if(Gate::denies('log_view'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if($request->ajax()){
             $id = decrypt($id);
             $logActivity = LogActivity::where('id',$id)->first();
