@@ -19,11 +19,8 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index(GroupDataTable $dataTable)
-    public function index(Request $request)
+    public function index(GroupDataTable $dataTable)
     {
-        $ip = $request->ip();
-        dd($ip);
         abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');        
         return $dataTable->render('admin.master.group.index');
     }
