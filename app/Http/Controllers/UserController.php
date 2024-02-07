@@ -27,7 +27,7 @@ class UserController extends Controller
      */
     public function index(UserDataTable $dataTable)
     {
-        //
+                //
         $type = 'all';
         abort_if(Gate::denies('staff_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $roles = Role::where('id','!=','1')->orderBy('id','asc')->get();

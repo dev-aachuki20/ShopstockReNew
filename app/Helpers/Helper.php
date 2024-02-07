@@ -5,6 +5,8 @@ use App\Models\Setting;
 use App\Models\Uploads;
 use App\Models\LogActivity;
 use Carbon\Carbon;
+use App\Models\RoleIp;
+use App\Models\RoleIpPermission;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str as Str;
 
@@ -200,6 +202,17 @@ if (!function_exists('CategoryAmountPercent')) {
         }
         $percentShare = ($amount / $totalAmount) * 100;
         return number_format($percentShare, 2) . '%';
+    }
+}
+if (!function_exists('checkRoleIpPermission')) {
+    function checkRoleIpPermission($ip , $roleid) {
+		$checkPermission = RoleIp::where('ip_address',$ip)
+		->leftJoin('role_ip_permissions', 'role_ips.id', '=', 'role_ip_permissions.role_ip_id')
+		->where('role_ip_permissions.role_id',$roleid)->first();
+		if($checkPermission){
+			return "Yes";
+		}
+		return "No";
     }
 }
 

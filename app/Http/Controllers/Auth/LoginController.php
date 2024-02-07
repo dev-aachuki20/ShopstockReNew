@@ -37,9 +37,14 @@ class LoginController extends Controller
         ];
         try {
 
-            $user = User::where('username',$request->username)->first();
+            $user = User::where('username',$request->username)->first();            
             if($user){
                 if (Auth::attempt($credentialsOnly, $remember_me)) {
+                   $check_ip = checkRoleIpPermission($request->ip(), $user->roles->first()->id);
+                   if($check_ip == "No" && $user->roles->first()->id != 1){
+                        Auth::guard('web')->logout();
+                        return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.iperror')])->withInput($request->only('username', 'password'));
+                   }
                     // Staff Cannot Login Into Web
                    // dd(auth()->user()->getRoleNames());
                     if ((auth()->user()->hasRole(config('app.roleid.staff')))) {
