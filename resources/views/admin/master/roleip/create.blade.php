@@ -10,7 +10,7 @@
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card">
             <div class="card-body">
-            <form action="{{ route('role_ip.store') }}"  id="roleForm" method="POST"  name="roleForm" enctype="multipart/form-data">
+            <form action="{{ route('admin.master.role_ip.store') }}"  id="roleForm" method="POST"  name="roleForm" enctype="multipart/form-data">
               <div class="row">
                 @include('admin.master.roleip.form')
               </div>

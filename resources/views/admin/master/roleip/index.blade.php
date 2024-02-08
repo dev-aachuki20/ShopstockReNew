@@ -15,7 +15,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.ip.title') </h4>
                   @can('ip_create')
-                    <a href="{{route('role_ip.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add" /></a>
+                    <a href="{{route('admin.master.role_ip.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add-device" /></a>
                   @endcan
                 </div>
                 <div class="card-body">
@@ -80,7 +80,7 @@
     // delete
           $(document).on('click','.delete_role_ip',function(){
             var delete_id = $(this).data('id');
-            var delete_url = "{{ route('role_ip.update',['role_ip'=> ':roleipId']) }}";
+            var delete_url = "{{ route('admin.master.role_ip.update',['role_ip'=> ':roleipId']) }}";
             delete_url = delete_url.replace(':roleipId', delete_id);
             swal({
             title: "Are  you sure?",

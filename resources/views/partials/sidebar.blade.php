@@ -36,6 +36,22 @@
        
 
 
+        {{-- <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.customer-management.title')</span>
+            </a> 
+            <ul class="dropdown-menu">               
+                @if (Gate::check('group_access'))
+                    <li class="{{ Request::is('admin/master/groups*') }}">
+                        <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
+                            @lang('quickadmin.customer-management.fields.add')
+                        </a>
+                    </li>
+                @endif
+            </ul>
+        </li> --}}
+
 
 
 
@@ -66,13 +82,13 @@
                         </a>
                     </li>
                 @endif --}}
-                {{-- @if (Gate::check('category_access')) --}}
+                @if (Gate::check('unit_access'))
                     <li class="{{ Request::is('admin/master/product-unit*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.product-unit.index') }}">
                             @lang('quickadmin.product_unint_master.title')
                         </a>
                     </li>
-                {{-- @endif --}}
+                @endif
                 @if (Gate::check('product_access'))
                     <li class="{{ Request::is('admin/master/products*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.products.index') }}">
@@ -89,27 +105,33 @@
                         </a>
                     </li>
                 @endif
-
-                <li class="{{ Request::is('admin/master/split*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin.master.split.index') }}">
-                        @lang('quickadmin.split.title')
-                    </a>
-                </li>
-                <li class="{{ Request::is('admin/master/log-activity*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('admin.master.log-activity.index') }}">
-                        @lang('quickadmin.logActivities.title')
-                    </a>
-                </li>
                 
+                {{-- @if (Gate::check('split_access'))
+                    <li class="{{ Request::is('admin/master/split*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.split.index') }}">
+                            @lang('quickadmin.split.title')
+                        </a>
+                    </li>
+                @endif --}}
+                @if (Gate::check('log_access'))
+                    <li class="{{ Request::is('admin/master/log-activity*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.log-activity.index') }}">
+                            @lang('quickadmin.logActivities.title')
+                        </a>
+                    </li>
+                @endif
+                
+                @if (Gate::check('ip_access'))
+                    <li class="{{ Request::is('admin/master/role_ip*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.role_ip.index') }}">
+                            @lang('quickadmin.ip.title')
+                        </a>
+                    </li>
+                @endif
+
             </ul>
         </li>
-
-        <li class="{{ Request::is('role_ip*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('role_ip.index') }}">
-                @lang('quickadmin.ip.title')
-            </a>
-        </li>
-
+        
 
 
         @can('setting_access')

@@ -16,7 +16,7 @@
               <div class="row align-items-center">
                   <div class="col-auto px-1">
                       @can('area_create')
-                        <button type="button" class="addnew-btn add_area sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
+                        <button type="button" class="addnew-btn add_area sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add-device" /></button>
                       @endcan
                   </div>
               </div>

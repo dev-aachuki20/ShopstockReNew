@@ -72,7 +72,7 @@ class GroupDataTable extends DataTable
     public function query(Group $model): QueryBuilder
     {
         $query = $model->newQuery()->select(['groups.*'])->withCount('products')->withCount('subproducts');
-        $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END ASC');
+        $query->orderByRaw('CASE WHEN parent_id = 0 THEN id  ELSE parent_id END DESC');
         if($this->isRecycle == "isRecycle"){            
             $query->onlyTrashed();           
         }

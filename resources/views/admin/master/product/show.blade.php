@@ -66,10 +66,10 @@
                 <td field-key='user name'>{{ $product->is_sub_product > 0 ?? '' }}</td>
             </tr>
             <tr>
-                <th>@lang('admin_master.product.enter_hint')</th>
+                <th>@lang('admin_master.product.hint')</th>
                 <td field-key='user name'>{{ $product->extra_option_hint ?? '' }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <th>@lang('admin_master.g_image')</th>
                 <td field-key='user name'>
                     @if(isset($product->image))
@@ -78,7 +78,7 @@
                             <img alt="" src="{{asset('admintheme/assets/img/default-img.jpg')}}" alt="profile" class="widthHeigh   mt-2 profile-image" id="profile-image1" >
                     @endif
                 </td>
-            </tr>
+            </tr> --}}
 
 
 

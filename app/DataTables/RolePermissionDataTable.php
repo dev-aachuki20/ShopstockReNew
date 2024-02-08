@@ -31,7 +31,7 @@ class RolePermissionDataTable extends DataTable
                 $action='';
                   if (Gate::check('ip_edit')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $editUrl = route("role_ip.edit",['role_ip' => $row->id] );
+                    $editUrl = route("admin.master.role_ip.edit",['role_ip' => $row->id] );
                     $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1 edit_product">'.$editIcon.'</a>';
                  }
                   if (Gate::check('ip_delete')) {
@@ -48,7 +48,7 @@ class RolePermissionDataTable extends DataTable
     public function query(RoleIp $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['role_ips.*']);
+        $query = $model->newQuery()->select(['role_ips.*'])->orderBy('id','DESC');
         return $this->applyScopes($query);
     }
 

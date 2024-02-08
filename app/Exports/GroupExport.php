@@ -27,7 +27,7 @@ class GroupExport implements FromCollection , WithHeadings
         }
 
         $query->select(['groups.*']);
-        $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END ASC');
+        $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END DESC');
         $groups = $query->withCount('products')->withCount('subproducts')->get();
 
         return $groups->map(function ($group, $key) {

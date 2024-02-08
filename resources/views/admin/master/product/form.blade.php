@@ -82,7 +82,7 @@
         <div class="error_retailer_price text-danger error"></div>
     </div>
 </div>
-<div class="col-md-3">
+<div class="col-md-6 mb-4">
     <div >
         <label>@lang('admin_master.product.extra_option') <span class="text-danger">*</span></label>
     </div>
@@ -106,14 +106,14 @@
         <input class="form-check-input is_sub_product" name="is_sub_product" type="checkbox" id="is_sub_product" value="1" {{(($product->is_sub_product ??'') == 1)?'checked':''}}>
         @lang('admin_master.product.is_sub_product')
     </label>
-</div>
-    <div class="extra_option_hint mb-5" style="display: none;">
+    </div>
+    <div class="extra_option_hint mt-2" style="display: none;">
         <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
         <span class="error_extra_option_hint text-danger error"></span>
     </div>
     
 </div>
-<div class="col-md-3">
+{{-- <div class="col-md-3">
     <div class="form-group">
         <label>@lang('admin_master.g_image')</label>
         <div class="input-group">
@@ -128,9 +128,8 @@
            @endif
         </div>
     </div>
-</div>
+</div> --}}
 <div class="col-md-12">  
-    <div class="success_error_message"></div>
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
 </div>
 
@@ -153,7 +152,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <div class="success_error_message_add)new"></div>
+          <div class="success_error_message_add_new"></div>
           <button type="button" class="btn btn-primary save_add_new">Save</button>
         </div>
       </div>
@@ -205,7 +204,6 @@
     $(document).on('submit', "#productForm", function(e) {
         e.preventDefault();
         $('.error').html('');
-        $('.success_error_message').html('');
         var action = $(this).attr('action');
         var method = $(this).attr('method');
         var formData = new FormData($("#productForm")[0]);
@@ -220,7 +218,10 @@
         processData: false,
         success: function(data) {            
             if ($.isEmptyObject(data.error)) {
-                $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
+                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                var message = data.success;
+                var title = "Group";
+                showToaster(title,alertType,message);   
                 setTimeout(() => {
                     window.location.replace("{{route('admin.master.products.index')}}");
                 }, 1500);                  

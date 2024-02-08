@@ -52,7 +52,7 @@ class LogActivityDataTable extends DataTable
     public function query(LogActivity $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['log_activities.*']);
+        $query = $model->newQuery()->select(['log_activities.*'])->orderBy('id','DESC');
         return $this->applyScopes($query);
     }
 

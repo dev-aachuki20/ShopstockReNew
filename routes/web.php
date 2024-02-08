@@ -53,12 +53,20 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         Route::get('/product-price/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
         Route::post('/product-price/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
         
+        Route::get('/product-group/update',[ProductController::class,'viewUpdateProductGroup'])->name('update-product-group');	
+        Route::get('/product-group/product-group-list',[ProductController::class,'productUpdateGroupList'])->name('product-group-list');
+        Route::post('/product-group/product-group-udpate',[ProductController::class,'updateProductGroup'])->name('product-group-update');	
+
         Route::resource('/log-activity', LogActivitiesController::class);
         Route::resource('/product-unit', ProductUnitController::class);
-        Route::resource('/split', SplitsController::class);   
-        
+        //Route::resource('/split', SplitsController::class);
+
+        Route::resource('/role_ip',RoleIpController::class);
         //Route::resource('/log-activit', LogActivitiesController::class);
     });
+    // Route::group(['prefix' => 'customer', 'as' => 'customer.'], function () {
+
+    // });
 });
 
 
@@ -67,7 +75,7 @@ Route::middleware(['auth','PreventBackHistory'])->group(function () {
     Route::get('/logout',[LoginController::class,'logout'])->name('logout');
 
     Route::resource('/roles',RoleController::class);
-    Route::resource('/role_ip',RoleIpController::class);
+    
 
     Route::post('/user-status-change',[UserController::class,'userStatusChange'])->name('user_status_change');
     Route::get('/profiles',[UserController::class,'showprofile'])->name('user.profile');

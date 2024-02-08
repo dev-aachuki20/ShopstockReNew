@@ -251,9 +251,13 @@ class ProductController extends Controller
             $fieldName = $request->input('fieldName');
             $newValue = $request->input('newValue');
             try {            
-                $product = Product::findOrFail($rowId);            
-                $product->$fieldName = $newValue;           
+                $product = Product::findOrFail($rowId); 
+                $oldvalue = $product->getOriginal();            
+                $product->$fieldName = $newValue;
                 $product->save();
+                $newValue = $product->refresh();
+                addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue); 
+
                 return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
             } catch (\Exception $e) {
                 return response()->json(['success' => false, 'message' => 'Error updating product price']);
@@ -278,6 +282,105 @@ class ProductController extends Controller
         $newValue = $deletedData->refresh();
         addToLog($request,'Product','Undo', $newValue ,$oldvalue);       
         return response()->json(['success' => 'Undo successfully.']);
+    }
+
+    public function viewUpdateProductGroup(Request $request)
+    {
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $product_groups = Group::Where('parent_id','0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.update_product_group',compact('product_groups'));
+    }
+
+    public function productUpdateGroupList(Request $request){
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if($request->ajax()){
+            $searchValue = $request->search['value'];
+            $paginationValue = $request->length;
+              $products = Product::select(['products.*']);
+              $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
+              $products->whereNull('groups.deleted_at')->orderBy('name','asc');
+            
+
+            if(isset($request->product_type) && $request->product_type != ''){
+                $products = $products->where('group_id',$request->product_type);
+            }            
+            if(!empty($searchValue)){
+                $products = $products->where(function($query) use($searchValue){
+                    $query->where('products.name','like','%'.$searchValue.'%');
+                });
+            }            
+            $products =  $products->get();
+
+            return DataTables::of($products)
+               ->editColumn('group_id', function ($row) {
+                    $allGroup = Group::Where('parent_id','0')->get();                    
+                    $html = "";
+                    $html .= '<select name="group" id="group" data-porduct_id="'.$row->id.'">';
+                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
+                    foreach($allGroup  as $group){
+                        $selected = "";
+                        if($group->id == $row->group_id){
+                            $selected = "selected";
+                        }
+                        $html .= '<option value="'.$group->id.'" '.$selected.'>'.$group->name.'</option>';
+                    }
+                    $html .='</select>';                  
+                    return $html;
+                })
+                ->editColumn('sub_group_id', function ($row) {
+                    $allGroup = Group::Where('parent_id',$row->group_id)->get();                    
+                    $html = "";
+                    $html .= '<select name="sub_group" id="sub_group" data-porduct_id="'.$row->id.'">';
+                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
+                    foreach($allGroup  as $group){
+                        $selected = "";
+                        if($group->id == $row->sub_group_id){
+                            $selected = "selected";
+                        }
+                        $html .= '<option value="'.$group->id.'" '.$selected.'>'.$group->name.'</option>';
+                    }
+                    $html .='</select>';                  
+                    return $html;
+                })
+                ->rawColumns(['group_id','sub_group_id'])->toJson();
+        }
+    }
+
+    public function updateProductGroup(Request $request)
+    {
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if($request->group_sub_group == "Group"){
+            $validator = Validator::make($request->all(), [
+                'porduct_id' => 'required|numeric',
+                'group_id' => 'required|numeric'           
+            ]);
+        }else{
+            $validator = Validator::make($request->all(), [
+                'porduct_id' => 'required|numeric',
+                'sub_group_id' => 'required|numeric'            
+            ]);
+        }
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors()->toArray()
+            ]);
+        }
+        $product = Product::findOrFail($request->porduct_id);
+        $oldvalue = $product->getOriginal(); 
+        if($request->group_sub_group == "Group"){
+            $product->group_id = $request->group_id; 
+            $product->sub_group_id = 0;
+        }
+        if($request->group_sub_group == "SubGroup"){
+             $product->sub_group_id = $request->sub_group_id;
+        } 
+      
+        $product->updated_by = Auth::id();  
+        $product->save();
+        $newValue = $product->refresh();
+        $group_sub_group = 'Update Product '.$request->group_sub_group;
+        addToLog($request,'Product',$group_sub_group, $newValue ,$oldvalue);  
+        return response()->json(['success' => 'Product Group successfully.']);
     }
 
 }

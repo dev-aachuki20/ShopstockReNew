@@ -31,8 +31,13 @@
                       <div class="row align-items-center">
                           <div class="col-auto px-1">
                               @can('group_create')
-                                <button type="button" class="addnew-btn add_group sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add" /></button>
-                              @endcan
+                                <button type="button" class="addnew-btn add_group sm_btn circlebtn" title="@lang('messages.add_group')" ><x-svg-icon icon="add-device" /></button>
+                              @endcan                            
+                          </div>
+                          <div class="col-auto px-1">
+                            @can('group_create')
+                              <button type="button" class="addnew-btn add_sub_group sm_btn circlebtn" title="@lang('messages.add_sub_group')" ><x-svg-icon icon="add-invoice" /></button>
+                            @endcan
                           </div>
                           <div class="col-auto pl-1">
                               @can('group_export')
@@ -107,7 +112,7 @@
       $(document).ready(function(){
         var DataaTable = $('#group-table').DataTable();
           $(document).on('click','.add_group',function(){
-            $('.parent_group').css('display','block');
+            $('.parent_group').css('display','none');
             $('.error').html('');
             $("#groupModal").modal('show');
             $(".group_edit_id").val('');
@@ -115,6 +120,18 @@
             $(".save_btn").html('Save');
             $(".Add_edit_group").html('Add');
             getParentGroup();
+            $('.save_btn').prop('disabled', false);
+          });
+          $(document).on('click','.add_sub_group',function(){
+            $('.parent_group').css('display','block');
+            $('.error').html('');
+            $("#groupModal").modal('show');
+            $(".group_edit_id").val('');
+            $(".group_edit_name").val('');
+            $(".save_btn").html('Save');
+            $(".Add_edit_group").html('Add Sub');
+            getParentGroup();
+            $('.save_btn').prop('disabled', false);
           })
           $(document).on('click','.edit_group',function(){
             $('.parent_group').css('display','none');
@@ -124,6 +141,7 @@
             $(".group_edit_name").val($(this).data('name'));
             $(".save_btn").html('Update');
             $(".Add_edit_group").html('Edit');
+            $('.save_btn').prop('disabled', false);
            // getParentGroup($(this).data('parent_id'));
           })
      
@@ -137,6 +155,7 @@
             var parent_id = $("#parent_id").val() ?? 0;
             var name = $("#name").val();
             var _id = $(".group_edit_id").val();
+            var add_type = $(".Add_edit_group").html();
             $('.save_btn').prop('disabled', true);
             var postType = "POST";
             var post_url = "{{ route('admin.master.groups.store') }}";
@@ -152,6 +171,7 @@
                 name: name,
                 id: _id,
                 parent_id: parent_id,
+                add_type: add_type,
               },
               success: function(data) {
                 $('.save_btn').prop('disabled', false);

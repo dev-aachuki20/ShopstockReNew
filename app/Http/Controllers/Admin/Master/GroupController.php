@@ -45,12 +45,16 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         abort_if(Gate::denies('group_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->parent_id > 0){
+        if($request->add_type == "Add Sub"){
             $validator = Validator::make($request->all(), [
                 'name' => [
                     'required',
                     Rule::unique('groups', 'name')->where('parent_id',$request->parent_id)
-                ]]);
+                ],
+                'parent_id' => [
+                    'required'
+                ]
+            ]);
         }else{
             $validator = Validator::make($request->all(), [
             'name' => [

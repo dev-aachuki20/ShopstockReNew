@@ -50,6 +50,9 @@ return [
     'are_you_sure_change_status' => 'Are you sure want to Active this user!',
     'are_you_sure_change_instatus' => 'Are you sure want to Inactive this user!',
     'add' => 'Add New',
+    'update_product_group' => 'Update Product Group',
+    'add_group' => 'Add Group',
+    'add_sub_group' => 'Add Sub Group',
     'excel' => 'Export Excel',
     'undo' => 'Undo List'
 ];

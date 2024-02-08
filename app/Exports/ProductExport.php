@@ -43,16 +43,22 @@ class ProductExport implements FromCollection , WithHeadings
                 'Unit Type' => $group->product_unit_name ?? "",
                 'Group' => $group->group_name ?? "",
                 'Sub Group' => $group->sub_group_name ?? "",
+                'Height' => $group->is_height ?? '',
+                'Width' => $group->is_width ?? '',
+                'Length' => $group->is_length ?? '',
+                'Is Sub Product' => $group->is_sub_product ?? '',
+                'Hint' => $group->extra_option_hint ?? '',
                 'Purchase Price' => $group->price ?? 0,
                 'Min. Sale Price' => $group->min_sale_price??0,
                 'Wholesaler price' => $group->wholesaler_price??0,
                 'Retailer price' => $group->retailer_price??0,
             ];
         });
+       
     }
 
     public function headings(): array
     {
-        return ["Sn.", "Name" , "Calculation Type","Unit Type" , "Group", "Sub Group", "Purchase Price","Min. Sale Price","Wholesaler price","Retailer price"];
+        return ["Sn.", "Name" , "Calculation Type","Unit Type" , "Group", "Sub Group" ,'Height','Width','Length','Is Sub Product','Hint', "Purchase Price","Min. Sale Price","Wholesaler price","Retailer price"];
     }
 }

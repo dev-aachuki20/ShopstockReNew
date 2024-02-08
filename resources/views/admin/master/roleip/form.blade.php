@@ -35,7 +35,6 @@
 
 </div>
 <div class="col-md-12">  
-    <div class="success_error_message"></div>
   <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
 </div>
 
@@ -54,7 +53,6 @@
     $(document).on('submit', "#roleForm", function(e) {
         e.preventDefault();
         $('.error').html('');
-        $('.success_error_message').html('');
         var action = $(this).attr('action');
         var method = $(this).attr('method');
         var formData = new FormData($("#roleForm")[0]);
@@ -69,9 +67,12 @@
         processData: false,
         success: function(data) {            
             if ($.isEmptyObject(data.error)) {
-                $('.success_error_message').html(`<span class="text-success">${data.success}</span>`);
+                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                var message = data.success;
+                var title = "Group";
+                showToaster(title,alertType,message);   
                 setTimeout(() => {
-                    window.location.replace("{{route('role_ip.index')}}");
+                    window.location.replace("{{route('admin.master.role_ip.index')}}");
                 }, 1500);                  
             } else {
                 $('.save_btn').prop('disabled', false);

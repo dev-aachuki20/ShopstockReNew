@@ -47,7 +47,7 @@ class ProductUnitDataTable extends DataTable
     public function query(ProductUnit $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['product_units.*']);
+        $query = $model->newQuery()->select(['product_units.*'])->orderBy('id','DESC');
         return $this->applyScopes($query);
     }
 

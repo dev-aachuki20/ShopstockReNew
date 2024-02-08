@@ -296,6 +296,8 @@ return [
 			'choose_file' 		=> 'Choose product image...',
 			'images' 			=> 'Product Images',
 			'product-category' 	=> 'Product Category',
+			'group' 			=> 'Group',
+			'sub_group' 		=> 'Sub Group',
 		],
 	],
 

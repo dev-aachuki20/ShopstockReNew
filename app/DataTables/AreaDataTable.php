@@ -47,7 +47,7 @@ class AreaDataTable extends DataTable
     public function query(Area $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['areas.*']);
+        $query = $model->newQuery()->select(['areas.*'])->orderBy('id','DESC');
         return $this->applyScopes($query);
     }
 
