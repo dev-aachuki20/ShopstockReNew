@@ -46,7 +46,8 @@ class AreaController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::create(['address' => $request->address,'created_by'=> Auth::id()]);  
+        $areaData = Area::create(['address' => $request->address,'created_by'=> Auth::id()]); 
+        addToLog($request,'Area','Create', $areaData); 
         return response()->json(['success' => 'Area created successfully.']);
     }
 
@@ -83,19 +84,27 @@ class AreaController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        Area::where('id',$id)->update(['address' => $request->address,'updated_by'=> Auth::id()]);  
+       $areaData =  Area::find($id);
+       $oldvalue = $areaData->getOriginal();         
+       $areaData->address = $request->address;
+       $areaData->updated_by = Auth::id();
+       $areaData->save();       
+       $newValue = $areaData->refresh();
+       addToLog($request,'Area','Edit', $newValue ,$oldvalue);
         return response()->json(['success' => 'Area Update successfully.']);
     }
-
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request,string $id)
     {
         abort_if(Gate::denies('area_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Area::find(decrypt($id));
+        $oldvalue = $record->getOriginal(); 
         $record->updated_by = Auth::id();
         $record->save();
+        $newValue = $record->refresh();
+        addToLog($request,'Area','Delete', $newValue ,$oldvalue);
         $record->delete();
         return response()->json(['success' => 'Area Deleted successfully.']);
     }
