@@ -29,7 +29,7 @@ class ProductExport implements FromCollection , WithHeadings
         $query->select(['products.*','groups.name as group_name','sub_group.name as sub_group_name','product_units.name as product_unit_name']);
         $query->leftJoin('groups', 'groups.id', '=', 'products.group_id');
         $query->leftJoin('groups as sub_group', 'sub_group.id', '=', 'products.sub_group_id');
-        $query->leftJoin('product_units', 'product_units.id', '=', 'products.unit_type');
+        $query->leftJoin('product_units', 'product_units.id', '=', 'products.unit_type')->orderBy('products.id','DESC');
         $groups = $query->get();
 
         return $groups->map(function ($group, $key) {
