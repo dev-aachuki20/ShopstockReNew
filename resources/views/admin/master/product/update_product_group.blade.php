@@ -30,7 +30,7 @@
             <h4>@lang('admin_master.product.seo_title_product_group_master')</h4>
           </div>
           <div class="card-body">
-            <div class="table-responsive fixed_Search">
+            <div class="table-responsive fixed_Search update_data_table_responsive">
               <table class="table table-bordered table-striped" id="productDatatable">
                 <thead>
                   <tr>
