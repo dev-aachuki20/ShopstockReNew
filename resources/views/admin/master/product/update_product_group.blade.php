@@ -85,7 +85,12 @@
                 },
                
             ],
+            drawCallback: function(settings) {
+              $('.group_list').select2();
+              $('.sub_group').select2();
+          }
         });
+        
 		    $('#product_group').change(function(){
             $('#productDatatable').DataTable().draw();
         });
@@ -97,27 +102,35 @@
         });
         const table = document.querySelector('table');
         table.addEventListener('click', function(event) {
-            // Get the `td` element that was clicked
             const clickedTD = event.target;
-            // Get the parent `tr` element of the `td` element
             const row = clickedTD.closest('tr');
-            // Get the row number of the `tr` element
             rowNumber = row.rowIndex;
-            // Do something with the row number
         });    
         
-        $(document).on('change','#group', function() {
+        $(document).on('change','.group_list', function() {
           var group_id = $(this).val();
           var porduct_id = $(this).data('porduct_id');
             if(group_id > 0){
               changeGroup(group_id,porduct_id,'Group');
+            }else{
+                var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                var message = "Please select one Group";
+                var title = "Group";
+                showToaster(title,alertType,message); 
+                $('#productDatatable').DataTable().draw();
             }
         });
-        $(document).on('change','#sub_group', function() {
+        $(document).on('change','.sub_group', function() {
           var group_id = $(this).val();
           var porduct_id = $(this).data('porduct_id');
             if(group_id > 0){
               changeGroup(group_id,porduct_id,'SubGroup');
+            }else{
+                var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                var message = "Please select one Sub Group";
+                var title = "Group";
+                showToaster(title,alertType,message); 
+                $('#productDatatable').DataTable().draw();
             }
         });
 
@@ -133,16 +146,11 @@
             url: "{{ route('admin.master.product-group-update')}}",
             data:{group_id:group_id,porduct_id:porduct_id,group_sub_group:type},
             success: function(data) {
-                // $('#sub_group_list').prop('disabled', false);               
-                // $('.sub_group_list').html('');
-                // $('.sub_group_list').html(data.html);
-                // $('#sub_group_list').select2({
-                //     }).on('select2:open', function () {
-                //         let a = $(this).data('select2');
-                //         if (!$('.select2-sub_group_add').length) {
-                //             a.$results.parents('.select2-results').append('<div class="select2-sub_group_add select_2_add_btn"><button class="btns addNewSubGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-                //         }
-                //     });
+                $('#productDatatable').DataTable().draw();
+                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                var message = "Changed successfully";
+                var title = "Group";
+                showToaster(title,alertType,message); 
             }
         });
     }

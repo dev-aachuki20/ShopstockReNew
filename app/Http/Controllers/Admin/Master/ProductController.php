@@ -315,7 +315,7 @@ class ProductController extends Controller
                ->editColumn('group_id', function ($row) {
                     $allGroup = Group::Where('parent_id','0')->get();                    
                     $html = "";
-                    $html .= '<select name="group" id="group" data-porduct_id="'.$row->id.'">';
+                    $html .= '<select class="group_list select2" id="group_$row->id" data-porduct_id="'.$row->id.'">';
                     $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
                     foreach($allGroup  as $group){
                         $selected = "";
@@ -330,7 +330,7 @@ class ProductController extends Controller
                 ->editColumn('sub_group_id', function ($row) {
                     $allGroup = Group::Where('parent_id',$row->group_id)->get();                    
                     $html = "";
-                    $html .= '<select name="sub_group" id="sub_group" data-porduct_id="'.$row->id.'">';
+                    $html .= '<select class="sub_group select2" id="sub_group_'.$row->id.'" data-porduct_id="'.$row->id.'">';
                     $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
                     foreach($allGroup  as $group){
                         $selected = "";
@@ -349,17 +349,10 @@ class ProductController extends Controller
     public function updateProductGroup(Request $request)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->group_sub_group == "Group"){
-            $validator = Validator::make($request->all(), [
-                'porduct_id' => 'required|numeric',
-                'group_id' => 'required|numeric'           
-            ]);
-        }else{
-            $validator = Validator::make($request->all(), [
-                'porduct_id' => 'required|numeric',
-                'sub_group_id' => 'required|numeric'            
-            ]);
-        }
+        $validator = Validator::make($request->all(), [
+            'porduct_id' => 'required|numeric',
+            'group_id' => 'required|numeric'           
+        ]);
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -372,9 +365,8 @@ class ProductController extends Controller
             $product->sub_group_id = 0;
         }
         if($request->group_sub_group == "SubGroup"){
-             $product->sub_group_id = $request->sub_group_id;
-        } 
-      
+             $product->sub_group_id = $request->group_id;
+        }       
         $product->updated_by = Auth::id();  
         $product->save();
         $newValue = $product->refresh();
