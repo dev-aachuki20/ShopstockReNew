@@ -42,3 +42,29 @@
 .add_group.circlebtn:hover{
   background: #2159d7 !important;
 }
+
+
+
+aside, .main-sidebar, .main-sidebar .dropdown, .main-sidebar .sidebar-menu li.active a  {
+  background: #062142 !important;
+}
+
+.main-sidebar .sidebar-brand a , .main-sidebar .sidebar-menu li a{
+  color: #fff !important;
+}
+
+.update_data_table_responsive{
+  overflow: hidden;
+}
+.update_data_table_responsive .dataTables_wrapper>div:nth-child(2)>div {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.update_data_table_responsive .dataTables_wrapper>div:nth-child(2)>div table {
+  white-space: nowrap;
+width: 100% !important;
+}
+
+.section-body .select2-container{
+  width: 100% !important;
+}
