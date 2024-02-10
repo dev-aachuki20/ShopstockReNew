@@ -68,7 +68,7 @@
   </section>
 
   
-<!-- Add Edit Modal -->
+<!-- view Modal -->
 <div class="modal fade" id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -83,7 +83,7 @@
     </div>
   </div>
 </div>
-<!-- Add Edit Modal -->
+<!-- view Modal -->
 @endsection
 
 @section('customJS')

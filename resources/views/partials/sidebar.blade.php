@@ -36,21 +36,28 @@
        
 
 
-        {{-- <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
+        <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.customer-management.title')</span>
             </a> 
-            <ul class="dropdown-menu">               
-                @if (Gate::check('group_access'))
-                    <li class="{{ Request::is('admin/master/groups*') }}">
-                        <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
+            <ul class="dropdown-menu"> 
+                @if (Gate::check('customer_create'))
+                    <li class="{{ Request::is('admin/customers/create') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.customers.create') }}">
                             @lang('quickadmin.customer-management.fields.add')
                         </a>
                     </li>
-                @endif
-            </ul>
-        </li> --}}
+                @endif  
+                @if (Gate::check('customer_access'))    
+                <li class="{{ Request::is('admin/customers') ||  Request::is('admin/customers/*/edit') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin.customers.index') }}">
+                        @lang('quickadmin.customer-management.fields.alter_list')
+                    </a>
+                </li>
+                @endif       
+             </ul>
+        </li>
 
 
 

@@ -1,0 +1,185 @@
+      
+    <div class="col-md-12 form-group">
+        {!! Form::label('name', trans('quickadmin.customers.fields.name'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
+        {!! Form::text('name', $customer->name??'', ['class' => 'form-control', 'placeholder' => 'Enter name']) !!}
+        <div class="error_name text-danger error"></div>       
+    </div>
+
+    <div class="col-md-12 form-group">
+        {!! Form::label('phone_number', trans('quickadmin.customers.fields.phone_number'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
+        {!! Form::text('phone_number',  $customer->phone_number ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter phone number']) !!}
+        <div class="error_phone_number text-danger error"></div>   
+    </div>
+    
+    <div class="col-md-12 form-group">
+        {!! Form::label('email', trans('quickadmin.customers.fields.email'), ['class' => 'control-label']) !!}
+        {!! Form::email('email',  $customer->email ?? '', ['class' => 'form-control', 'placeholder' => 'Enter email address']) !!}
+        <div class="error_email text-danger error"></div>   
+    </div>
+     
+    <div class="col-md-12 form-group">      
+        {!! Form::select('area_id', $areas,  $customer->area_id ?? '', ['id'=>'areaList','class' => 'form-control select2']) !!}
+        <p class="help-block red" id="area_id_error"></p>
+        <div class="error_area_id text-danger error"></div>   
+    </div>
+                
+    <div class="col-md-4 col-sm-12 col-lg-4">
+        {!! Form::label('is_type', trans('quickadmin.customers.fields.is_type'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
+        {!! Form::select('is_type', $types,  $customer->is_type ?? '', ['class' => 'form-control select2']) !!}
+        <div class="error_is_type text-danger error"></div>   
+    </div>
+	@if(!isset($customer))				
+        <div class="col-md-4 col-sm-12 col-lg-4 form-group">
+            {!! Form::label('opening_blance', trans('quickadmin.customers.fields.opening_blance'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
+            {!! Form::text('opening_blance', $customer->opening_blance ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter opening blance',  'min'=>"0" ,'autocomplete'=>"off" ]) !!}
+            <div class="error_opening_blance text-danger error"></div>   
+        </div>
+    @endif
+
+    <div class="col-md-4 col-sm-12 col-lg-4 form-group">
+        {!! Form::label('credit_limit', trans('quickadmin.customers.fields.credit_limit'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
+        {!! Form::text('credit_limit', $customer->credit_limit ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit',   'min'=>"0" ,'autocomplete'=>"off" ]) !!}
+        <div class="error_credit_limit text-danger error"></div>  
+    </div>  
+    <div class="col-md-12">  
+        @if(isset($customer))	
+            <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
+        @else
+            <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+        @endif
+    </div>       
+           
+
+
+<!-- Add Edit Modal -->
+<div class="modal fade" id="add_newModal" tabindex="-1" role="dialog" aria-labelledby="add_newModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Add</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="naem">ADDRESS:</label>
+            <input type="text" class="form-control" id="add_new_name" placeholder="Enter address">
+            <span class="error_new_address text-danger error"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary save_add_new">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Add Edit Modal -->
+
+@section('customJS')
+    <script type="text/javascript">         
+      $(document).ready(function(){    
+        $(document).on('input','.only_integer', function(evt) {
+            var inputValue = $(this).val();
+                $(this).val(inputValue.replace(/[^0-9.]/g, ''));
+        }); 
+    
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+    
+        $(document).on('submit', "#customerForm", function(e) {
+
+            e.preventDefault();
+            $('.error').html('');
+            var action = $(this).attr('action');
+            var method = $(this).attr('method');
+            var formData = new FormData($("#customerForm")[0]);
+            $('.save_btn').prop('disabled', true);
+            formData.append('_method', method);
+    
+            $.ajax({
+            type: "POST",
+            url: action,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(data) {            
+                if ($.isEmptyObject(data.error)) {
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Customer";
+                    showToaster(title,alertType,message);   
+                    setTimeout(() => {
+                        window.location.replace("{{route('admin.customers.index')}}");
+                    }, 1500);                  
+                } else {
+                    $('.save_btn').prop('disabled', false);
+                    printErrorMsg(data.error);
+                }
+            },
+            error: function(data){
+                $('.save_btn').prop('disabled', false);
+            }
+            });
+        });
+
+        // area add 
+        $("#areaList").select2({
+            }).on('select2:open', function () {
+                let a = $(this).data('select2');
+                if (!$('.select2-area_add').length) {
+                    a.$results.parents('.select2-results').append('<div class="select2-area_add select_2_add_btn"><button class="btns addNewAreaTypeBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+                }
+            });
+        // area add 
+
+    $(document).on('click',".addNewAreaTypeBtn",function(){
+        $("#add_new_name").val('');
+        $('.save_add_new').prop('disabled', false);
+        $('.add_new_drop').html('Area');
+        $("#add_newModal").modal('show');
+        $("#areaList").select2('close');
+        $(".save_add_new").addClass('add_unittype_btn');
+    });
+    $(document).on('click','.add_unittype_btn',function(e){
+        e.preventDefault();
+        var name = $("#add_new_name").val();
+        $('.save_add_new').prop('disabled', true);
+        $.ajax({
+            type: "POST",
+            url: "{{ route('admin.master.areas.store') }}",
+            data: { address: name,id: ""},
+            success: function(data) {
+                $('.save_add_new').prop('disabled', false);
+                if($.isEmptyObject(data.error)) { 
+                    var newOption = new Option(data.unitData.address, data.unitData.id, true, true);
+                    $('#areaList').append(newOption).trigger('change');
+                    $("#add_newModal").modal('hide');
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Area";
+                    showToaster(title,alertType,message);                   
+                }else {
+                    printErrorMsgAdd(data.error);
+                }
+            }
+        });
+    }); 
+
+})    
+function printErrorMsg(msg) {
+    $.each(msg, function(key, value) {
+    $(`.error_${key}`).html(value);
+    });
+}
+
+function printErrorMsgAdd(msg) {
+    $.each(msg, function(key, value) {
+        $(`.error_new_${key}`).html(value);
+    });
+}
+    </script>
+@endsection

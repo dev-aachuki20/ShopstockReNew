@@ -2,6 +2,7 @@
 
 return [
     'g_submit' => "Submit",
+    'g_update' => "Update",
     'g_image' => "Image",
     'g_please_select' => "Please Select",
     'g_height'               => 'Height',

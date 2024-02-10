@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Master\ProductController;
 use App\Http\Controllers\Admin\Master\LogActivitiesController;
 use App\Http\Controllers\Admin\Master\SplitsController;
 use App\Http\Controllers\Admin\Master\ProductUnitController;
+use App\Http\Controllers\Admin\CustomerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -60,13 +61,10 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         Route::resource('/log-activity', LogActivitiesController::class);
         Route::resource('/product-unit', ProductUnitController::class);
         //Route::resource('/split', SplitsController::class);
-
         Route::resource('/role_ip',RoleIpController::class);
-        //Route::resource('/log-activit', LogActivitiesController::class);
     });
-    // Route::group(['prefix' => 'customer', 'as' => 'customer.'], function () {
+    Route::resource('/customers',CustomerController::class);
 
-    // });
 });
 
 

@@ -17,6 +17,7 @@ return [
     */
 
     'name' => 'Dashboard Widgets',
+    'date_format' => 'Y-m-d',
     'start_date' => '2022-01-05',
     'support_email' => env('COMPANY_SUPPORT_EMAIL', 'invoiceapp@invoice.com'),
     'support_phone' => env('COMPANY_SUPPORT_PHONE', '1234567890'),

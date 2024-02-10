@@ -48,7 +48,7 @@ class AreaController extends Controller
         }
         $areaData = Area::create(['address' => $request->address,'created_by'=> Auth::id()]); 
         addToLog($request,'Area','Create', $areaData); 
-        return response()->json(['success' => 'Area created successfully.']);
+        return response()->json(['success' => 'Area created successfully.', 'unitData' => $areaData]);
     }
 
     /**

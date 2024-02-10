@@ -20,4 +20,9 @@ class Customer extends Model
         'created_by',
         'updated_by'
     ];
+
+    public function area(){
+        return $this->belongsTo(Area::class, 'area_id');
+    }
+
 }

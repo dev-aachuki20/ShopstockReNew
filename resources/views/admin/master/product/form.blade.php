@@ -130,7 +130,11 @@
     </div>
 </div> --}}
 <div class="col-md-12">  
-  <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+    @if(isset($product))	
+        <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
+    @else
+        <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+    @endif
 </div>
 
 
