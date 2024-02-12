@@ -12,7 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class CustomerDataTable extends DataTable
+class CustomerListDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -27,29 +27,38 @@ class CustomerDataTable extends DataTable
             ->editColumn('name',function($row){
                 return $row->name ?? "";
             })
-            ->editColumn('email',function($row){
-                return $row->email ?? "";
-            })
             ->editColumn('phone_number',function($row){
                 return $row->phone_number ?? "";
+            })            
+            ->editColumn('debit',function($row){
+               $getTotalBlance = getTotalBlance($row->id,1);
+               $dabit_blance = "";
+               if($getTotalBlance > 0){
+                $dabit_blance = '<i class="fa fa-inr" aria-hidden="true"></i> '. number_format(abs($getTotalBlance),2);
+               }
+               return $dabit_blance;
+            })
+            ->editColumn('credit',function($row){
+                $getTotalBlance = getTotalBlance($row->id,1);
+                $credit_blance = "";
+                if($getTotalBlance < 0){
+                    $credit_blance = '<i class="fa fa-inr" aria-hidden="true"></i> '. number_format(abs($getTotalBlance),2);
+                }
+                return $credit_blance;
             })
             ->addColumn('action',function($row){
                 $action='';
                 if (Gate::check('customer_access')) {
                     $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-id="'.encrypt($row->id).'" >'.$editIcon.'</a>';
-                }
-                if (Gate::check('customer_edit')) {
-                    $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                    $editUrl = route("admin.customers.edit",['customer' => $row->id] );
-                    $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1">'.$editIcon.'</a>';
+                    $url = route('admin.customers.view_customer',['id'=> $row->id]);
+                    $action .= '<a href="'.$url.'" class="btn btn-icon btn-info m-1 view_detail">'.$editIcon.'</a>';
                 }
                 if (Gate::check('customer_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_customer" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                 }
                 return $action;
-            })->rawColumns(['action']);
+            })->rawColumns(['action','debit','credit']);
     }
 
     /**
@@ -96,8 +105,9 @@ class CustomerDataTable extends DataTable
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.customers.fields.name')),
-            Column::make('email')->title(trans('quickadmin.customers.fields.email')),
             Column::make('phone_number')->title(trans('quickadmin.customers.fields.phone_number')),
+            Column::make('debit')->title(trans('quickadmin.transaction.fields.debit_amount')),
+            Column::make('credit')->title(trans('quickadmin.transaction.fields.credit_amount')),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

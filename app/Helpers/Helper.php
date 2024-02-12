@@ -7,6 +7,7 @@ use App\Models\LogActivity;
 use Carbon\Carbon;
 use App\Models\RoleIp;
 use App\Models\RoleIpPermission;
+use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str as Str;
 
@@ -215,6 +216,51 @@ if (!function_exists('checkRoleIpPermission')) {
 		return "No";
     }
 }
+if (!function_exists('getTotalBlance')) {
+    /**
+     * Return the total debit amount into payment transaction table.
+     *
+     * @return string
+     */
+    function getTotalBlance($customer_id,$is_label=0){
+        $totalDebit = getTotalDebit($customer_id);
+        $totalCredit = getTotalCredit($customer_id);
+        $total = $totalCredit - $totalDebit;
 
+        if($is_label == 0){
+            $total = number_format(abs($total),2);
+            if($totalDebit >= $totalCredit){
+                return '<button type="button" class="btn btn-success"><i class="fa fa-inr"></i>'.$total.'/-</button>';
+            }else{
+                return '<button type="button" class="btn btn-danger"><i class="fa fa-inr"></i>'.$total.'/-</button>';
+            }
+        }
+        return $total;
+    }
+}
+
+if (!function_exists('getTotalDebit')) {
+    /**
+     * Return the total debit amount into payment transaction table.
+     *
+     * @return string
+     */
+    function getTotalDebit($customer_id){
+        return PaymentTransaction::where('payment_type','debit')->where('customer_id',$customer_id)->sum('amount');
+    }
+}
+
+
+if (!function_exists('getTotalCredit')) {
+    /**
+     * Return the total credit amount into payment transaction table.
+     *
+     * @return string
+     */
+    function getTotalCredit($customer_id){
+         return PaymentTransaction::where('payment_type','credit')->where('customer_id',$customer_id)->sum('amount');
+
+    }
+}
 
 ?>

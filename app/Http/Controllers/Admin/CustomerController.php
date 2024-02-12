@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\DataTables\CustomerDataTable;
+use App\DataTables\CustomerListDataTable;
 use App\Models\Area;
 use App\Models\Customer;
 use App\Models\PaymentTransaction;
@@ -25,6 +26,20 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.customer.index');
     }
+    public function customerList(CustomerListDataTable $dataTable)
+    {
+        abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return $dataTable->render('admin.customer.list');
+    }
+    public function viewCostomer(Request $request)
+    {
+        abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $customer = Customer::findOrFail($request->id);
+        $openingBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+        return view('admin.customer.view_list_customer',compact('customer','openingBalance'));
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

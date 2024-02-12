@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title')@lang('quickadmin.group_master.title') @endsection
+@section('title')@lang('quickadmin.group_master.sub_title') @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
@@ -12,7 +12,7 @@
 @section('main-content')
 
 @php $isRecycle = ""; @endphp
-@if(Request::is('admin/master/group-recycle*'))
+@if(Request::is('admin/master/sub-group-recycle*'))
   @php  $isRecycle = "Yes"; @endphp
 @endif
 
@@ -24,24 +24,24 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   @if($isRecycle == "Yes")
-                  <h4>@lang('quickadmin.group_master.recycle')</h4>
+                  <h4>@lang('quickadmin.group_master.sub_recycle')</h4>
                   @else               
-                  <h4>@lang('quickadmin.group_master.title')</h4> 
+                  <h4>@lang('quickadmin.group_master.sub_title')</h4> 
                     <div class="col-auto  mt-md-0 mt-3 ml-auto">
-                      <div class="row align-items-center">
+                      <div class="row align-items-center">                          
                           <div class="col-auto px-1">
-                              @can('group_create')
-                                <button type="button" class="addnew-btn add_group sm_btn circlebtn" title="@lang('messages.add_group')" ><x-svg-icon icon="add-device" /></button>
-                              @endcan                            
+                            @can('group_create')
+                              <button type="button" class="addnew-btn add_sub_group sm_btn circlebtn" title="@lang('messages.add_sub_group')" ><x-svg-icon icon="add-device" /></button>
+                            @endcan
                           </div>
                           <div class="col-auto pl-1">
                               @can('group_export')
-                              <a href="{{ route('admin.master.group.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
+                              <a href="{{ route('admin.master.sub.group.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
                               @endcan
                           </div>
                           <div class="col-auto pl-1">
                               @can('group_undo')
-                              <a href="{{ route('admin.master.groups.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
+                              <a href="{{ route('admin.master.sub.group.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
                               @endcan
                           </div>
                       </div>

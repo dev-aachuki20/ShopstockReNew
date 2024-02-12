@@ -55,6 +55,11 @@
                         @lang('quickadmin.customer-management.fields.alter_list')
                     </a>
                 </li>
+                {{-- <li class="{{ Request::is('admin/customer/list')? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin.customer_list') }}">
+                        @lang('quickadmin.customer-management.fields.list')
+                    </a>
+                </li> --}}
                 @endif       
              </ul>
         </li>
@@ -79,6 +84,11 @@
                     <li class="{{ Request::is('admin/master/groups*') || Request::is('admin/master/group-recycle*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
                             @lang('quickadmin.group_master.title')
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/master/sub-groups*') || Request::is('admin/master/sub-group-recycle*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.master.sub_group.index') }}">
+                            @lang('quickadmin.group_master.sub_title')
                         </a>
                     </li>
                 @endif

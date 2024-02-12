@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use App\DataTables\GroupDataTable;
+use App\DataTables\GroupSubDataTable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\Group;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use App\Exports\GroupExport;
+use App\Exports\GroupSubExport;
 
 class GroupController extends Controller
 {
@@ -29,6 +31,17 @@ class GroupController extends Controller
         abort_if(Gate::denies('group_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $recycle = 'isRecycle';
         return $dataTable->withParam1($recycle)->render('admin.master.group.index');
+    }
+    public function subGroupIndex(GroupSubDataTable $dataTable)
+    {
+        abort_if(Gate::denies('group_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');        
+        return $dataTable->render('admin.master.group.sub_group_index');
+    }
+    public function subGroupRecycleIndex(GroupSubDataTable $dataTable)
+    {
+        abort_if(Gate::denies('group_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $recycle = 'isRecycle';
+        return $dataTable->withParam1($recycle)->render('admin.master.group.sub_group_index');
     }
 
     /**
@@ -163,6 +176,10 @@ class GroupController extends Controller
     public function export($group_id = null){
         abort_if(Gate::denies('group_export'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return Excel::download(new GroupExport($group_id), 'group-list.xlsx');
+    }
+    public function exportSubGroup($group_id = null){
+        abort_if(Gate::denies('group_export'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        return Excel::download(new GroupSubExport($group_id), 'sub-group-list.xlsx');
     }
 
     public function undoGroup(Request $request){

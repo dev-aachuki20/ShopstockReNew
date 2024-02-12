@@ -5,7 +5,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Models\Group;
 
-class GroupExport implements FromCollection , WithHeadings
+class GroupSubExport implements FromCollection , WithHeadings
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -27,16 +27,16 @@ class GroupExport implements FromCollection , WithHeadings
         }
 
         $query->select(['groups.*']);
-        // $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END DESC');
-        $query->where('parent_id','0')->orderBy('id','DESC');
+       // $query->orderByRaw('CASE WHEN parent_id = 0 THEN id ELSE parent_id END DESC');
+       $query->where('parent_id','>','0')->orderBy('id','DESC');
         $groups = $query->withCount('products')->withCount('subproducts')->get();
 
         return $groups->map(function ($group, $key) {
               return [
                 'Sn.' => $key + 1,
-                'Name' => ($group->parent_id == 0)?$group->name ?? "":$group->parent->name,
-                // 'Product' => ($group->products_count > 0)? $group->products_count :$group->subproducts_count,
-                 'Product' => ($group->products_count > 0)? $group->products_count : 0,
+                'Sub Group' => ($group->parent_id > 0)?$group->name ?? "":"",
+                'Group Name' => ($group->parent_id == 0)?$group->name ?? "":$group->parent->name,
+                'Product' => ($group->products_count > 0)? $group->products_count : 0,
                 'Created At' => $group->created_at->format('d-m-Y'),
             ];
         });
@@ -45,6 +45,6 @@ class GroupExport implements FromCollection , WithHeadings
 
     public function headings(): array
     {
-        return ["Sn.", "Name" ,"Product", "Created At"];
+        return ["Sn.", "Sub Group" , "Group Name" , "Product", "Created At"];
     }
 }

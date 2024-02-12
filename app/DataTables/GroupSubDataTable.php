@@ -12,7 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class GroupDataTable extends DataTable
+class GroupSubDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -31,7 +31,10 @@ class GroupDataTable extends DataTable
         
         return datatables()
         ->eloquent($query)
-            ->addIndexColumn()
+            ->addIndexColumn()            
+            ->editColumn('parent_id',function($row){
+                return ($row->parent_id > 0)?$row->name ?? "":"";
+            })
             ->editColumn('name',function($row){
                 if($row->parent_id == 0){
                     return $row->name ?? "";
@@ -39,9 +42,6 @@ class GroupDataTable extends DataTable
                     return $row->parent->name ?? "";
                 }                
             })
-            // ->editColumn('parent_id',function($row){
-            //     return ($row->parent_id > 0)?$row->name ?? "":"";
-            // })
             ->editColumn('products_count',function($row){
                 return ($row->products_count > 0)? $row->products_count :$row->subproducts_count;
             })
@@ -72,8 +72,8 @@ class GroupDataTable extends DataTable
     public function query(Group $model): QueryBuilder
     {
         $query = $model->newQuery()->select(['groups.*'])->withCount('products')->withCount('subproducts');
-       // $query->orderByRaw('CASE WHEN parent_id = 0 THEN id  ELSE parent_id END DESC');
-       $query->where('parent_id','0')->orderBy('id','DESC');
+        //$query->orderByRaw('CASE WHEN parent_id = 0 THEN id  ELSE parent_id END DESC');
+        $query->where('parent_id','>','0')->orderBy('id','DESC');
         if($this->isRecycle == "isRecycle"){            
             $query->onlyTrashed();           
         }
@@ -112,8 +112,8 @@ class GroupDataTable extends DataTable
     {
         return [
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
-           // Column::make('parent_id')->title(trans('quickadmin.group_master.fields.sub_group')),
+            Column::make('parent_id')->title(trans('quickadmin.group_master.fields.sub_group')),
+            Column::make('name')->title(trans('quickadmin.group_master.group_name')),
             Column::make('products_count')->title(trans('admin_master.product.products')),
             Column::computed('action')
             ->exportable(false)

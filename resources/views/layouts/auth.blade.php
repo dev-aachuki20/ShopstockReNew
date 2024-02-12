@@ -7,7 +7,7 @@
 
 </head>
 <body class="background-image-body">
-    <div class="loader"></div>
+    {{-- <div class="loader"></div> --}}
     <div id="app">
         @yield('main-content')
     </div>

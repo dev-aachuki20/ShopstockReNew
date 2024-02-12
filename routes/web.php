@@ -44,6 +44,12 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         Route::get('/group-child', [GroupController::class,'getSubGroup'])->name('get_group_child');
         Route::get('group-export/',[GroupController::class,'export'])->name('group.export');
 
+        // sub groups
+            Route::get('/sub-groups/index',[GroupController::class,'subGroupIndex'])->name('sub_group.index');
+            Route::get('/sub-group-recycle', [GroupController::class,'subGroupRecycleIndex'])->name('sub.group.recycle');        
+            Route::get('sub-group-export/',[GroupController::class,'exportSubGroup'])->name('sub.group.export');
+        // sub groups
+
         Route::resource('/products', ProductController::class);	
         Route::get('product-export/',[ProductController::class,'export'])->name('product.export');
         Route::get('/product-recycle', [ProductController::class,'recycleIndex'])->name('product.recycle');
@@ -64,6 +70,9 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         Route::resource('/role_ip',RoleIpController::class);
     });
     Route::resource('/customers',CustomerController::class);
+    Route::get('/customer/list',[CustomerController::class,'customerList'])->name('customer_list');
+    Route::get('/customer/view-customer',[CustomerController::class,'viewCostomer'])->name('customers.view_customer');	
+   
 
 });
 
