@@ -32,10 +32,6 @@
         </li>
         @endcan
 
-
-       
-
-
         <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
@@ -55,11 +51,11 @@
                         @lang('quickadmin.customer-management.fields.alter_list')
                     </a>
                 </li>
-                {{-- <li class="{{ Request::is('admin/customer/list')? 'active' : '' }}">
+                <li class="{{ Request::is('admin/customer/list') || Request::is('admin/customer/*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin.customer_list') }}">
                         @lang('quickadmin.customer-management.fields.list')
                     </a>
-                </li> --}}
+                </li>
                 @endif       
              </ul>
         </li>

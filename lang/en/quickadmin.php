@@ -721,6 +721,7 @@ return [
     'qa_no_record'=>'No Record Found!',
     'qa_record_found'=>'Record Found!',
     'thaila' => 'थैला',
+	'qa_payment_history' => 'Payment History',
 
 
 ];

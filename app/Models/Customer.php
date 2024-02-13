@@ -25,4 +25,7 @@ class Customer extends Model
         return $this->belongsTo(Area::class, 'area_id');
     }
 
+    public function transaction(){
+        return $this->hasMany(PaymentTransaction::class, 'customer_id')->orderBy('entry_date','asc');
+    }
 }

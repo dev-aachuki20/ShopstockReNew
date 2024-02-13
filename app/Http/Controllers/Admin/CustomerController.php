@@ -181,4 +181,27 @@ class CustomerController extends Controller
         $record->delete();
         return response()->json(['success' => 'Delete successfully.']);
     }
+
+
+    public function historyFilter(Request $request){        
+        $customerId = $request->customer;
+        $openingBalance = 0;
+        $openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+        if(is_null($request->from_date) && is_null($request->to_date)){
+             $customer = Customer::findOrFail($customerId);
+        }else{            
+             $startDate = Carbon::parse($request->from_date)->format('Y-m-d');
+             $endDate  = Carbon::parse($request->to_date)->format('Y-m-d');
+ 
+             $previousDebitBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','debit')->sum('amount');
+             $previousCreditBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','credit')->sum('amount');
+             $openingBalance = $openingBalance + ((float)$previousCreditBalance - (float)$previousDebitBalance);
+ 
+             $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
+                     $query->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
+             }])->where('id',$customerId)->first();
+        }         
+        $view = view('admin.customer.payment_history', compact('customer','openingBalance'))->render();       
+        return response()->json(array('success' => true,'viewRender' =>$view), 200);
+     }
 }
