@@ -165,6 +165,7 @@ return [
             'add' 	=> 'Add Party',
             'edit' => 'Edit Party',
             'select_address' => 'Select City',
+            'area_address' => 'Area Address',
 
 		],
 	],

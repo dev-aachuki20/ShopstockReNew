@@ -17,7 +17,7 @@
 
 
             <tr>
-                <th>Area Address</th>
+                <th>@lang('quickadmin.customers.fields.area_address')</th> 
                 <td >{{ $customer->area->address ?? '' }}</td>
             </tr>
             <tr>

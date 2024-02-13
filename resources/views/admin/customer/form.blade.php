@@ -17,7 +17,8 @@
         <div class="error_email text-danger error"></div>   
     </div>
      
-    <div class="col-md-12 form-group">      
+    <div class="col-md-12 form-group">  
+        {!! Form::label('area_id', trans('quickadmin.customers.fields.area_address'), ['class' => 'control-label']) !!}    
         {!! Form::select('area_id', $areas,  $customer->area_id ?? '', ['id'=>'areaList','class' => 'form-control select2']) !!}
         <p class="help-block red" id="area_id_error"></p>
         <div class="error_area_id text-danger error"></div>   

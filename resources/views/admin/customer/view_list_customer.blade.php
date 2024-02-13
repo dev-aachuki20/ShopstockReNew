@@ -15,7 +15,18 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.customer-management.fields.alter_list')</h4>                 
                 </div>
-                
+                <div class="col-md-12">
+                    <h3>{{$customer->name}}</h3>
+                    <p class="clientInformation">
+                      <small title="Customer category">
+                        <i class="fa fa-user-md" aria-hidden="true"></i> 
+                        Retailer
+                      </small>
+                        <small title="Customer phone number"><i class="fa fa-phone" aria-hidden="true"></i> 9680505848</small>
+                        <small title="Customer total blance"><i class="fa fa-money" aria-hidden="true"></i> ₹22899</small>
+                        <small title="Customer address"><i class="fa fa-map-marker" aria-hidden="true"></i> Kekri</small>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
