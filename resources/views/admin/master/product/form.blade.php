@@ -33,7 +33,7 @@
         <div class="input-group">           
             {!! Form::select('calculation_type',['' => trans('admin_master.g_please_select')]+ config('constant.calculationType'), $product->calculation_type??'', ['class' => 'form-control select2', 'id'=>'calculation_type']) !!}
         </div>
-        <div class="error_product_category_id text-danger error"></div>
+        <div class="error_calculation_type text-danger error"></div>
     </div>
 </div>
 <div class="col-md-3">
