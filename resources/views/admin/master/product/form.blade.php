@@ -1,4 +1,4 @@
-div<div class="col-md-12">
+<div class="col-md-12">
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
         <div class="input-group">
@@ -109,10 +109,9 @@ div<div class="col-md-12">
     </div>
     <div class="extra_option_hint mt-2" style="display: none;">
         <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
-    </div>
-    <div>
-        <span class="error_extra_option_hint text-danger error"></span>
-    </div>
+     </div>
+    <div><span class="error_extra_option_hint text-danger error"></span></div>
+    
 </div>
 {{-- <div class="col-md-3">
     <div class="form-group">
