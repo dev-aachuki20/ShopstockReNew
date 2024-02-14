@@ -53,10 +53,10 @@ class CustomerListDataTable extends DataTable
                     $url = route('admin.customers.view_customer',['id'=> $row->id]);
                     $action .= '<a href="'.$url.'" class="btn btn-icon btn-info m-1 view_detail">'.$editIcon.'</a>';
                 }
-                if (Gate::check('customer_delete')) {
-                    $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_customer" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                }
+                // if (Gate::check('customer_delete')) {
+                //     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
+                //     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_customer" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
+                // }
                 return $action;
             })->rawColumns(['action','debit','credit']);
     }

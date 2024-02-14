@@ -123,6 +123,7 @@ return [
     'customer-management' => [
 		'title' 	=> 'Party Management',
 		'fields' 	=> [
+			'party' 	=> 'View Party',
 			'add' 	=> 'Add New',
 			'list' 	=> 'Party List',
 			'alter_list' 	=> 'Alter List',

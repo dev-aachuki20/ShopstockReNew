@@ -14,7 +14,7 @@
 <section class="section roles update_product" style="z-index: unset">
   <div class="section-body">
     <div class="row">
-      <div class="col-md-12 form-group ">
+      {{-- <div class="col-md-12 form-group ">
         {!! Form::label('name', trans('admin_master.product.group_type').'*', ['class' => 'control-label']) !!}
         {!! Form::select('product_group', $product_groups, old('product_group'), ['class' => 'form-control select2 ', 'id'=>'product_group', 'required' => '']) !!}
         @if($errors->has('name'))
@@ -22,7 +22,7 @@
                 {{ $errors->first('name') }}
             </p>
         @endif
-      </div>
+      </div> --}}
 
       <div class="col-12">
         <div class="card">
@@ -37,6 +37,7 @@
                     <th>@lang('quickadmin.product2.fields.name')</th>
                     <th>@lang('quickadmin.product2.fields.group')</th>
                     <th>@lang('quickadmin.product2.fields.sub_group')</th>
+                    <th>@lang('quickadmin.product2.fields.unit_type')</th>
                   </tr>
                 </thead>
                 <tbody class="product-price-list">
@@ -75,6 +76,7 @@
                 { data: 'name', name: 'name' },
                 { data: 'group_id', name: 'group_id' },
                 { data: 'sub_group_id', name: 'sub_group_id' },
+                { data: 'unit_type', name: 'unit_type' },
             ],
             // Add an action column
             columnDefs: [
@@ -88,6 +90,7 @@
             drawCallback: function(settings) {
               $('.group_list').select2();
               $('.sub_group').select2();
+              $('.product_unit').select2();
           }
         });
         
@@ -133,6 +136,19 @@
                 $('#productDatatable').DataTable().draw();
             }
         });
+        $(document).on('change','.product_unit', function() {
+          var unit_id = $(this).val();
+          var porduct_id = $(this).data('porduct_id');
+            if(unit_id > 0){
+              changeGroup(unit_id,porduct_id,'Unit');
+            }else{
+                var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                var message = "Please select Unit";
+                var title = "Unit";
+                showToaster(title,alertType,message); 
+                $('#productDatatable').DataTable().draw();
+            }
+        });
 
     });
     $.ajaxSetup({
@@ -148,8 +164,8 @@
             success: function(data) {
                 $('#productDatatable').DataTable().draw();
                 var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                var message = "Changed successfully";
-                var title = "Group";
+                var message = "Update successfully";
+                var title = "Product";
                 showToaster(title,alertType,message); 
             }
         });

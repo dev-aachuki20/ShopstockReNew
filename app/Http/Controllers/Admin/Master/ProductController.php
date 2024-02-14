@@ -212,8 +212,11 @@ class ProductController extends Controller
               $products->whereNull('groups.deleted_at')->orderBy('name','asc');
             
 
-            if(isset($request->product_type) && $request->product_type != ''){
-                $products = $products->where('group_id',$request->product_type);
+            if(isset($request->group_id) && $request->group_id != ''){
+                $products = $products->where('group_id',$request->group_id);
+            }            
+            if(isset($request->sub_group_id) && $request->sub_group_id != ''){
+                $products = $products->where('sub_group_id',$request->sub_group_id);
             }            
             if(!empty($searchValue)){
                 $products = $products->where(function($query) use($searchValue){
@@ -342,7 +345,22 @@ class ProductController extends Controller
                     $html .='</select>';                  
                     return $html;
                 })
-                ->rawColumns(['group_id','sub_group_id'])->toJson();
+                ->editColumn('unit_type', function ($row) {
+                    $allUnit = ProductUnit::get();                    
+                    $html = "";
+                    $html .= '<select class="product_unit select2" id="product_unit_'.$row->id.'" data-porduct_id="'.$row->id.'">';
+                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
+                    foreach($allUnit  as $unit){
+                        $selected = "";
+                        if($unit->id == $row->unit_type){
+                            $selected = "selected";
+                        }
+                        $html .= '<option value="'.$unit->id.'" '.$selected.'>'.$unit->name.'</option>';
+                    }
+                    $html .='</select>';                  
+                    return $html;
+                })
+                ->rawColumns(['group_id','sub_group_id','unit_type'])->toJson();
         }
     }
 
@@ -367,12 +385,15 @@ class ProductController extends Controller
         if($request->group_sub_group == "SubGroup"){
              $product->sub_group_id = $request->group_id;
         }       
+        if($request->group_sub_group == "Unit"){
+             $product->unit_type = $request->group_id;
+        }       
         $product->updated_by = Auth::id();  
         $product->save();
         $newValue = $product->refresh();
         $group_sub_group = 'Update Product '.$request->group_sub_group;
         addToLog($request,'Product',$group_sub_group, $newValue ,$oldvalue);  
-        return response()->json(['success' => 'Product Group successfully.']);
+        return response()->json(['success' => 'Product Update successfully.']);
     }
 
 }

@@ -14,14 +14,25 @@
 <section class="section roles update_product" style="z-index: unset">
   <div class="section-body">
     <div class="row">
-      <div class="col-md-12 form-group ">
-        {!! Form::label('name', trans('admin_master.product.group_type').'*', ['class' => 'control-label']) !!}
+      <div class="col-md-6 form-group ">
+        {!! Form::label('name', trans('admin_master.product.group_type'), ['class' => 'control-label']) !!}
         {!! Form::select('product_group', $product_groups, old('product_group'), ['class' => 'form-control select2 ', 'id'=>'product_group', 'required' => '']) !!}
         @if($errors->has('name'))
             <p class="help-block red">
                 {{ $errors->first('name') }}
             </p>
         @endif
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+            <label>@lang('admin_master.product.sub_group_type_name') </label>
+            <div class="sub_group_list">
+                <div class="input-group">
+                    {!! Form::select('sub_group_id', [], $product->sub_group_id??'', ['class' => 'form-control select2', 'id'=>'sub_group_list']) !!}
+                </div>
+                <div class="error_sub_group_id text-danger error"></div>
+            </div>
+        </div>
       </div>
 
       <div class="col-12">
@@ -60,6 +71,15 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script type="text/javascript">
+   // get sub Group
+    $(document).on('change','#product_group', function() {
+          var group_list_id = $(this).val();
+          if(group_list_id > 0){
+              $('#sub_group_list').prop('disabled', true);
+              getSubGroup(group_list_id);
+          }
+      });
+    // get sub Group
   var updateProductObject = {data:[]};
   var singleProduct = {};
   var rowNumber;
@@ -70,7 +90,8 @@
             ajax: {
                 url: "{{ route('admin.master.product-price-list') }}",
                 data: function (data) {
-                    data.product_type = $('#product_group').val();
+                    data.group_id = $('#product_group').val();
+                    data.sub_group_id = $('#sub_group_list').val();
                 }
             },
             columns: [
@@ -91,8 +112,8 @@
             ],
         });
 		    $('#product_group').change(function(){
-            $('#productDatatable').DataTable().draw();
-        });
+           // $('#productDatatable').DataTable().draw();
+        });		   
         $(document).on('change','#productDatatable_length select',function(){
             $('#productDatatable').DataTable().draw();
         });
@@ -152,6 +173,25 @@
             editElement.html(inputElement);
             inputElement.focus();
         });
+
+        $(document).on('change','#sub_group_list',function(){
+            $('#productDatatable').DataTable().draw();
+        });
     });
+
+    function getSubGroup(group_list_id,selected_id=""){
+    $.ajax({
+            type: "GET",
+            url: "{{ route('admin.master.get_group_child')}}",
+            data:{parent_id:group_list_id,selected_id:selected_id},
+            success: function(data) {
+                $('#sub_group_list').prop('disabled', false);               
+                $('.sub_group_list').html('');
+                $('.sub_group_list').html(data.html);
+                $('#sub_group_list').select2();
+                $('#productDatatable').DataTable().draw();
+            }
+        });
+   }
 </script>
 @endsection

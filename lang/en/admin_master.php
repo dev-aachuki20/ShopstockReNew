@@ -12,7 +12,7 @@ return [
         'seo_title_product_master'             => 'Product Master',
         'product_recycle_master'             => 'Product Recycle Master',
         'seo_title_product_price_master'             => 'Update Product Price',
-        'seo_title_product_group_master'             => 'Update Product Group',
+        'seo_title_product_group_master'             => 'Update Product',
         'seo_title'             => 'Add Product',
         'add'             => 'Add Product',
         'product_view'             => 'View Product',

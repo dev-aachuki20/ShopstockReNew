@@ -102,8 +102,8 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('product_access'))
-                    <li class="{{ Request::is('admin/master/products*') ? 'active' : '' }}">
+                @if (Gate::check('product_access')) 
+                    <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.products.index') }}">
                             @lang('admin_master.product.seo_title_product_master')
                         </a>
