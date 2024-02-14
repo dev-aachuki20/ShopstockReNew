@@ -13534,6 +13534,38 @@ button.category-product-detail:hover{
     border-color: #f0f5f7;
     background-color: #f0f5f7;
 }
+
+/*13-02-2024*/
+.customer_view_deail .card-header{
+    margin-bottom: 20px;
+}
+.customer_view_deail .clientInformation small{
+    font-size: 16px;
+    margin-right: 15px;
+    position: relative;
+    border-right: 1px solid #c7c7c7;
+    padding-right: 15px;
+}
+.customer_view_deail .clientInformation small:last-child{
+    padding-right: 0;
+    margin-right: 0;
+    border-right: none;
+}
+.customer_view_deail .clientInformation small .fa-phone{
+    transform: rotate(98deg);
+    -webkit-transform: rotate(98deg);
+}
+.customer_view_deail .panel-default .panel-body .btn{
+    font-size: 14px;
+    padding: 12px;
+    height: auto;
+    line-height: 16px;
+    border-radius: 0;
+    min-width: 80px;
+    text-align: center;
+    margin-top: 29px;
+}
+
 @media (max-width:1550px){
     #invoice-filter-form > .row {
         row-gap: 15px;
@@ -13564,6 +13596,10 @@ button.category-product-detail:hover{
     #internetlostMessage {
         font-size: 12px;
         padding: 4px 16px !important;
+    }
+    .customer_view_deail .panel-default .panel-body .btn{
+        margin-top: 0px;
+        margin-bottom: 20px;
     }
 }
 
