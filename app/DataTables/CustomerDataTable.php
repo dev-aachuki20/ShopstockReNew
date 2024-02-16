@@ -27,9 +27,6 @@ class CustomerDataTable extends DataTable
             ->editColumn('name',function($row){
                 return $row->name ?? "";
             })
-            ->editColumn('email',function($row){
-                return $row->email ?? "";
-            })
             ->editColumn('phone_number',function($row){
                 return $row->phone_number ?? "";
             })
@@ -96,7 +93,6 @@ class CustomerDataTable extends DataTable
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.customers.fields.name')),
-            Column::make('email')->title(trans('quickadmin.customers.fields.email')),
             Column::make('phone_number')->title(trans('quickadmin.customers.fields.phone_number')),
             Column::computed('action')
             ->exportable(false)
