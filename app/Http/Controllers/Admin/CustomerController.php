@@ -8,6 +8,8 @@ use App\DataTables\CustomerDataTable;
 use App\DataTables\CustomerListDataTable;
 use App\Models\Area;
 use App\Models\Customer;
+use App\Models\Group;
+use App\Models\CustomerGroup;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
@@ -49,7 +51,8 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $areas = Area::orderBy('address','ASC')->get()->pluck('address', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $types = ['' => trans('quickadmin.qa_please_select')]+config('constant.customer_types');
-        return view('admin.customer.create',compact('areas','types'));
+        $groups = Group::where('parent_id','0')->get();
+        return view('admin.customer.create',compact('areas','types','groups'));
     }
 
     /**
@@ -57,29 +60,44 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+      //  dd($request->all());
         abort_if(Gate::denies('customer_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => ['required','string','max:250'], 
             'phone_number' => ['required','numeric','digits_between:7,15'], 
-            'email' => [
-                'required','max:50','email',
-                Rule::unique('customers', 'email')->whereNull('deleted_at'),
-            ],
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,15'], 
             'area_id' => ['required','numeric'], 
             'is_type' => ['required','string','max:50'], 
-            'opening_blance' => ['required','numeric'], 
-            'credit_limit' => ['required','numeric'], 
+            'opening_blance' => ['required','numeric'],
         ]); 
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
             ]);
         }
+        $phoneNumber = $request->phone_number;
+        $altPhoneNumber = $request->alternate_phone_number;
 
+
+        $checkPhoneNumber =  Customer::where('name',$request->name)->where(function ($query) use ($phoneNumber,$altPhoneNumber) {
+            $query->where('phone_number', '=', $phoneNumber)
+                  ->orWhere('alternate_phone_number', '=', $phoneNumber);
+            if($altPhoneNumber !=''){
+                $query->orWhere('phone_number', '=', $altPhoneNumber)
+                       ->orWhere('alternate_phone_number', '=', $altPhoneNumber);
+                }
+        })->first();
+
+
+        if($checkPhoneNumber){
+            return response()->json([
+                'error' => array("name" => "Name AND Phone number or Alternate Phone Number Alredy Exit")
+            ]);
+        }
         $data = [
             'name' => $request->name,
             'phone_number' => $request->phone_number,
-            'email' => $request->email,
+            'alternate_phone_number' => $request->alternate_phone_number,
             'area_id' => $request->area_id,
             'is_type' => $request->is_type,            
             'credit_limit' => $request->credit_limit ?? 0,
@@ -97,6 +115,20 @@ class CustomerController extends Controller
             'entry_date' => Carbon::now()->format(config('app.date_format')),
             'created_by' => Auth::id(),
         );
+        // group add
+            if($request->is_type == "wholesaler"){
+                if($request->has('groups')){
+                    foreach($request->groups as $row){
+                        $groupData = [
+                            'group_id' =>  $row,
+                            'customer_id' => $customer->id,
+                        ];
+                        CustomerGroup::create($groupData);
+                    }
+                }
+            }
+        // group add
+
         $transaction = PaymentTransaction::create($transactionDetails);
         addToLog($request,'PaymentTransaction','Create From Customer', $transaction);
         return response()->json(['success' => 'Created successfully.']);
@@ -111,7 +143,8 @@ class CustomerController extends Controller
         if($request->ajax()){
             $id = decrypt($id);
             $customer = Customer::where('id',$id)->first();
-            $html = View::make('admin.customer.show',compact('customer'))->render();
+            $customerGroup = CustomerGroup::where('customer_id',$id)->get();
+            $html = View::make('admin.customer.show',compact('customer','customerGroup'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
     }
@@ -125,7 +158,9 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $areas = Area::orderBy('address','ASC')->get()->pluck('address', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $types = ['' => trans('quickadmin.qa_please_select')]+config('constant.customer_types');
-        return view('admin.customer.edit',compact('areas','types','customer'));
+        $groups = Group::where('parent_id','0')->get();
+        $customerGroup = CustomerGroup::where('customer_id',$id)->get()->pluck('group_id');
+        return view('admin.customer.edit',compact('areas','types','customer','groups','customerGroup'));
     }
 
     /**
@@ -137,13 +172,9 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => ['required','string','max:250'], 
             'phone_number' => ['required','numeric','digits_between:7,15'], 
-            'email' => [
-                'required','max:50','email',
-                Rule::unique('customers', 'email')->whereNull('deleted_at')->ignore($id),
-            ],
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,15'], 
             'area_id' => ['required','numeric'], 
-            'is_type' => ['required','string','max:50'], 
-            'credit_limit' => ['required','numeric'], 
+            'is_type' => ['required','string','max:50']
         ]); 
         if ($validator->fails()) {
             return response()->json([
@@ -151,17 +182,51 @@ class CustomerController extends Controller
             ]);
         }
 
+        // for validate
+        $phoneNumber = $request->phone_number;
+        $altPhoneNumber = $request->alternate_phone_number;
+        $checkPhoneNumber =  Customer::where('name',$request->name)->where('id','<>',$id)->where(function ($query) use ($phoneNumber,$altPhoneNumber) {
+            $query->where('phone_number', '=', $phoneNumber)
+                  ->orWhere('alternate_phone_number', '=', $phoneNumber);
+            if($altPhoneNumber !=''){
+                $query->orWhere('phone_number', '=', $altPhoneNumber)
+                       ->orWhere('alternate_phone_number', '=', $altPhoneNumber);
+                }
+        })->first();
+        if($checkPhoneNumber){
+            return response()->json([
+                'error' => array("name" => "Name AND Phone number or Alternate Phone Number Alredy Exit")
+            ]);
+        }
+        // for validate
+
         $customer = Customer::findOrFail($id);
         $oldvalue = $customer->getOriginal(); 
         $customer->name = $request->name; 
         $customer->phone_number = $request->phone_number; 
-        $customer->email = $request->email; 
+        $customer->alternate_phone_number = $request->alternate_phone_number; 
         $customer->area_id = $request->area_id; 
         $customer->is_type = $request->is_type; 
         $customer->credit_limit = $request->credit_limit ?? 0; 
         $customer->updated_by = Auth::id(); 
         $customer->save();
         $newValue = $customer->refresh();
+
+         // group add
+         CustomerGroup::where('customer_id',$customer->id)->delete();
+         if($request->is_type == "wholesaler"){
+            if($request->has('groups')){
+                foreach($request->groups as $row){
+                    $groupData = [
+                        'group_id' =>  $row,
+                        'customer_id' => $customer->id,
+                    ];
+                    CustomerGroup::create($groupData);
+                }
+            }
+        }
+        // group add
+
         addToLog($request,'Customer','Edit', $newValue ,$oldvalue); 
         return response()->json(['success' => 'Update successfully.']);
     }

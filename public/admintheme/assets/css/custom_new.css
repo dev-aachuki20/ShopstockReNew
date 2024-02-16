@@ -90,3 +90,6 @@ width: 100% !important;
 .theme-white .btn-primary{
   padding: 0px 30px;
 }
+.edit_product_price:focus{
+  background-color: #2159d7 !important;
+}

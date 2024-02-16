@@ -1,47 +1,73 @@
       
-    <div class="col-md-12 form-group">
+    <div class="col-md-6 form-group">
         {!! Form::label('name', trans('quickadmin.customers.fields.name'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
         {!! Form::text('name', $customer->name??'', ['class' => 'form-control', 'placeholder' => 'Enter name']) !!}
         <div class="error_name text-danger error"></div>       
     </div>
 
-    <div class="col-md-12 form-group">
+    <div class="col-md-6 form-group">
         {!! Form::label('phone_number', trans('quickadmin.customers.fields.phone_number'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
         {!! Form::text('phone_number',  $customer->phone_number ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter phone number']) !!}
         <div class="error_phone_number text-danger error"></div>   
     </div>
-    
-    <div class="col-md-12 form-group">
-        {!! Form::label('email', trans('quickadmin.customers.fields.email'), ['class' => 'control-label']) !!}
-        {!! Form::email('email',  $customer->email ?? '', ['class' => 'form-control', 'placeholder' => 'Enter email address']) !!}
-        <div class="error_email text-danger error"></div>   
-    </div>
+    <div class="col-md-6 form-group">
+        {!! Form::label('alternate_phone_number', trans('quickadmin.customers.fields.alternate_phone_number'), ['class' => 'control-label']) !!} 
+        {!! Form::text('alternate_phone_number',  $customer->alternate_phone_number ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter Alternate phone number']) !!}
+        <div class="error_alternate_phone_number text-danger error"></div>   
+    </div>  
+   
      
-    <div class="col-md-12 form-group">  
+    <div class="col-md-6 form-group">  
         {!! Form::label('area_id', trans('quickadmin.customers.fields.area_address'), ['class' => 'control-label']) !!}    
         {!! Form::select('area_id', $areas,  $customer->area_id ?? '', ['id'=>'areaList','class' => 'form-control select2']) !!}
         <p class="help-block red" id="area_id_error"></p>
         <div class="error_area_id text-danger error"></div>   
     </div>
-                
-    <div class="col-md-4 col-sm-12 col-lg-4">
-        {!! Form::label('is_type', trans('quickadmin.customers.fields.is_type'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
-        {!! Form::select('is_type', $types,  $customer->is_type ?? '', ['class' => 'form-control select2']) !!}
-        <div class="error_is_type text-danger error"></div>   
-    </div>
+
 	@if(!isset($customer))				
-        <div class="col-md-4 col-sm-12 col-lg-4 form-group">
+        <div class="col-md-6 col-sm-12 col-lg-6 form-group">
             {!! Form::label('opening_blance', trans('quickadmin.customers.fields.opening_blance'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
             {!! Form::text('opening_blance', $customer->opening_blance ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter opening blance',  'min'=>"0" ,'autocomplete'=>"off" ]) !!}
             <div class="error_opening_blance text-danger error"></div>   
         </div>
     @endif
 
-    <div class="col-md-4 col-sm-12 col-lg-4 form-group">
-        {!! Form::label('credit_limit', trans('quickadmin.customers.fields.credit_limit'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
-        {!! Form::text('credit_limit', $customer->credit_limit ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit',   'min'=>"0" ,'autocomplete'=>"off" ]) !!}
+    <div class="col-md-6 col-sm-12 col-lg-6 form-group">
+        {!! Form::label('credit_limit', trans('quickadmin.customers.fields.credit_limit'), ['class' => 'control-label ']) !!}
+        {!! Form::text('credit_limit', $customer->credit_limit ?? 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit',   'min'=>"0" ,'autocomplete'=>"off" ]) !!}
         <div class="error_credit_limit text-danger error"></div>  
-    </div>  
+    </div> 
+    <div class="col-md-12"></div>
+    <div class="col-md-6 mb-3">
+        {!! Form::label('is_type', trans('quickadmin.customers.fields.is_type'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
+        <span class="select_group_list" style="@if(($customer->is_type ??'') != 'wholesaler') display: none @endif"><input type="checkbox" id="select_all"> <label for="select_all">Select All</label></span>
+        {!! Form::select('is_type', $types,  $customer->is_type ?? '', ['class' => 'form-control select2']) !!}
+        <div class="error_is_type text-danger error"></div>  
+        
+        <div class="select_group_list" style="@if(($customer->is_type ??'') != 'wholesaler') display: none @endif">
+            <ul>
+               @foreach ($groups as $row)
+                    <li>
+                        @php $isChecked = ""; @endphp    
+                        @if(isset($customerGroup))
+                            @php 
+                                $values = collect($customerGroup);
+                                $searchValue = $row->id;                                       
+                            @endphp
+                            @if($values->contains($searchValue))
+                                @php   $isChecked = "checked"; @endphp
+                            @endif
+                        @endif
+
+                        <input type="checkbox" {{$isChecked}} id="group_check_{{$row->id}}" class="selected_product" name="groups[]" value="{{$row->id}}">
+                        <label for="group_check_{{$row->id}}"> {{$row->name}}</label>
+                    </li>
+               @endforeach 
+            </ul>
+        </div>
+    </div>
+
+    
     <div class="col-md-12">  
         @if(isset($customer))	
             <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
@@ -79,7 +105,25 @@
 
 @section('customJS')
     <script type="text/javascript">         
-      $(document).ready(function(){    
+      $(document).ready(function(){
+        //
+            $(document).on('change','#select_all', function() {   
+                var isChecked = $(this).prop('checked');
+                $('.selected_product').prop('checked', isChecked);
+            });
+            $(document).on('change','#is_type', function() {
+                 var is_type_selected =  $(this).val();
+                 if(is_type_selected =="wholesaler"){
+                    $('.select_group_list').css('display','inline-block');
+                }else{
+                    $('#select_all').prop('checked', false);
+                    $('.selected_product').prop('checked', false);
+                     $('.select_group_list').css('display','none');
+                 }
+            });
+        // 
+
+        
         $(document).on('input','.only_integer', function(evt) {
             var inputValue = $(this).val();
                 $(this).val(inputValue.replace(/[^0-9.]/g, ''));

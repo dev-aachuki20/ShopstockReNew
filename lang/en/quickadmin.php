@@ -162,6 +162,7 @@ return [
 			'is_type'		=> 'Type',
 			'credit_limit'  => 'Credit Limit',
 			'phone_number' 	=> 'Phone Number',
+			'alternate_phone_number' 	=> 'Alternate Phone Number',
 			'opening_blance'=> 'Opening Blance',
             'add' 	=> 'Add Party',
             'edit' => 'Edit Party',

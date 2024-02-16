@@ -11,8 +11,8 @@
                 <td >{{ $customer->phone_number ?? '' }}</td>
             </tr>
             <tr>
-                <th>@lang('quickadmin.customers.fields.email')</th>
-                <td >{{ $customer->email ?? '' }}</td>
+                <th>@lang('quickadmin.customers.fields.alternate_phone_number')</th>
+                <td >{{ $customer->alternate_phone_number ?? '' }}</td>
             </tr>
 
 
@@ -24,6 +24,16 @@
                 <th>@lang('quickadmin.customers.fields.is_type')</th>
                 <td >{{ $customer->is_type ?? '' }}</td>
             </tr>
+            @if($customer->is_type =="wholesaler")
+            <tr>
+                <th>Grops</th>
+                <td >
+                    @foreach($customerGroup as $row)
+                            {{$row->group->name??''}}@if (!$loop->last),@endif
+                    @endforeach
+                </td>
+            </tr>
+            @endif
 
 
             <tr>
