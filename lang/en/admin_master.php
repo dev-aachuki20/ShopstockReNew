@@ -17,6 +17,7 @@ return [
         'add'             => 'Add Product',
         'product_view'             => 'View Product',
         'products'             => 'Products',
+        'edit'             => 'Edit Price',
         'name'          => 'Name',
         'product_name'          => 'Product Name',
         'product_name_enter'          => 'Enter Product Name',

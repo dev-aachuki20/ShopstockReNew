@@ -230,6 +230,9 @@ class ProductController extends Controller
             $products =  $products->get();
 
             return DataTables::of($products)
+                ->editColumn('select_p', function ($row) {
+                    return '<input type="checkbox" class="selected_product" name="products[]" value="'.$row->id.'">';
+                })
                 ->editColumn('price', function ($row) {
                     return '<i class="fa fa-inr"></i> <span data-field="price" data-product="'.$row->id.'">'.$row->price ?? 0.00.'</span>';
                 })
@@ -242,7 +245,7 @@ class ProductController extends Controller
                 ->editColumn('retailer_price', function ($row) {
                     return '<i class="fa fa-inr"></i> <span data-field="retailer_price" data-product="'.$row->id.'">'.$row->retailer_price ?? 0.00.'</span>';
                 })
-                ->rawColumns(['price','min_sale_price','wholesaler_price','retailer_price'])->toJson();
+                ->rawColumns(['select_p','price','min_sale_price','wholesaler_price','retailer_price'])->toJson();
         }
     }
 
@@ -257,6 +260,7 @@ class ProductController extends Controller
                 $product = Product::findOrFail($rowId); 
                 $oldvalue = $product->getOriginal();            
                 $product->$fieldName = $newValue;
+                $product->updated_by =  Auth::id(); 
                 $product->save();
                 $newValue = $product->refresh();
                 addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue); 
@@ -265,6 +269,37 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 return response()->json(['success' => false, 'message' => 'Error updating product price']);
             }
+        }
+    }
+    public function updateProductPriceGroup(Request $request){
+        abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if($request->ajax()){
+            $validator = Validator::make($request->all(), [
+                'price_type' => 'required|string',
+                'amount' => 'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->toArray()
+                ]);
+            }   
+            $product_id = $request->product_ids;
+            $price_type = $request->price_type;      
+            foreach($product_id as $row){
+                $product = Product::findOrFail($row); 
+                $oldvalue = $product->getOriginal();         
+                if($price_type == "increment" || $price_type == "decrement"){
+                    $product->$price_type('price', $request->amount);
+                    $product->$price_type('min_sale_price', $request->amount);
+                    $product->$price_type('wholesaler_price', $request->amount);
+                    $product->$price_type('retailer_price', $request->amount);
+                    $product->updated_by =  Auth::id(); 
+                    $product->save();
+                    $newValue = $product->refresh();
+                    addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue); 
+                }
+            }
+            return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
         }
     }
 

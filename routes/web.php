@@ -59,6 +59,7 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
         Route::get('/product-price/update-prices',[ProductController::class,'viewUpdateProductPrice'])->name('update-prices');	
         Route::get('/product-price/product-price-list',[ProductController::class,'productPriceList'])->name('product-price-list');	
         Route::post('/product-price/product-price-udpate',[ProductController::class,'updateProductPrice'])->name('updateProductPrice');	
+        Route::post('/product-price/group-product-price-udpate',[ProductController::class,'updateProductPriceGroup'])->name('updateProductPriceGroup');	
         
         Route::get('/product-group/update',[ProductController::class,'viewUpdateProductGroup'])->name('update-product-group');	
         Route::get('/product-group/product-group-list',[ProductController::class,'productUpdateGroupList'])->name('product-group-list');
