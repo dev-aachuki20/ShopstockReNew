@@ -32,6 +32,26 @@
         </li>
         @endcan
 
+
+
+
+        <li class="dropdown {{ Request::is('admin/orders*') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.order-management2.title')</span>
+            </a> 
+            <ul class="dropdown-menu"> 
+                    <li class="{{ Request::is('admin/orders/create') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.orders.create') }}">
+                            @lang('quickadmin.order-management2.fields.add')
+                        </a>
+                    </li>
+                </li>    
+             </ul>
+        </li>
+
+
+
         <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
@@ -61,11 +81,6 @@
         </li>
 
 
-
-
-
-      
-            
            
 
 

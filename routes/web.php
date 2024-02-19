@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\Master\LogActivitiesController;
 use App\Http\Controllers\Admin\Master\SplitsController;
 use App\Http\Controllers\Admin\Master\ProductUnitController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\OrdersController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -73,9 +74,9 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
     Route::resource('/customers',CustomerController::class);
     Route::get('/customer/list',[CustomerController::class,'customerList'])->name('customer_list');
     Route::get('/customer/view-customer',[CustomerController::class,'viewCostomer'])->name('customers.view_customer');	
-   
     Route::post('/customer/history-filter',[CustomerController::class,'historyFilter'])->name('customers.historyFilter');
-
+    
+    Route::resource('/orders',OrdersController::class);
 });
 
 

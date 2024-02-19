@@ -311,6 +311,16 @@ return [
 			'list' 	=> 'Invoice List',
 		],
 	],
+	'order-management2' => [
+		'title' 	=> 'Estimate management',
+		'return-title' 	=> 'Return Order Management',
+		'title-draft' 	=> 'Draft Estimate Management',
+		'title-case-reciept'  => 'Create new cash reciept',
+		'fields' 	=> [
+			'add' 	=> 'New Estimate',
+			'list' 	=> 'Manage Estimates',
+		],
+	],
 
 	'order'  => [
 		'title'  => 'Orders',
