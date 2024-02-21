@@ -39,14 +39,14 @@
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.order-management2.title')</span>
-            </a> 
-            <ul class="dropdown-menu"> 
+            </a>
+            <ul class="dropdown-menu">
                     <li class="{{ Request::is('admin/orders/create') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.orders.create') }}">
                             @lang('quickadmin.order-management2.fields.add')
                         </a>
                     </li>
-                </li>    
+                </li>
              </ul>
         </li>
 
@@ -56,16 +56,16 @@
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.customer-management.title')</span>
-            </a> 
-            <ul class="dropdown-menu"> 
+            </a>
+            <ul class="dropdown-menu">
                 @if (Gate::check('customer_create'))
                     <li class="{{ Request::is('admin/customers/create') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.customers.create') }}">
                             @lang('quickadmin.customer-management.fields.add')
                         </a>
                     </li>
-                @endif  
-                @if (Gate::check('customer_access'))    
+                @endif
+                @if (Gate::check('customer_access'))
                 <li class="{{ Request::is('admin/customers') ||  Request::is('admin/customers/*/edit') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin.customers.index') }}">
                         @lang('quickadmin.customer-management.fields.alter_list')
@@ -76,21 +76,21 @@
                         @lang('quickadmin.customer-management.fields.list')
                     </a>
                 </li>
-                @endif       
+                @endif
              </ul>
         </li>
 
 
-           
+
 
 
         <li class="dropdown {{ Request::is('admin/master*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.master-management.title')</span>
-            </a> 
+            </a>
             <ul class="dropdown-menu">
-               
+
                 @if (Gate::check('group_access'))
                     <li class="{{ Request::is('admin/master/groups*') || Request::is('admin/master/group-recycle*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.groups.index') }}">
@@ -117,7 +117,7 @@
                         </a>
                     </li>
                 @endif
-                @if (Gate::check('product_access')) 
+                @if (Gate::check('product_access'))
                     <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.products.index') }}">
                             @lang('admin_master.product.seo_title_product_master')
@@ -133,7 +133,7 @@
                         </a>
                     </li>
                 @endif
-                
+
                 {{-- @if (Gate::check('split_access'))
                     <li class="{{ Request::is('admin/master/split*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.split.index') }}">
@@ -148,7 +148,7 @@
                         </a>
                     </li>
                 @endif
-                
+
                 @if (Gate::check('ip_access'))
                     <li class="{{ Request::is('admin/master/role_ip*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('admin.master.role_ip.index') }}">
@@ -159,7 +159,7 @@
 
             </ul>
         </li>
-        
+
 
 
         @can('setting_access')

@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'products';
-    protected $fillable = [        
+    protected $fillable = [
         'name',
         'group_id',
         'sub_group_id',
@@ -20,7 +20,7 @@ class Product extends Model
         'min_sale_price',
         'wholesaler_price',
         'retailer_price',
-        'image',       
+        'image',
         'is_height',
         'is_width',
         'is_length',
@@ -42,4 +42,14 @@ class Product extends Model
     public function product_unit(){
         return $this->belongsTo(ProductUnit::class, 'unit_type');
     }
+    public function getPurchasePriceEncodeAttribute()
+    {
+        $encodedPrice = str_replace(config('constant.cost_price_encode_format.code'), config('constant.cost_price_encode_format.encode'),$this->price);
+		return $encodedPrice ?? '';
+    }
+    public function product_category(){
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
+
+
 }

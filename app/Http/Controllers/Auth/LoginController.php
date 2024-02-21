@@ -18,7 +18,7 @@ class LoginController extends Controller
     {
         //
         return view('auth.login');
-    } 
+    }
 
     public function login(Request $request){
         $validated = $request->validate([
@@ -37,7 +37,7 @@ class LoginController extends Controller
         ];
         try {
 
-            $user = User::where('username',$request->username)->first();            
+            $user = User::where('username',$request->username)->first();
             if($user){
                 if (Auth::attempt($credentialsOnly, $remember_me)) {
                    $check_ip = checkRoleIpPermission($request->ip(), $user->roles->first()->id);

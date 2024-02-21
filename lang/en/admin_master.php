@@ -29,7 +29,7 @@ return [
         'product_type'          => 'Calculation type',
         'category_name'          => 'Category',
         'unit_type'             => 'Unit Type',
-        'extra_option'          => 'Extra Option',        
+        'extra_option'          => 'Extra Option',
         'is_sub_product'        => 'Is Sub Product',
         'enter_hint'            => 'Enter Hint',
         'hint'                  => 'Hint',
@@ -42,6 +42,20 @@ return [
         'retailer_price'        => 'Retailer price',
         'retailer_price_enter'        => 'Enter Retailer price',
         'update_product_price'        => 'Update Products Prices'
+    ],
+
+    'new_estimate' =>[
+        'customer_name'     => 'Customer Name',
+        'customer_number'   => 'Customer Number',
+        'supply_place'      => 'Place of Supply',
+        'date'              => 'Date',
+        'estimate_number'   => 'Estimate Number',
+        'quantity'          => 'Quantity',
+        'price'             => 'Price',
+        'amount'            => 'Amount',
+        'seo_title'         => 'Add Order',
+
+
     ]
 ]
 ?>
