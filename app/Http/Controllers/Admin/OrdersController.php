@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Http\Requests\Order\StoreOrdersRequest;
+use App\Models\PaymentTransaction;
 use App\Models\Product;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
@@ -28,16 +31,93 @@ class OrdersController extends Controller
     {
         $orderType = 'create';
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        $products  = Product::select('id', 'name', 'price', 'group_id')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        // $products  = Product::select('id', 'name', 'price', 'group_id')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+
+        $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')
+            ->orderBy('name', 'asc')
+            ->get();
+
         return view('admin.orders.create', compact('customers', 'products', 'orderType'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreOrdersRequest $request)
     {
-        //
+        $isDraft = $request->get('submit') == 'draft' ? true : false;
+		$invoiceNumber = getNewInvoiceNumber('','new'); 
+        $inputs = array(
+            'customer_id'    => $request->get('customer_id'),
+            'order_type'     => $request->get('order_type'),
+            'invoice_number' => $invoiceNumber,
+            'area_id'        => $request->get('area_id'),
+            'invoice_date'   => date('Y-m-d'),
+            'shipping_amount'=> (float)str_replace(',','',$request->get('shipping_amount')) ?? null,
+            'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',','',$request->get('total_amount'))),
+            'remark'         => $request->get('remark'),
+            'sold_by'        => $request->get('sold_by'),
+            'created_by'     => Auth::user()->id,
+            'is_draft'       => $isDraft ? 1 : 0,
+			'is_add_shipping'=> $request->get('is_add_shipping') == 'on'?1:0
+        );
+        
+        // $order = Order::create($inputs);
+        $orderId = Order::insertGetId($inputs);
+        $order = Order::find($orderId);
+        
+        // dd($inputs,$order);
+        
+        $orderProducts = $request->get('products');
+        $allOrderProducts = array();
+        foreach($orderProducts as $oProduct){
+            $createOrderProduct = [
+                'product_id' => $oProduct['product_id'],
+                'quantity'   => $oProduct['quantity'],
+                'price'      => (float)str_replace(',','',$oProduct['price']) ?? null,
+                'height'     => $oProduct['height'] ?? null,
+                'width'      => $oProduct['width'] ?? null,
+                'length'     => $oProduct['length'] ?? null,
+                'is_draft'   => $oProduct['is_draft'] ?? 0,
+                'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] :null,
+                'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'],true)) :null,
+                'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
+                'total_price'   => round((float)str_replace(',','',$oProduct['total_price'])) ?? 0.00,
+            ];
+            $allOrderProducts[] = $createOrderProduct;
+        }
+        if(count($allOrderProducts) > 0){
+            $order->orderProduct()->createMany($allOrderProducts);
+        }
+       
+        if(!$isDraft){
+            $transaction = [
+                'order_id'      => $order->id, 
+                'customer_id'   => $order->customer_id,
+                'payment_type'  => ($order->order_type == 'return')?'debit':'credit',
+                'payment_way'   => 'order_'.$order->order_type,
+                'voucher_number' => $invoiceNumber,
+                'amount'        => round((float)str_replace(',','',$order->total_amount)),
+                'created_by'    => Auth::user()->id,
+                'entry_date'    => date('Y-m-d'),
+                'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+            ];
+            PaymentTransaction::create($transaction);
+        }
+
+        if($order->order_type == 'return'){
+            return response()->json(['success' => true,
+            'message'     => 'Successfully created!',
+            'printPdfUrl' => route('admin.orders.printPdf',encrypt($order->id)),
+            'redirectUrl' => route('admin.orders.return'),
+            ],200);
+        }
+
+        return response()->json(['success' => true,
+            'message'     => 'Successfully created!',
+            // 'printPdfUrl' => route('admin.orders.printPdf',encrypt($order->id)),
+            'redirectUrl' => route('admin.orders.create'),
+        ],200);
     }
 
     /**
@@ -93,20 +173,6 @@ class OrdersController extends Controller
         }
     }
 
-    // public function get_product_detail(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $id = $request->product_id;
-    //         $productDetail = Product::where('id', $id)->first();
-    //         $customerType = Customer::where('id', $request->customer_id)->pluck('is_type');
-    //         $productDetail['customerType'] = $customerType[0];
-    //         return response()->json([
-    //             'success' => true,
-    //             'data' => $productDetail,
-    //         ]);
-    //     }
-    // }
-
     public function get_product_detail(Request $request)
     {
         if ($request->ajax()) {
@@ -127,9 +193,10 @@ class OrdersController extends Controller
 
             $product = Product::findOrFail($request->product_id);
             $customer = Customer::findOrFail($request->customer_id);
-            $unit = config('constant.unitTypes')[strtolower($product->unit_type)];
+            // $unit = config('constant.unitTypes')[strtolower($product->unit_type)];
+            $unit = $product->product_unit ? $product->product_unit->name : '';
             $purchase_price = $product->purchase_price_encode;
-            $last_order_price = '';
+            $last_order_price = 0.00;
             $orders = [];
             if ($product->is_sub_product == 1) {
                 $orders = Order::select(
@@ -161,10 +228,10 @@ class OrdersController extends Controller
                     ->where('order_products.product_id', $request->product_id)
                     ->orderBy('order_products.id', 'desc')
                     ->first();
-                $last_order_price = $order->price ?? '';
+                $last_order_price = $order->price ?? 0.00;
                 $rowData['order'] = !is_null($order) ? encrypt($order->id) : '';
             }
-
+            // dd($product->group_id);
             $rowData['customer_type']    = $customer->is_type ?? '';
             $rowData['product_name']     = $product->name;
             $rowData['purchase_price']   = $purchase_price ?? 0.00;
@@ -174,19 +241,24 @@ class OrdersController extends Controller
             $rowData['wholesaler_price'] = $product->wholesaler_price ?? 0.00; //($customer->is_type == 'wholesaler') ? $product->wholesaler_price : 0.00;
             $rowData['last_order_price'] = $last_order_price ?? 0.00;
 
-            $price = 00.00;
-            if (isset($last_order_price) && $last_order_price != 0) {
+            $price = 00.00; 
+            /* if (isset($last_order_price) && $last_order_price != 0) {
                 $price = $last_order_price;
-            } else if (isset($product)) {
-                if ($customer->is_type == 'retailer') {
-                    $product->retailer_price ?? 0.00;
-                } else if ($customer->is_type == 'wholesaler') {
-                    $product->wholesaler_price ?? 0.00;
+            } else */ if (isset($product)) {
+                if ($customer->is_type == 'wholesaler' && $customer->group && $customer->group->group_id == $product->group_id) {
+                    $price = $product->wholesaler_price ?? 0.00;
+                    $priceName = 'WSP';
+                } else if ($customer->is_type == 'retailer' || $customer->is_type == 'wholesaler') {
+                    $price = $product->retailer_price ?? 0.00;
+                    $priceName = 'RSP';
                 } else {
                     $price = $product->price;
                 }
             }
+            
             $rowData['price'] = $price;
+            $rowData['priceName'] = $priceName ?? '';
+            $rowData['unit'] = $unit;           
             $rowData['sub_total'] = $product->price ?? 0.00;
             $rowData['extra_option_hint'] = $product->extra_option_hint ?? '';
             if (empty($last_order_price)) {
@@ -196,29 +268,11 @@ class OrdersController extends Controller
                     $last_order_price = $rowData['wholesaler_price'];
                 }
             }
-
-            $productDetail =  view('admin.orders.order_detail_table', compact('product', 'orders', 'customer', 'last_order_price' /* ,'unit' */))->render();
+            
+            $productDetail =  view('admin.orders.product_detail', compact('product', 'orders', 'customer', 'last_order_price' /* ,'unit' */))->render();
             return response()->json(array('status' => true, 'data' => $productDetail, 'rowData' => $rowData, 'is_sub_product' => $product->is_sub_product), 200);
         }
         return response()->json(array('status' => false, 'data' => ''), 200);
-
-
-
-
-
-
-
-
-
-            // $id = $request->product_id;
-            // $productDetail = Product::where('id', $id)->first();
-            // $customerType = Customer::where('id', $request->customer_id)->pluck('is_type');
-            // $productDetail['customerType'] = $customerType[0];
-            // return response()->json([
-                // 'success' => true,
-                // 'data' => $productDetail,
-            // ]);
-        // }
     }
 
     public function add_product_row(Request $request)
@@ -245,6 +299,7 @@ class OrdersController extends Controller
             $product = Product::findOrFail($request->product_id);
             $customer = Customer::findOrFail($request->customer_id);
             // $unit = config('constant.unitTypes')[strtolower($product->unit_type)];
+            $unit = $product->product_unit ? $product->product_unit->name : '';
             $purchase_price = $product->purchase_price_encode;
 
             $last_order_price = '';
@@ -307,7 +362,7 @@ class OrdersController extends Controller
             $rowData['price'] = $price;
             $rowData['sub_total'] = $product->price ?? 0.00;
             $rowData['extra_option_hint'] = $product->extra_option_hint ?? '';
-            dd($rowData);
+            // dd($rowData);
             if (empty($last_order_price)) {
                 if ($customer->is_type == 'retailer') {
                     $last_order_price = $rowData['retailer_price'];
@@ -316,9 +371,28 @@ class OrdersController extends Controller
                 }
             }
 
-            $productDetail =  view('admin.orders.order_detail_table', compact('product', 'orders', 'customer', 'last_order_price' /* ,'unit' */))->render();
+            $productDetail =  view('admin.orders.product_detail', compact('product', 'orders', 'customer', 'last_order_price' ,'unit'))->render();
             return response()->json(array('status' => true, 'data' => $productDetail, 'rowData' => $rowData, 'is_sub_product' => $product->is_sub_product), 200);
         }
         return response()->json(array('status' => false, 'data' => ''), 200);
+    }
+
+    public function addGlassProductView(Request $request)
+    {
+        if($request->ajax()){
+           
+            if(isset($request->otherDetails) && !is_null($request->otherDetails)){               
+                $otherDetails = json_decode($request->otherDetails,true);
+                $product = Product::where('id',$request->product_id)->pluck('product_category_id');
+                $html =  view('admin.orders.partials.editGlassProductDetails',compact('otherDetails','product'))->render();
+            }else{                
+                $customer = Customer::findOrFail($request->customer_id);
+                $product = Product::findOrFail($request->product_id);
+                $html =  view('admin.orders.partials.addGlassProductDetails',compact('product','customer'))->render();
+            }
+
+			return response()->json(array('status' => true,'html' =>$html), 200);
+
+        }
     }
 }

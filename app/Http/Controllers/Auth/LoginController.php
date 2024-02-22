@@ -46,7 +46,7 @@ class LoginController extends Controller
                         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.iperror')])->withInput($request->only('username', 'password'));
                    }
                     // Staff Cannot Login Into Web
-                   // dd(auth()->user()->getRoleNames());
+                   
                     if ((auth()->user()->hasRole(config('app.roleid.staff')))) {
                         Auth::guard('web')->logout();
                         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.unauthorize')])->withInput($request->only('username', 'password'));
