@@ -3,7 +3,7 @@
     <div class="col-xs-8 col-lg-5 col-md-12 col-sm-12">
         <div class="quantity-content">
             @if(isset($product) && ($product->is_height || $product->is_width || $product->is_length))
-                <input type="hidden" name="product_category_id" class="product_category_id" value="{{$product['product_category_id'] ?? '' }}"/>
+                <input type="hidden" name="product_category_id" class="product_category_id" value="{{$product['calculation_type'] ?? '' }}"/>
                 <input type="hidden" name="extra_option_hint" class="extra_option_hint_value" value="{{$product['extra_option_hint'] ?? '' }}"/>
             @endif
 

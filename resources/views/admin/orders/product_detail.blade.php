@@ -1,10 +1,19 @@
 <div class="product-table-design" id="products_table">
     <div class="row">
-    @if(isset($product->is_sub_product) && $product->is_sub_product == 1)   
-            <div class="col-lg-2 col-md-12 pr-0">
+        @if(isset($product->is_sub_product) && $product->is_sub_product == 1)   
+            <div class="col-lg-2 col-md-12 pr-0 sub_product_div">
                 <div class="form-group">
                     <label for="sub_product">@lang('admin_master.product.sub_product')</label>
-
+                    @if($orders->count() > 0)
+                        <a href="javascript: void(0);" id="addNewSubProduct" class="add-inline-btn" style="float: right;"><i class="fa fa-plus {{$orders->count() > 0 ? 'selectBox':'textBox'}}"></i></a>
+                        {{-- <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5" required> --}}
+                        <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5">
+                            <option value="" data-order_id="" data-price="0">{{ trans('quickadmin.qa_please_select') }}</option>
+                            @foreach($orders as $value)
+                                <option  value="{{ $value->is_sub_product }}" data-order_id="{{ $value->id }}" data-price="{{ $value->price }}">{{ $value->is_sub_product }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                     <input type="text" name="is_sub_product" id="sub_product" class="form-control sub_product is_sub_product_text" style="display:{{ ($orders->count() > 0)? 'none':''}}" />
 
                 </div>
@@ -52,10 +61,22 @@
                         }
                     }
                 }
+
+                $productAtr = 0;
+                if(isset($product) && !in_array($product->calculation_type,config('constant.product_category_id'))){
+                    if($product->is_height){
+                        $productAtr++;
+                    }
+                    if($product->is_width){
+                        $productAtr++;
+                    }
+                    if($product->is_length){
+                        $productAtr++;
+                    }
+                } 
             @endphp
 
-
-        <div class="col-xs-2 {{ (isset($product->is_sub_product) && $product->is_sub_product == 1) ? 'col-lg-4' : 'col-lg-4' }} col-md-12 col-sm-12 pr-xl-0">
+        <div class="col-xs-2 {{ $productAtr != 0 ? 'col-lg-4' : 'col-lg-2'}} col-md-12 col-sm-12 pr-xl-0">
             <div class="quantity-content">
 
                 @if(isset($editRow) && $editRow)   
@@ -133,7 +154,7 @@
         </div>
 
         <!-- Start Sub Total -->
-        <div class="col-xs-1 {{ (isset($product->is_sub_product) && $product->is_sub_product == 1) ? 'col-lg-2' : 'col-lg-1' }} col-md-12 col-sm-12">
+        <div class="col-xs-1 col-lg-2 col-md-12 col-sm-12">
             <div class="form-group">
                 <label for="customer">@lang('quickadmin.order.fields.sub_total')</label>
                 <div class="input-group">
@@ -146,7 +167,7 @@
         </div>
         <!-- End Sub Total -->
 
-        <div class="col-xs-12 {{ (isset($product->is_sub_product) && $product->is_sub_product == 1) ? 'col-lg-2' : 'col-lg-3' }} col-md-12 col-sm-12 form-group add-product mt-10">
+        <div class="col-xs-12 {{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-3'}} col-md-12 col-sm-12 form-group add-product mt-10">
             <button title="Add Product" type="button" id='add_row' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addRow pull-right btn btn-success"><i class="fa fa-plus"></i></button>
 
             <button title="Add Description" type="button" id='addDesBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addDes pull-right btn btn-primary"><i class="fa fa-commenting"></i></button>

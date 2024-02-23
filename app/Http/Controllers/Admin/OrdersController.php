@@ -44,7 +44,7 @@ class OrdersController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreOrdersRequest $request)
-    {
+    { 
         $isDraft = $request->get('submit') == 'draft' ? true : false;
 		$invoiceNumber = getNewInvoiceNumber('','new'); 
         $inputs = array(
@@ -52,7 +52,7 @@ class OrdersController extends Controller
             'order_type'     => $request->get('order_type'),
             'invoice_number' => $invoiceNumber,
             'area_id'        => $request->get('area_id'),
-            'invoice_date'   => date('Y-m-d'),
+            'invoice_date'   => $request->get('invoice_date'),
             'shipping_amount'=> (float)str_replace(',','',$request->get('shipping_amount')) ?? null,
             'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',','',$request->get('total_amount'))),
             'remark'         => $request->get('remark'),
@@ -99,7 +99,7 @@ class OrdersController extends Controller
                 'voucher_number' => $invoiceNumber,
                 'amount'        => round((float)str_replace(',','',$order->total_amount)),
                 'created_by'    => Auth::user()->id,
-                'entry_date'    => date('Y-m-d'),
+                'entry_date'    => date('Y-m-d',strtotime($request->get('invoice_date'))),
                 'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
             ];
             PaymentTransaction::create($transaction);
@@ -218,8 +218,6 @@ class OrdersController extends Controller
                     ->whereNull('orders.deleted_at')
                     ->orderByDesc('order_products.id')->get();
 
-                // dd($orders);
-
                 $rowData['order'] = $orders;
             } else {
                 $order = Order::select('order_products.price', 'orders.id')
@@ -231,7 +229,7 @@ class OrdersController extends Controller
                 $last_order_price = $order->price ?? 0.00;
                 $rowData['order'] = !is_null($order) ? encrypt($order->id) : '';
             }
-            // dd($product->group_id);
+            
             $rowData['customer_type']    = $customer->is_type ?? '';
             $rowData['product_name']     = $product->name;
             $rowData['purchase_price']   = $purchase_price ?? 0.00;

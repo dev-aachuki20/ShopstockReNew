@@ -34,7 +34,7 @@
     <div class="form-group">
         <label>@lang('admin_master.new_estimate.date') <span class="text-danger">*</span></label>
         <div class="input-group">
-            <input type="date" class="form-control" name="date" value="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+            <input type="date" class="form-control" name="invoice_date" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
         </div>
         <div class="error_date text-danger error"></div>
     </div>
@@ -239,9 +239,10 @@
 
     var glassProduct= {'products':{},'totalQty':0};
     var productObject = {'description':''};
-
+    var productDetailHtml = $('#products_table').html();
     // get customer data
     $(document).on('change','#customerList', function() {
+        $('select.customers').siblings('#customer_error').remove();
         var customer_id = $(this).val();
             $.ajax({
             type: "GET",
@@ -366,13 +367,14 @@
         }else{
             productDetail['product'] = '';
             
-            $('#glassProductBtn').remove();
+            // $('#glassProductBtn').remove();
             $('.product_information-block').hide();
-            $('.quantity').removeAttr('disabled');
-            $('.sub_total').text('0');
-            $('.price').val('0');
-            $('.unit').text('');
-            $('#product_id_error').show();
+            // $('#product_quantity').removeAttr('disabled');
+            // $('#product_amount').val('0');
+            // $('.price').val('0');
+            // $('#product_unit').val('');
+            // $('.error_product_id').show();
+            $('#products_table').html(productDetailHtml);
         }
         // console.log("productCost",productCost);
 
@@ -384,9 +386,9 @@
 
 		var productCategory = $('select.products').find('option:selected').attr('data-type'); 
 
-		var unit 	 	= products_table.find('.unit').text() != undefined ? products_table.find('.unit').text() : '';
+		var unit 	 	= products_table.find('#product_unit').val() != undefined ? products_table.find('#product_unit').val() : '';
 
-		var quantity 	= products_table.find('.quantity').val() != undefined && products_table.find('.quantity').val() != '' ? products_table.find('.quantity').val() : 0;
+		var quantity 	= products_table.find('#product_quantity').val() != undefined && products_table.find('#product_quantity').val() != '' ? products_table.find('#product_quantity').val() : 0;
 
 		var height  	= products_table.find('.pro_height').val() != undefined && products_table.find('.pro_height').val() != '' ? products_table.find('.pro_height').val() : 0;
 
@@ -395,7 +397,7 @@
 		var length  	= products_table.find('.pro_length').val() != undefined  && products_table.find('.pro_length').val() != ''? products_table.find('.pro_length').val() : 0;
 
 		var price 		= parseFloat(products_table.find('.price').val());
-		var sub_total   = parseFloat(products_table.find('.sub_total').text());
+		var sub_total   = parseFloat(products_table.find('#product_amount').val());
 
 		
 		switch (productCategory) {
@@ -438,7 +440,7 @@
 
 		if(!isNaN(sub_total)){
 			// products_table_block.find('.sub_total').text(sub_total.toFixed(2));
-			products_table_block.find('.sub_total').text(Math.round(sub_total));
+			products_table_block.find('#product_amount').val(sub_total.toFixed(2));
 
 			// calculateGrandTotal();
 		}
@@ -449,7 +451,7 @@
 		var subTotal = parseFloat(quantity) * parseFloat(price);
 		if(!isNaN(subTotal)){
 			// products_table_block.find('.sub_total').text(subTotal.toFixed(2));
-			products_table_block.find('.sub_total').text(Math.round(subTotal));
+			products_table_block.find('#product_amount').val(subTotal.toFixed(2));
 		}
 	}
 
@@ -672,11 +674,13 @@
                             measurementValue *= parseFloat(length);
                         }
                     }
-
+                    
                     itemObj['qty'] = parseFloat(qty).toFixed(2).replace(/\.0+$/,'');
-                    itemObj['extra_option_hint'] = extra_option_hint_value;
-                    glassProduct['products'][rowIndex] = itemObj;
 
+                    itemObj['extra_option_hint'] = extra_option_hint_value;
+
+                    glassProduct['products'][rowIndex] = itemObj;
+                    
                     if(product_category_id != undefined && product_category_id == 2){
                         totalQty += calculateSqft(measurementValue) * parseFloat(qty).toFixed(2);
                     }else if(product_category_id != undefined && product_category_id == 3){
@@ -689,7 +693,7 @@
 
             });
             
-            products_table.find('.quantity').val(totalQty).trigger('input');				
+            products_table.find('#product_quantity').val(totalQty).trigger('keyup');				
             glassProduct['totalQty'] = totalQty;
             if(isModalClose){
                 $('#addGlassProductDetailModal').modal('hide');
@@ -700,19 +704,19 @@
     // End glass product details
 
     // calulate total amount based on quantity and price.
-    $(document).on('keyup','#product_quantity, .price',function() {
-        var product_quantity 	= $('#product_quantity').val(); 
-        var product_price       = $("#product_price").val();
-        var total = product_quantity * product_price;
-        $("#product_amount").val(total.toFixed(2));
-    });
+    // $(document).on('keyup','#product_quantity, .price',function() {
+    //     var product_quantity 	= $('#product_quantity').val(); 
+    //     var product_price       = $("#product_price").val();
+    //     var total = product_quantity * product_price;
+    //     $("#product_amount").val(total.toFixed(2));
+    // });
 
     $(document).on('click', '.addRow', function(e){	
 		$('select.customers').siblings('p').remove();
 		$('select.products').siblings('p#products_error').remove();
 		$('select.customers').siblings('.jquery-validation-error').remove();
 		$('select.products').siblings('.jquery-validation-error').remove();
-		$('.quantity').siblings('#quantity_error').remove();
+		$('#product_quantity').siblings('#quantity_error').remove();
 		$('.is_sub_product').siblings('#is_sub_product').remove();
         $('.error_product_id').html('');	 
 		var row_count = 1;
@@ -791,7 +795,7 @@
 								var extra_option_hint = product.extra_option_hint;
 								var productMeasurement = '';
 								
-								if(productCategory == '2'){ console.log(product.height, product.width,product.length);
+								if(productCategory == '2'){ 
 									if(product.height != 0 && product.width != 0){
 										productMeasurement += product.height+" "+extra_option_hint+" × "+product.width+" "+extra_option_hint+" - "+product.qty+" pc";
 									}else if(product.width != 0 && product.length != 0){
@@ -826,7 +830,7 @@
 							markup += "<input type='hidden' name='products["+row_count+"][product_id]' value='"+product_id+"' required/>";
 							markup += "<input type='hidden' name='products["+row_count+"][description]' value='"+productObject.description+"' required/>";
 							markup += product_name;
-
+                            
 							if(is_sub_product != undefined && is_sub_product == 1 && is_sub_product_value != ''){
 								markup += "("+is_sub_product_value+")";
 								markup += "<input type='hidden' name='products["+row_count+"][is_sub_product]' value='"+is_sub_product+"' required/>";
@@ -880,24 +884,26 @@
 						calculateGrandTotal();	
 						
 						products_table.find('#product_unit').val('');
-						$(".is_sub_product_select").select2().val('').trigger('change');
-						if($("#addNewSubProduct").find("i").hasClass("fa-remove")){
-							$("#addNewSubProduct").find("i").toggleClass("fa-plus fa-remove");
-						}
-						// $('.is_sub_product_text').hide();
-						$('.sub_product').remove();
+						// $(".is_sub_product_select").select2().val('').trigger('change');
+						// if($("#addNewSubProduct").find("i").hasClass("fa-remove")){
+						// 	$("#addNewSubProduct").find("i").toggleClass("fa-plus fa-remove");
+						// }
+						// $('.sub_product_div').remove();
+						// $('.sub_product').remove();
 
-						$(".price").val('0');
-						$("#product_quantity").val('0');
-						$('#product_amount').val('0');
-						$('.update_price').val('0');
+						// $(".price").val('0');
+						// $("#product_quantity").val('0');
+						// $('#product_amount').val('0');
+						// $('.update_price').val('0');
 				
-						$(".price").parent().parent().parent().removeClass('col-lg-1');
-						$(".price").parent().parent().parent().addClass('col-lg-3');
+						// $(".price").parent().parent().parent().removeClass('col-lg-1');
+						// $(".price").parent().parent().parent().addClass('col-lg-3');
 
-						products_table.find('.pro_height').parent().remove();
-						products_table.find('.pro_width').parent().remove();
-						products_table.find('.pro_length').parent().remove();
+						// products_table.find('.pro_height').parent().remove();
+						// products_table.find('.pro_width').parent().remove();
+						// products_table.find('.pro_length').parent().remove();
+
+                        $('#products_table').html(productDetailHtml);
 
 						//Empty product object
 						glassProduct.products = {};
@@ -915,6 +921,34 @@
 				}
 			}
 		}
+	});
+
+    $(document).on('change','.is_sub_product_select',function(e){
+		e.preventDefault();
+		var price = $('#products_table').find('.price').attr('data-price');
+		if($(this).val() != ''){
+			var price = $(this).find('option:selected').attr('data-price');
+			$('#products_table').find('.price').val(price);
+		}else{
+			$('#products_table').find('.price').val(price);
+		}
+		calculateProducts();
+	});
+
+    $(document).on('click','#addNewSubProduct',function(e){
+		$('.is_sub_product_text').toggle('1000');
+		$('.is_sub_product_select').toggle('900');
+		icon = $(this).find("i");
+		icon.toggleClass("fa-plus fa-remove");
+
+		if(icon.hasClass("fa-plus") && $(".is_sub_product_select").find('option:selected').val() != ''){
+			var price = $(".is_sub_product_select").find('option:selected').attr('data-price');
+			$('#products_table').find('.price').val(price);
+		}else{
+			var price = $('#products_table').find('.price').attr('data-price');
+			$('#products_table').find('.price').val(price);
+		}
+		calculateProducts();
 	});
 
     $(document).on('click','#addDesBtn',function(e){
@@ -1064,7 +1098,7 @@
                 // console.log(response);
                 var errorArray = response.responseJSON.errors;
                 $.each(errorArray, function(index, item) {
-                    console.log(index, item);
+                    // console.log(index, item);
                     $('.error_'+index).html(item);
                     if(index == 'products'){
                         $('.error_product_id').html('Add at least 1 product');
@@ -1075,7 +1109,7 @@
         });
 	});
 
-    $(document).on('input','.price',function(e){
+    $(document).on('input','.update_price,.price',function(e){
 		
         if($(this).hasClass('price')){
             var priceVal = $(this).val();
@@ -1105,6 +1139,56 @@
         calculateProducts();
         
     });
+
+    $(document).on('click','.update_price,.price,.glass-input',function(e){
+        var value = parseInt($(this).val());
+        if(value == 0){
+            $(this).val('');
+        }
+    });
+
+    $(document).on('focusout','.update_price, .price ,.shipping_amount,.glass-input',function(e){
+        if($(this).val() == ''){
+            $(this).val('0');
+        }
+    });
+
+    //To get next closest number from given array
+	function getClosestValue(targetVal) {
+		const range = (start, stop, step) => Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+		// console.log(range(6,506,6));
+		var glass_range = parseInt("{{config('constant.glass_range')}}");
+		var standardArray = range(6,glass_range,6);
+
+		standardArray = standardArray.sort(function(a, b){return a-b});
+		if (!(standardArray) || standardArray.length == 0) {
+			return null;
+		}
+        
+		if (standardArray.length == 1){
+			return standardArray[0];
+		}
+
+		for (var i=0; i<standardArray.length-1; i++) {
+			if (standardArray[i] >= targetVal) {
+				var curr = standardArray[i];
+				var next = standardArray[i+1]
+				return Math.abs( curr-targetVal ) < Math.abs( next-targetVal ) ? curr : next;
+			}
+		}
+        
+		return standardArray[standardArray.length-1];        
+    }
+
+    //To calculate sqft
+	function calculateSqft(measurementValue){
+		const range = (start, stop, step) => Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+		
+		var glass_range = parseInt("{{config('constant.glass_range')}}");
+		var glassArr = range(6,glass_range,6);
+		var sqft = parseFloat(parseFloat(measurementValue) /144);
+		return sqft;
+	}
 
 </script>
 @endsection

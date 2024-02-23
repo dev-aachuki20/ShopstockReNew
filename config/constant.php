@@ -33,4 +33,5 @@ return [
 	],
     'product_category_id' => [2,3],
 	'shipping_amount' => '150',
+	'glass_range' => 10006,
 ];
