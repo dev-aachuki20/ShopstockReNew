@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Http\Requests\Order\StoreOrdersRequest;
 use App\Models\PaymentTransaction;
 use App\Models\Product;
-use App\Models\PaymentTransaction;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
