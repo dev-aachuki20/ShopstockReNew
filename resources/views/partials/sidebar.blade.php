@@ -47,11 +47,11 @@
                         </a>
                     </li>
 
-                    <li>
+                   {{-- <li>
                         <a href="{{ route('admin.transactions.create') }}">
                             <span>@lang('quickadmin.transaction-management.fields.new_case_reciept')</span>
                         </a>
-                    </li>
+                    </li>--}}
 
              </ul>
         </li>
