@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\PaymentTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
@@ -320,5 +321,30 @@ class OrdersController extends Controller
             return response()->json(array('status' => true, 'data' => $productDetail, 'rowData' => $rowData, 'is_sub_product' => $product->is_sub_product), 200);
         }
         return response()->json(array('status' => false, 'data' => ''), 200);
+    }
+
+    public function checkInvoiceNumber(Request $request){
+        $orderId = '';
+        $exists = true;
+        
+        if(isset($request->orderId) && !empty($request->orderId)){
+            $orderId = $request->orderId;
+        }
+        
+        if($request->routeName == 'new_edit'){
+            $exists  = getNewInvoiceNumber($orderId,$request->routeName,$request->invoice_number);
+        }else if($request->routeName == 'new_cash_receipt'){
+            $invoiceNumber = getNewInvoiceNumber($orderId,$request->routeName,$request->voucher_number);
+           
+            $exists = PaymentTransaction::where('voucher_number',$request->voucher_number)->exists();
+           
+        }else{
+            $invoiceNumber = getNewInvoiceNumber($orderId,$request->routeName,$request->invoice_number);
+           
+            $exists = Order::where('invoice_number',$request->invoice_number)->exists();
+        }
+
+        return response()->json(!$exists);
+       
     }
 }

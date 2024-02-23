@@ -35,7 +35,7 @@
 
 
 
-        <li class="dropdown {{ Request::is('admin/orders*') ? 'active' : '' }}">
+        <li class="dropdown {{ Request::is('admin/orders*') || Request::is('admin/transactions*') ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">
                 <x-side-bar-svg-icon icon="user" />
                 <span>@lang('quickadmin.order-management2.title')</span>
@@ -46,7 +46,13 @@
                             @lang('quickadmin.order-management2.fields.add')
                         </a>
                     </li>
-                </li>
+
+                    <li>
+                        <a href="{{ route('admin.transactions.create') }}">
+                            <span>@lang('quickadmin.transaction-management.fields.new_case_reciept')</span>
+                        </a>
+                    </li>
+
              </ul>
         </li>
 

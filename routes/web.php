@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\Master\SplitsController;
 use App\Http\Controllers\Admin\Master\ProductUnitController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\OrdersController;
+use App\Http\Controllers\Admin\PaymentTransactionsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -80,7 +81,9 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
     Route::get('/get_customer_detail',[OrdersController::class,'get_customer_detail'])->name('customer_detail');
     Route::post('/get_product_detail',[OrdersController::class,'get_product_detail'])->name('product_detail');
     Route::post('/add_product_row',[OrdersController::class,'add_product_row'])->name('add_product_row');
-
+    
+    Route::resource('/transactions',PaymentTransactionsController::class);
+    Route::post('checkInvoiceNumber', [OrdersController::class,'checkInvoiceNumber'])->name('orders.checkInvoiceNumber');
 });
 
 

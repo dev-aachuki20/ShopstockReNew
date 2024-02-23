@@ -197,6 +197,13 @@
              inputElement.keypress(function (e) {
                 if (e.which === 13) {
                     var newValue = inputElement.val();
+                    if(newValue < 0){
+                          var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                          var messages = "The price field must be at least 0.";
+                          var title = "Product";
+                          showToaster(title,alertType,messages); 
+                          return false; 
+                    }
                     $.ajaxSetup({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
                     });
