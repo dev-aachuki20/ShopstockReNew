@@ -28,4 +28,8 @@ class Customer extends Model
     public function transaction(){
         return $this->hasMany(PaymentTransaction::class, 'customer_id')->orderBy('entry_date','asc');
     }
+
+    public function group(){
+        return $this->hasOne(CustomerGroup::class, 'customer_id');
+    }
 }

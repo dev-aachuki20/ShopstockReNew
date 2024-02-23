@@ -79,11 +79,12 @@ Route::group(['middleware' => ['auth','PreventBackHistory'], 'prefix' => 'admin'
 
     Route::resource('/orders',OrdersController::class);
     Route::get('/get_customer_detail',[OrdersController::class,'get_customer_detail'])->name('customer_detail');
-    Route::post('/get_product_detail',[OrdersController::class,'get_product_detail'])->name('product_detail');
+    Route::post('/get_product_detail',[OrdersController::class,'get_product_detail'])->name('get_product_detail');
     Route::post('/add_product_row',[OrdersController::class,'add_product_row'])->name('add_product_row');
     
     Route::resource('/transactions',PaymentTransactionsController::class);
     Route::post('checkInvoiceNumber', [OrdersController::class,'checkInvoiceNumber'])->name('orders.checkInvoiceNumber');
+    Route::post('/add-glass-product-view', [OrdersController::class, 'addGlassProductView'])->name('addGlassProductView');
 });
 
 

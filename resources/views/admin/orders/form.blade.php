@@ -2,6 +2,7 @@
     <div class="form-group">
         <label>@lang('admin_master.new_estimate.customer_name') <span class="text-danger">*</span></label>
         <div class="input-group">
+            {!! Form::hidden('order_type', $orderType) !!}
             {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
         </div>
         <div class="error_customer_id text-danger error"></div>
@@ -23,6 +24,7 @@
         <label>@lang('admin_master.new_estimate.supply_place') <span class="text-danger">*</span></label>
         <div class="input-group">
             <input type="text" class="form-control" name="customer_place" value="" id="customer_place" autocomplete="true" readonly>
+            <input type="hidden" name="area_id" class="area_id" id="area_id">
         </div>
         <div class="error_customer_place text-danger error"></div>
     </div>
@@ -48,11 +50,17 @@
     </div>
 </div> --}}
 
-<div class="col-md-3">
+<div class="col-md-12 col-lg-12 col-xl-3">
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            {!! Form::select('product_id', $products , $product->calculation_type??'', ['class' => 'form-control select2 product', 'id'=>'productList']) !!}
+        <div class="input-group"> 
+            <select class="form-control select2 products">
+                <option value="">{{trans('admin_master.g_please_select')}}</option>		
+                @foreach($products as $productData)
+                    <option value="{{$productData->id}}" data-name="{{$productData->name ?? ''}}" data-type="{{$productData->calculation_type}}" data-isSubProduct="{{$productData->is_sub_product}}">{{$productData->name ?? ''}}</option>	
+                @endforeach
+            </select>
+            {{--{!! Form::select('product_id', $products , $product->calculation_type??'', ['class' => 'form-control select2 products', 'id'=>'productList']) !!}--}}
         </div>
         <div class="error_product_id text-danger error"></div>
         {{-- <p id="get_estimate_price">
@@ -64,13 +72,17 @@
         <p class="product_information-block" style="display:none">
             {{-- <label>Product Price:<span class="purchase-price"> 777</span></label> --}}
             <label>MSP:<span class="min-sale-price"> 555</span></label>
-            <label>WSP:<span class="whole-sale-price"> 333</span></label>
+            <label><span class="price-name">WSP</span>:<span class="whole-sale-price"> 333</span></label>
             <label><a href="#pre" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a></label>
         </p>
     </div>
 </div>
 
-<div class="col-md-1">
+<div class="form-group product-detail col-md-12 col-lg-12 col-xl-9">
+    @include('admin.orders.product_detail')
+</div>
+
+{{--<div class="col-md-1">
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
         <div class="input-group">
@@ -116,11 +128,11 @@
         <button title="Add Product" type="button" id="add_row" data-product-exists="" data-edit-row-num="" class="addRow pull-right btn btn-success"><i class="fa fa-plus"></i></button>
         <button title="Add Description" type="button" id="addDesBtn" data-product-exists="" data-edit-row-num="" class="addDes pull-right btn btn-primary"><i class="fa fa-commenting"></i></button>
     </div>
-</div>
+</div>--}}
 
 
 {{-- table html --}}
-    <div class="col-md-12 form-group order_products_table-design product-detail">
+    <div class="col-md-12 form-group order_products_table-design">
         {{-- @include('admin.orders.order_detail_table') --}}
 
 
@@ -178,27 +190,6 @@
     </div>
 {{-- end table html --}}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {{-- <div class="col-md-12">
     @if(isset($product))
         <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
@@ -234,15 +225,20 @@
   </div>
 <!-- Add Edit Modal -->
 
+<!-- All modals -->
+@include('admin.orders.modal.create_all_modal')
 
 @section('customJS')
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
 
     var productDetail = {
         // 'customer':'',
         'product':'',
     };
+
+    var glassProduct= {'products':{},'totalQty':0};
+    var productObject = {'description':''};
 
     // get customer data
     $(document).on('change','#customerList', function() {
@@ -259,6 +255,7 @@
                     $('.error_customer_id').text('');
                     $('#customer_number').val(data.data.data.phone_number);
                     $('#customer_place').val(data.data.place_name.address);
+                    $('#area_id').val(data.data.place_name.id);
                 }else{
                     $('.error_customer_id').text('Please select customer.');
                 }
@@ -266,478 +263,487 @@
             });
     });
 
-    $(document).on('change','#productList', function() {
-        var product_id = $(this).val();
-        var customer_id =  $('#customerList').val();
-        $.ajaxSetup({
-					headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-				});
-        $.ajax({
-        type: "POST",
-        url: "{{ route('admin.product_detail')}}",
-        data:{
-            product_id:product_id,
-            customer_id:customer_id,
-        },
-        success: function(data) {
-            var customer_id =  $('#customerList').val();
-            if(!customer_id){
-                $('.error_customer_id').text('Please select customer.');
-                $('#productList').val('').trigger('change');
-           }else{
-                $('.error_customer_id').text('');
-                $('.error_product_id').text('');
-                $('#product_unit').val(data.data.unit_type);
-                $('#product_price').val(data.data.price);
-                // $('#get_estimate_price').append(`MSP:${data.data.min_sale_price} WSP:${data.data.wholesaler_price} RSP:${data.data.retailer_price}`);
-                if(data.data.customerType == 'retailer'){
-                    minPrePrice = data.data.retailer_price;
-                }else if(data.data.customerType == 'wholesaler'){
-                    minPrePrice = data.data.wholesaler_price;
-                }else{
-                    minPrePrice = data.data.price;
-                }
+    // get product data
+    var productCost = {};
+    $("select.products").change(function(e){
+        e.preventDefault();
+        $('.error_product_id').html('');	 
+        $('.products_error').hide();
+        $('select.customers').siblings('#customer_error').remove();
+        $('select.products').siblings('#products_error').remove();
+        $('select.customers').siblings('.jquery-validation-error').remove();
+        $('select.products').siblings('.jquery-validation-error').remove();
 
-                $('.min-pre-price').html('');
-				$('.min-pre-price').parent('#prevOrderLink').css('display','none');
-
-                $('.purchase-price').text(data.data.purchase_price);
-				$('.min-sale-price').text(data.data.min_sale_price);
-				$('.whole-sale-price').text(data.data.wholesaler_price);
-				$('.retail-sale-price').text(data.data.retailer_price);
-                $('.product_information-block').show();
-           }
+        customer_id = $(".customers option:selected").val();
+        if( customer_id == '' ){
+            // $('#customer_error').show();
+            $('<p id="customer_error" style="color:red; font-size:12px;">Please select customer.</p>').insertAfter($('select.customers').siblings('.select2-container'));
+            $(this).select2('destroy').find('option:selected').prop('selected', false).end().select2();
+            return;
         }
-        });
 
+        var product_id = $(this).select2('val');
+        var productCategory = $(this).find('option:selected').attr('data-type');
+        var is_sub_product = $(this).find('option:selected').attr('data-isSubProduct');
+        
+        if (product_id !='' && customer_id !='') {
+            productDetail['product'] = product_id;
 
-                // $.ajax({
-				// 	type:'POST',
-				// 	url:"{{ route('admin.add_product_row') }}",
-		 		// 	data:{
-		 		// 		product_id:product_id,
-		 		// 		customer_id:customer_id,
-		 		// 	},
-				// 	success:function(response){
-                //         console.log('response', response);
-				// 		productCost['response'] = response;
+            // $('.estimateInvoice').show();
+            productCost['product_id'] = product_id; 
+            productCost['customer_id'] = customer_id; 
+            productCost['is_sub_product'] = is_sub_product; 
 
-				// 		if (response.status) {
-				// 			$('.product-detail').html(response.data);
+            $.ajaxSetup({
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+            });			 
+            $.ajax({
+                type:'POST',
+                url:"{{ route('admin.get_product_detail') }}",
+                data:{
+                    product_id:product_id,
+                    customer_id:customer_id,
+                },
+                success:function(response){	
+                    productCost['response'] = response; 
 
-				// 			var products_table = $('#products_table');
+                    if (response.status) {
+                        $('.product-detail').html(response.data);
 
-				// 			var minPrePrice = 0 ;
-				// 			if(response.rowData.last_order_price != 0){
-				// 				minPrePrice = response.rowData.last_order_price;
-				// 				$('.min-pre-price').parent('#prevOrderLink').css('display','block');
-				// 				$('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
-				// 				$('.min-pre-price').text(minPrePrice);
-				// 			}else{
-				// 				if(response.rowData.customer_type == 'retailer'){
-				// 					minPrePrice = response.rowData.retailer_price;
-				// 				}else if(response.rowData.customer_type == 'wholesaler'){
-				// 					minPrePrice = response.rowData.wholesaler_price;
-                //                 // alert(minPrePrice);
+                        var products_table = $('#products_table');
 
-				// 				}else{
-				// 					minPrePrice = response.rowData.price;
-				// 				}
-				// 				$('.min-pre-price').html('');
-				// 				$('.min-pre-price').parent('#prevOrderLink').css('display','none');
+                        var minPrePrice = 0;
+                        if(response.rowData.last_order_price != 0){
+                            minPrePrice = response.rowData.last_order_price;
+                            $('.min-pre-price').parent('#prevOrderLink').css('display','block');
+                            $('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
+                            $('.min-pre-price').text(minPrePrice);
+                        }else{
+                            
+                            if(response.rowData.customer_type == 'retailer'){
+                                minPrePrice = response.rowData.retailer_price;
+                            }else if(response.rowData.customer_type == 'wholesaler'){
+                                minPrePrice = response.rowData.wholesaler_price;
+                            }else{
+                                minPrePrice = response.rowData.price;
+                            }
 
-				// 			}
+                            $('.min-pre-price').html('');
+                            $('.min-pre-price').parent('#prevOrderLink').css('display','none');
 
-				// 		    products_table.find('.price').text(response.rowData.price);
-				// 			products_table.find('.sub_total').text(response.rowData.sub_total);
-				// 			// console.log(response.rowData);
-				// 			// $('.purchase-price').text(response.rowData.purchase_price);
-				// 			// $('.min-sale-price').text(response.rowData.min_sale_price);
-				// 			// $('.whole-sale-price').text(response.rowData.wholesaler_price);
-				// 			// $('.retail-sale-price').text(response.rowData.retailer_price);
+                        }
+                       var priceToDisplay = response.rowData.price;
+                       if(response.rowData.last_order_price){
+                        priceToDisplay = response.rowData.last_order_price;
+                       }
+                        products_table.find('.price').val(priceToDisplay);
+                        // products_table.find('.sub_total').text(response.rowData.sub_total);
+                        
+                        $('.purchase-price').text(response.rowData.purchase_price);
+                        $('.min-sale-price').text(response.rowData.min_sale_price);
+                        $('.whole-sale-price').text(response.rowData.price);
+                        $('.price-name').text(response.rowData.priceName);
 
-				// 			$('.addRow').data('product_name',response.rowData.product_name);
+                        // $('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
+                        // $('.min-pre-price').text(minPrePrice);
+                        $('.addRow').data('product_name',response.rowData.product_name);
 
-				// 			// $('.product_information-block').show();
-				// 			calculateProducts();
-				// 		}
-				// 	},
-                //     error: function (reject) {
-                //         if( reject.status === 400 ) {
-                //             var rejectResponse = $.parseJSON(reject.responseText);
-                //             var error = rejectResponse.errors;
-                //             $.each(error, function (key, val) {
-				// 				// console.log("#" + key + "_error = "+val[0])
-                //                 $("#" + key + "_error").text(val[0]);
-                //             });
-                //         }
-                //     }
-		 		// });
+                        $('.product_information-block').show();
+                        calculateProducts();
+                    }
+                },
+                error: function (reject) {
+                    if( reject.status === 400 ) {
+                        var rejectResponse = $.parseJSON(reject.responseText);
+                        var error = rejectResponse.errors;
+                        $.each(error, function (key, val) {
+                            // console.log("#" + key + "_error = "+val[0])
+                            $("#" + key + "_error").text(val[0]);
+                        });
+                    }
+                }
+            });
+        }else{
+            productDetail['product'] = '';
+            
+            $('#glassProductBtn').remove();
+            $('.product_information-block').hide();
+            $('.quantity').removeAttr('disabled');
+            $('.sub_total').text('0');
+            $('.price').val('0');
+            $('.unit').text('');
+            $('#product_id_error').show();
+        }
+        // console.log("productCost",productCost);
+
     });
 
-
-    // show product
-    // var productCost = {};
-        // $(".product").change(function(e){
-		// 	e.preventDefault();
-		// 	$('#product_id_error').hide();
-		// 	$('#products_error').hide();
-		// 	$('select.customers').siblings('#customer_error').remove();
-		// 	$('select.products').siblings('#products_error').remove();
-		// 	$('select.customers').siblings('.jquery-validation-error').remove();
-		// 	$('select.products').siblings('.jquery-validation-error').remove();
-
-		// 	customer_id = $(".customers option:selected").val();
-		// 	// if( customer_id == '' ){
-		// 	// 	// $('#customer_error').show();
-		// 	// 	$('<p id="customer_error" style="color:red; font-size:12px;">Please select customer.</p>').insertAfter($('select.customers').siblings('.select2-container'));
-		// 	// 	$(this).select2('destroy').find('option:selected').prop('selected', false).end().select2()
-		// 	// }
-        //     // if( customer_id === '' ){
-        //     //     $('.error_customer_id').text('Please select customer.');
-        //     //     $('.product').val('').trigger('change');
-        //     // }
-
-
-		// 	var product_id = $(this).select2('val');
-		// 	var productCategory = $(this).find('option:selected').attr('data-type');
-		// 	var is_sub_product = $(this).find('option:selected').attr('data-isSubProduct');
-		// 	// console.log('pid:',product_id);
-		// 	if (product_id !='' && customer_id !='') {
-		// 		productDetail['product'] = product_id;
-
-		// 		// $('.estimateInvoice').show();
-		// 		productCost['product_id'] = product_id;
-		// 		productCost['customer_id'] = customer_id;
-		// 		productCost['is_sub_product'] = is_sub_product;
-
-		// 		$.ajaxSetup({
-		// 			headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-		// 		});
-		// 		$.ajax({
-		// 			type:'POST',
-		// 			url:"{{ route('admin.add_product_row') }}",
-		// 			data:{
-		// 				product_id:product_id,
-		// 				customer_id:customer_id,
-		// 			},
-		// 			success:function(response){
-		// 				productCost['response'] = response;
-
-		// 				if (response.status) {
-		// 					$('.product-detail').html(response.data);
-
-		// 					var products_table = $('#products_table');
-
-		// 					var minPrePrice = 0;
-		// 					if(response.rowData.last_order_price != 0){
-		// 						minPrePrice = response.rowData.last_order_price;
-		// 						$('.min-pre-price').parent('#prevOrderLink').css('display','block');
-		// 						$('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
-		// 						$('.min-pre-price').text(minPrePrice);
-		// 					}else{
-
-		// 						if(response.rowData.customer_type == 'retailer'){
-		// 							minPrePrice = response.rowData.retailer_price;
-		// 						}else if(response.rowData.customer_type == 'wholesaler'){
-		// 							minPrePrice = response.rowData.wholesaler_price;
-		// 						}else{
-		// 							minPrePrice = response.rowData.price;
-		// 						}
-
-		// 						$('.min-pre-price').html('');
-		// 						$('.min-pre-price').parent('#prevOrderLink').css('display','none');
-
-		// 					}
-
-		// 				    products_table.find('.price').text(response.rowData.price);
-		// 					products_table.find('.sub_total').text(response.rowData.sub_total);
-
-		// 					$('.purchase-price').text(response.rowData.purchase_price);
-		// 					$('.min-sale-price').text(response.rowData.min_sale_price);
-
-		// 					// $('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
-		// 					// $('.min-pre-price').text(minPrePrice);
-		// 					$('.addRow').data('product_name',response.rowData.product_name);
-
-		// 					$('.product_information-block').show();
-		// 					calculateProducts();
-		// 				}
-		// 			},
-        //             error: function (reject) {
-        //                 if( reject.status === 400 ) {
-        //                     var rejectResponse = $.parseJSON(reject.responseText);
-        //                     var error = rejectResponse.errors;
-        //                     $.each(error, function (key, val) {
-		// 						// console.log("#" + key + "_error = "+val[0])
-        //                         $("#" + key + "_error").text(val[0]);
-        //                     });
-        //                 }
-        //             }
-		// 		});
-		// 	}else{
-		// 		productDetail['product'] = '';
-
-		// 		$('#glassProductBtn').remove();
-		// 		$('.product_information-block').hide();
-		// 		$('.quantity').removeAttr('disabled');
-		// 		$('.sub_total').text('0');
-		// 		$('.price').val('0');
-		// 		$('.unit').text('');
-		// 		$('#product_id_error').show();
-		// 	}
-		// 	console.log("productCost",productCost);
-
-		// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // get product data
-    // var productCost = {};
-    // $(document).on('change','#productList', function() {
-    //     var product_id = $(this).val();
-    //     var customer_id =  $('#customerList').val();
-
-    //     $.ajax({
-    //     type: "GET",
-    //     url: "{{ route('admin.product_detail')}}",
-    //     data:{
-    //         product_id:product_id,
-    //         customer_id:customer_id,
-    //     },
-    //     success: function(data) {
-    //         var customer_id =  $('#customerList').val();
-    //         if(!customer_id){
-    //             $('.error_customer_id').text('Please select customer.');
-    //             $('#productList').val('').trigger('change');
-    //        }else{
-    //             $('.error_customer_id').text('');
-    //             $('.error_product_id').text('');
-    //             $('#product_unit').val(data.data.unit_type);
-    //             $('#product_price').val(data.data.price);
-    //             // $('#get_estimate_price').append(`MSP:${data.data.min_sale_price} WSP:${data.data.wholesaler_price} RSP:${data.data.retailer_price}`);
-    //             if(data.data.customerType == 'retailer'){
-    //                 minPrePrice = data.data.retailer_price;
-    //             }else if(data.data.customerType == 'wholesaler'){
-    //                 minPrePrice = data.data.wholesaler_price;
-    //             }else{
-    //                 minPrePrice = data.data.price;
-    //             }
-
-    //             $('.min-pre-price').html('');
-	// 			$('.min-pre-price').parent('#prevOrderLink').css('display','none');
-
-    //             $('.purchase-price').text(data.data.purchase_price);
-	// 			$('.min-sale-price').text(data.data.min_sale_price);
-	// 			$('.whole-sale-price').text(data.data.wholesaler_price);
-	// 			$('.retail-sale-price').text(data.data.retailer_price);
-    //             $('.product_information-block').show();
-    //        }
-    //     }
-    //     });
-
-
-    //             // $.ajax({
-	// 			// 	type:'POST',
-	// 			// 	url:"{{ route('admin.add_product_row') }}",
-	// 	 		// 	data:{
-	// 	 		// 		product_id:product_id,
-	// 	 		// 		customer_id:customer_id,
-	// 	 		// 	},
-	// 			// 	success:function(response){
-    //             //         console.log('response', response);
-	// 			// 		productCost['response'] = response;
-
-	// 			// 		if (response.status) {
-	// 			// 			$('.product-detail').html(response.data);
-
-	// 			// 			var products_table = $('#products_table');
-
-	// 			// 			var minPrePrice = 0 ;
-	// 			// 			if(response.rowData.last_order_price != 0){
-	// 			// 				minPrePrice = response.rowData.last_order_price;
-	// 			// 				$('.min-pre-price').parent('#prevOrderLink').css('display','block');
-	// 			// 				$('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
-	// 			// 				$('.min-pre-price').text(minPrePrice);
-	// 			// 			}else{
-	// 			// 				if(response.rowData.customer_type == 'retailer'){
-	// 			// 					minPrePrice = response.rowData.retailer_price;
-	// 			// 				}else if(response.rowData.customer_type == 'wholesaler'){
-	// 			// 					minPrePrice = response.rowData.wholesaler_price;
-    //             //                 // alert(minPrePrice);
-
-	// 			// 				}else{
-	// 			// 					minPrePrice = response.rowData.price;
-	// 			// 				}
-	// 			// 				$('.min-pre-price').html('');
-	// 			// 				$('.min-pre-price').parent('#prevOrderLink').css('display','none');
-
-	// 			// 			}
-
-	// 			// 		    products_table.find('.price').text(response.rowData.price);
-	// 			// 			products_table.find('.sub_total').text(response.rowData.sub_total);
-	// 			// 			// console.log(response.rowData);
-	// 			// 			// $('.purchase-price').text(response.rowData.purchase_price);
-	// 			// 			// $('.min-sale-price').text(response.rowData.min_sale_price);
-	// 			// 			// $('.whole-sale-price').text(response.rowData.wholesaler_price);
-	// 			// 			// $('.retail-sale-price').text(response.rowData.retailer_price);
-
-	// 			// 			$('.addRow').data('product_name',response.rowData.product_name);
-
-	// 			// 			// $('.product_information-block').show();
-	// 			// 			calculateProducts();
-	// 			// 		}
-	// 			// 	},
-    //             //     error: function (reject) {
-    //             //         if( reject.status === 400 ) {
-    //             //             var rejectResponse = $.parseJSON(reject.responseText);
-    //             //             var error = rejectResponse.errors;
-    //             //             $.each(error, function (key, val) {
-	// 			// 				// console.log("#" + key + "_error = "+val[0])
-    //             //                 $("#" + key + "_error").text(val[0]);
-    //             //             });
-    //             //         }
-    //             //     }
-	// 	 		// });
-    // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // on increase button for add orders in table (show error and save data).
-    $(document).on('click','.addRow', function(){
-        var customer_id       = $('.customers').val();
-        var product_id        = $('.product').val();
-        var product_quantity  = $('#product_quantity').val();
-
-        if(customer_id === '' && product_id === ''){
-            $('.error_customer_id').text('Please select customer.');
-            $('.error_product_id').text('Please select product.');
-        }else if(customer_id === ''){
-            $('.error_customer_id').text('Please select customer.');
-        }else if(product_id === ''){
-            $('.error_product_id').text('Please select product.');
-        }else if(product_quantity == 0){
-            $('.error_product_quantity').text('Please enter quantity.');
-        }else{
-            $('.error_customer_id').text('');
-            $('.error_product_id').text('');
-        }
-
-
-        // add order
-        // var product_price = $('.product_price').val();
-        // var product_amount = $('.product_amount').val();
-
-                // $.ajax({
-				// 	type:'POST',
-				// 	url:"{{ route('admin.add_product_row') }}",
-		 		// 	data:{
-		 		// 		product_id:product_id,
-		 		// 		customer_id:customer_id,
-		 		// 	},
-				// 	success:function(response){
-                //         console.log('response', response);
-				// 		productCost['response'] = response;
-
-				// 		if (response.status) {
-				// 			$('.product-detail').html(response.data);
-
-				// 			var products_table = $('#products_table');
-
-				// 			var minPrePrice = 0 ;
-				// 			if(response.rowData.last_order_price != 0){
-				// 				minPrePrice = response.rowData.last_order_price;
-				// 				$('.min-pre-price').parent('#prevOrderLink').css('display','block');
-				// 				$('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
-				// 				$('.min-pre-price').text(minPrePrice);
-				// 			}else{
-				// 				if(response.rowData.customer_type == 'retailer'){
-				// 					minPrePrice = response.rowData.retailer_price;
-				// 				}else if(response.rowData.customer_type == 'wholesaler'){
-				// 					minPrePrice = response.rowData.wholesaler_price;
-                //                 // alert(minPrePrice);
-
-				// 				}else{
-				// 					minPrePrice = response.rowData.price;
-				// 				}
-				// 				$('.min-pre-price').html('');
-				// 				$('.min-pre-price').parent('#prevOrderLink').css('display','none');
-
-				// 			}
-
-				// 		    products_table.find('.price').text(response.rowData.price);
-				// 			products_table.find('.sub_total').text(response.rowData.sub_total);
-				// 			// console.log(response.rowData);
-				// 			// $('.purchase-price').text(response.rowData.purchase_price);
-				// 			// $('.min-sale-price').text(response.rowData.min_sale_price);
-				// 			// $('.whole-sale-price').text(response.rowData.wholesaler_price);
-				// 			// $('.retail-sale-price').text(response.rowData.retailer_price);
-
-				// 			$('.addRow').data('product_name',response.rowData.product_name);
-
-				// 			// $('.product_information-block').show();
-				// 			calculateProducts();
-				// 		}
-				// 	},
-                //     error: function (reject) {
-                //         if( reject.status === 400 ) {
-                //             var rejectResponse = $.parseJSON(reject.responseText);
-                //             var error = rejectResponse.errors;
-                //             $.each(error, function (key, val) {
-				// 				// console.log("#" + key + "_error = "+val[0])
-                //                 $("#" + key + "_error").text(val[0]);
-                //             });
-                //         }
-                //     }
-		 		// });
-        // end add order
-
-
-        var row_count = 1;
-        var products_table = $('#products_table');
-        console.log(products_table.find('.price').val());
-        return false;
-        var isDraftSymbol_N_Price = products_table.find('.price').val().toLowerCase() == 'n' ? 1 : 0;
-
-        var unit 	 	= products_table.find('.unit').text();
-		var quantity 	= products_table.find('.quantity').val();
+    async function calculateProducts(){
+		
+		var products_table = $('#products_table');
+
+		var productCategory = $('select.products').find('option:selected').attr('data-type'); 
+
+		var unit 	 	= products_table.find('.unit').text() != undefined ? products_table.find('.unit').text() : '';
+
+		var quantity 	= products_table.find('.quantity').val() != undefined && products_table.find('.quantity').val() != '' ? products_table.find('.quantity').val() : 0;
+
+		var height  	= products_table.find('.pro_height').val() != undefined && products_table.find('.pro_height').val() != '' ? products_table.find('.pro_height').val() : 0;
+
+		var width   	= products_table.find('.pro_width').val() != undefined  && products_table.find('.pro_width').val() != '' ? products_table.find('.pro_width').val() : 0;
+
+		var length  	= products_table.find('.pro_length').val() != undefined  && products_table.find('.pro_length').val() != ''? products_table.find('.pro_length').val() : 0;
+
+		var price 		= parseFloat(products_table.find('.price').val());
+		var sub_total   = parseFloat(products_table.find('.sub_total').text());
+
+		
+		switch (productCategory) {
+			case '1':
+				simpleCalculation(products_table,height,width,length,quantity,price,sub_total);
+				break;
+			case '2':
+				GlassCalculation(products_table,quantity,price,sub_total);
+				break;
+			case '3':
+				GlassCalculation(products_table,quantity,price,sub_total);
+				break;
+			default:
+				console.log('Invalid Category!');
+		}
+
+	}
+
+    async function simpleCalculation(products_table_block,height,width,length,quantity,price,sub_total){
+		var matrialValue = 1;
+		if(height != 0){
+			matrialValue *= height;
+		}
+
+		if(width != 0){
+			matrialValue *= width;
+		}
+
+		if(length != 0){
+			matrialValue *= length;
+		}
+
+
+		var totalMatirial = parseFloat(matrialValue)*parseFloat(quantity);
+		price = isNaN(price) ? 0.00 : price;
+		sub_total = totalMatirial * price;
+
+		// console.log('price',price);
+		// console.log('sub_total',sub_total);
+
+		if(!isNaN(sub_total)){
+			// products_table_block.find('.sub_total').text(sub_total.toFixed(2));
+			products_table_block.find('.sub_total').text(Math.round(sub_total));
+
+			// calculateGrandTotal();
+		}
+	}
+
+	async function GlassCalculation(products_table_block,quantity,price,sub_total){
+		
+		var subTotal = parseFloat(quantity) * parseFloat(price);
+		if(!isNaN(subTotal)){
+			// products_table_block.find('.sub_total').text(subTotal.toFixed(2));
+			products_table_block.find('.sub_total').text(Math.round(subTotal));
+		}
+	}
+
+    //Render glass product item 
+	function addGlassProductViewRender(customer_id,product_id,renderType='html'){
+		$.ajaxSetup({
+			headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+		});			 
+		$.ajax({
+			type:'POST',
+			url:"{{ route('admin.addGlassProductView') }}",
+			data:{
+				customer_id:customer_id,
+				product_id:product_id,
+			},
+			success:function(response){		
+				if (response.status) {
+					// console.log(response);
+					if(renderType == 'html'){
+						$('.glass-product-item').html(response.html);
+					}else if(renderType == 'append'){
+						$('.glass-product-item').append(response.html);
+					}
+				}
+			},
+			error: function (reject) {
+				if( reject.status === 400 ) {
+					var rejectResponse = $.parseJSON(reject.responseText);
+					var error = rejectResponse.errors;
+					$.each(error, function (key, val) {
+						// console.log("#" + key + "_error = "+val[0])
+						$("#" + key + "_error").text(val[0]);
+					});
+				}
+			}
+		});
+	}
+
+    async function calculateGrandTotal(){
+		
+		var customerCreditAmount = parseFloat($(".customers option:selected").attr('data-credit'));
+		var customerDebitAmount  = parseFloat($(".customers option:selected").attr('data-debit'));
+		var customerCreditLimit  = parseFloat($(".customers option:selected").attr('data-limit'));
+
+		var remmainCreditLimit = customerCreditAmount - customerDebitAmount;
+		// var remmainCreditLimit = customerCreditLimit - customerDebitAmount;
+
+		var orderTable = document.querySelectorAll('#order_products_table tbody tr');
+		$('.addRow').attr('data-row-count',orderTable.length);
+		var serialNo = 1;
+		var allPrices = [];
+		orderTable.forEach((trElement) => {
+			// First check that the element has child nodes
+			if (trElement.hasChildNodes()) {
+				let tdElement = trElement.childNodes;
+				if(tdElement.length > 1){
+					trElement.firstChild.textContent  = serialNo;
+					for(var i=1; i<tdElement.length; i++){
+						if(i != (tdElement.length-1)){
+							let inputElement = tdElement[i].children;
+							for(var j=0; j<inputElement.length; j++){
+								if(inputElement[j].tagName.toLowerCase() == 'input'){
+									var name = inputElement[j].getAttribute('name');
+									if(name.slice(11) == '[price]'){
+										allPrices.push(inputElement[j].getAttribute('value'));
+									}
+									var setName = name.replace(/\d+/g, serialNo);
+									inputElement[j].setAttribute('name',setName);
+								}
+							}			
+						}
+					}
+				}
+			}
+			serialNo++;
+		});
+
+		//Start to disable save button
+		if(allPrices.includes('0')){
+			$('.order_create').find('button[value=draft]').removeAttr('disabled');
+			$('.order_create').find('button[value=save]').attr('disabled',true);
+		}else{
+			$('.order_create').find('button[value=draft]').attr('disabled',true);
+			$('.order_create').find('button[value=save]').removeAttr('disabled');
+		}
+		//End to disable save button
+
+		var grand_total = 0;
+		var totalPriceTd = document.querySelectorAll('.total_price input');
+		totalPriceTd.forEach((totalPriceElement) => {
+			grand_total += parseFloat(totalPriceElement.value.replace(/\,/g,'')); 
+		});
+
+		if($('#isAddShipping').is(':checked')){
+			var shipping_amount = 0.00;
+			if($('.shipping_amount').val() != ''){
+				shipping_amount = $('.shipping_amount').val();
+			}
+			grand_total += parseFloat(shipping_amount.replace(/\,/g,''));
+		}
+
+		if(customerCreditLimit !=0 &&  !(customerCreditLimit > remmainCreditLimit && customerCreditLimit > grand_total)){
+			// Toast.fire({
+			// 	icon: 'error',
+			// 	title: 'Note:Credit limit has been exceeds!',
+			// });
+			// console.log(customerCreditLimit,remmainCreditLimit,grand_total);
+			$('#credit-limit-alert').text('Note:Credit limit has been exceeds!');
+		}else{
+			$('#credit-limit-alert').text('');
+		}
+
+		$('#grandTotalSpan').text(numberWithCommas(grand_total.toFixed(0)));
+		$('.grandTotalHidden').val(grand_total.toFixed(0));
+		
+	}
+
+    // Start glass product details
+        $(document).on('click','#glassProductBtn',function(e){
+            $('select.products').siblings('p#products_error').remove();
+            $('select.products').siblings('.jquery-validation-error').remove();
+            
+            var products_table = $('#products_table');
+            
+            if(productDetail.product == ''){
+                $('<p id="products_error" style="color:red; font-size:12px;">Please select product.</p>').insertAfter($('select.products').siblings('.select2-container'));
+            }
+
+            var customer_id = $('select.customers').select2().val();
+            var product_id 	= $(".products option:selected").val();
+            var product_name = $(".products option:selected").attr('data-name');
+            if(product_id != ''){
+                $('#addGlassProductDetailModal').modal('show');
+                $('#addGlassProductDetailModal').find('.modal-title').text(product_name);
+                
+                if(Object.keys(glassProduct.products).length > 0){
+                    // addGlassProductViewRender(customer_id,product_id,'append');
+                }else{
+                    addGlassProductViewRender(customer_id,product_id,'html');
+                }
+                
+            }
+        });
+        
+        //Start glass product item
+        $(document).on('click','.addGlassRow',function(e){
+            var addGlassItemBtn = $(this);
+
+            var products_table = $('#products_table');
+            var customerId = $('select.customers').select2().val();
+            var productId  = $(".products option:selected").val();
+            var price 	   = products_table.find('.price').val();
+
+            addGlassProductViewRender(customerId,productId,'append');
+        
+        });
+
+        $(document).on('click','.deleteGlassRow',function(){
+            $(this).parent().parent().parent().remove();
+            delete glassProduct.products[$(this).attr('data-row-index')];
+        });
+
+        $(document).on('click','.glass-item-save',function(e){
+            e.preventDefault();
+            var totalQty = 0;
+            var products_table = $('#products_table');
+            var isModalClose = true;
+            
+            $('.glass-product-item .row').each(function(rowIndex,rowElement){
+                
+                $(rowElement).find('.deleteGlassRow').attr('data-row-index',rowIndex);
+
+                var product_category_id = $(rowElement).find('.product_category_id').val(); 
+                var qty    = $(rowElement).find('.glass-no-item').val(); 
+                var height = $(rowElement).find('.glass-height').val();
+                var width  = $(rowElement).find('.glass-width').val();
+                var	length = $(rowElement).find('.glass-length').val();
+                var	extra_option_hint_value = $(rowElement).find('.extra_option_hint_value').val();
+                
+                var isEmpty = false;
+                $('#addGlassProductDetailModal input[type="number"]').each(function(){
+                    $(this).siblings('.glass_error').remove();
+
+                    var value = $.trim($(this).val());
+                    
+                    if( value == 0){
+                        isEmpty = true;
+                        $('<p class="glass_error" style="color:red; font-size:12px;margin-bottom:0px;">This field is required!</p>').insertAfter($(this));
+                    }
+
+                });
+
+                var measurementValue = 1;
+                if (!isEmpty){
+                    var itemObj = {};
+                    if(height != undefined){
+                        itemObj['height'] = parseFloat(height).toFixed(2).replace(/\.0+$/,'');
+                        
+                        if(product_category_id != undefined && product_category_id == 2){
+                            measurementValue *= getClosestValue(parseFloat(height));
+                        }else if(product_category_id != undefined && product_category_id == 3){
+                            measurementValue *= parseFloat(height);
+                        }
+                    }
+                    if(width != undefined){
+                        itemObj['width'] = parseFloat(width).toFixed(2).replace(/\.0+$/,'');
+
+                        if(product_category_id != undefined && product_category_id == 2){
+                            measurementValue *= getClosestValue(parseFloat(width));
+                        }else if(product_category_id != undefined && product_category_id == 3){
+                            measurementValue *= parseFloat(width);
+                        }
+                    }
+                    if(length != undefined){
+                        itemObj['length'] = parseFloat(length).toFixed(2).replace(/\.0+$/,'');
+
+                        if(product_category_id != undefined && product_category_id == 2){
+                            measurementValue *= getClosestValue(parseFloat(length));
+                        }else if(product_category_id != undefined && product_category_id == 3){
+                            measurementValue *= parseFloat(length);
+                        }
+                    }
+
+                    itemObj['qty'] = parseFloat(qty).toFixed(2).replace(/\.0+$/,'');
+                    itemObj['extra_option_hint'] = extra_option_hint_value;
+                    glassProduct['products'][rowIndex] = itemObj;
+
+                    if(product_category_id != undefined && product_category_id == 2){
+                        totalQty += calculateSqft(measurementValue) * parseFloat(qty).toFixed(2);
+                    }else if(product_category_id != undefined && product_category_id == 3){
+                        totalQty += measurementValue * parseFloat(qty).toFixed(2);
+                    }
+
+                }else{
+                    isModalClose = false;
+                }
+
+            });
+            
+            products_table.find('.quantity').val(totalQty).trigger('input');				
+            glassProduct['totalQty'] = totalQty;
+            if(isModalClose){
+                $('#addGlassProductDetailModal').modal('hide');
+            }
+        });
+        //End glass product item
+
+    // End glass product details
+
+    // calulate total amount based on quantity and price.
+    $(document).on('keyup','#product_quantity, .price',function() {
+        var product_quantity 	= $('#product_quantity').val(); 
+        var product_price       = $("#product_price").val();
+        var total = product_quantity * product_price;
+        $("#product_amount").val(total.toFixed(2));
+    });
+
+    $(document).on('click', '.addRow', function(e){	
+		$('select.customers').siblings('p').remove();
+		$('select.products').siblings('p#products_error').remove();
+		$('select.customers').siblings('.jquery-validation-error').remove();
+		$('select.products').siblings('.jquery-validation-error').remove();
+		$('.quantity').siblings('#quantity_error').remove();
+		$('.is_sub_product').siblings('#is_sub_product').remove();
+        $('.error_product_id').html('');	 
+		var row_count = 1;
+		
+		if(productDetail.customer == ''){
+			$('<p id="customer_error" style="color:red; font-size:12px;">Please select customer.</p>').insertAfter($('select.customers').siblings('.select2-container'));
+		}
+		if(productDetail.product == ''){
+			$('<p id="products_error" style="color:red; font-size:12px;">Please select product.</p>').insertAfter($('select.products').siblings('.select2-container'));
+		}
+
+		var product_id 	= $(".products option:selected").val();
+		var product_name = $(".products option:selected").attr('data-name');
+		var productCategory = $('select.products').find('option:selected').attr('data-type');
+		var is_sub_product = $('select.products').find('option:selected').attr('data-isSubProduct');
+		var products_table = $('#products_table');
+
+		var isDraftSymbol_N_Price = products_table.find('.price').val().toLowerCase() == 'n' ? 1 : 0;
+
+		var unit 	 	= products_table.find('#product_unit').val();
+		var quantity 	= products_table.find('#product_quantity').val();
 		var height  	= products_table.find('.pro_height').val();
 		var width   	= products_table.find('.pro_width').val();
 		var length  	= products_table.find('.pro_length').val();
-        var price 		= products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('.price').val()).toFixed(2);
-        var total_price = products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('.sub_total').text()).toFixed(2);
+		// var price 		= parseFloat(products_table.find('.price').val()).toFixed(2);
+		var price 		= products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('.price').val()).toFixed(2);
+		// var total_price   = parseFloat(products_table.find('.sub_total').text()).toFixed(0);
+		var total_price = products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('#product_amount').val()).toFixed(2);
 		var extra_option_hint = products_table.find('.extra_option_hint').val();
-
-
-        icon = products_table.find('#addNewSubProduct i');
+		
+		icon = products_table.find('#addNewSubProduct i');
 		var is_sub_product_value = '';
 		if(icon.hasClass("fa-plus")){
 			is_sub_product_value = products_table.find('.is_sub_product_select option:selected').val();
@@ -745,18 +751,17 @@
 			is_sub_product_value = products_table.find('.is_sub_product_text').val();
 		}
 
-        var MinSalePrice = parseFloat($('.min-sale-price').text());
-		// if(is_sub_product == 1 && is_sub_product_value == ''){
-		// 	$('#is_sub_product').removeClass('d-none');
-		// 	$('#is_sub_product').text('Please enter sub product.');
-		// 	return false;
-		// }else{
-		// 	$('#is_sub_product').addClass('d-none');
-		// 	$('#is_sub_product').text('');
-		// }
+		var MinSalePrice = parseFloat($('.min-sale-price').text());
+		if(is_sub_product == 1 && is_sub_product_value == ''){
+			$('#is_sub_product').removeClass('d-none');
+			$('#is_sub_product').text('Please enter sub product.');
+			return false;
+		}else{
+			$('#is_sub_product').addClass('d-none');
+			$('#is_sub_product').text('');
+		}
 
-
-        if((!(MinSalePrice <= price)) && products_table.find('.price').val().toLowerCase() != 'n' && price != 0){
+		if((!(MinSalePrice <= price)) && products_table.find('.price').val().toLowerCase() != 'n' && price != 0){
 			$('#price_error').removeClass('d-none');
 			$('#price_error').text('Price should be greater or equal to min sale price.');
 		}else{
@@ -765,28 +770,28 @@
 
 			if(product_id != ''){
 				if(quantity != 0){
-					$('#quantity_error').hide();
+                    $('#quantity_error').addClass('d-none');
+                    $('#quantity_error').text('');
 					if(products_table.find('.price').val() != 0){
 						$('#price_error').addClass('d-none');
 						$('#price_error').text('');
-
+					
 						$('.product_information-block').hide();
 						$('#tmptr').remove();
 						$(".products").select2().val('').trigger('change');
 
-
 						var markup = "<tr><td>"+row_count+"</td>";
 
 						var matrialElement = '';
-
+						
 						if(productCategory == '2' || productCategory == '3'){
-							console.log('proCat:',productCategory);
+							// console.log('proCat:',productCategory);
 							var glassProductSizeList = '';
 							for (const [key, product] of Object.entries(glassProduct.products)) {
 								var extra_option_hint = product.extra_option_hint;
 								var productMeasurement = '';
-
-								if(productCategory == '2'){
+								
+								if(productCategory == '2'){ console.log(product.height, product.width,product.length);
 									if(product.height != 0 && product.width != 0){
 										productMeasurement += product.height+" "+extra_option_hint+" × "+product.width+" "+extra_option_hint+" - "+product.qty+" pc";
 									}else if(product.width != 0 && product.length != 0){
@@ -832,7 +837,7 @@
 								markup += "<p style='margin-top:0px; margin-bottom:0px;'>("+productObject.description+")</p>";
 							}
 
-							//8 ft x 4 ft - 1 pc
+							//8 ft x 4 ft - 1 pc 
 							markup +="</td>";
 							if(height != undefined && height != 0){
 								matrialElement += "<input type='hidden' name='products["+row_count+"][height]' value='"+parseFloat(height).toFixed(2)+"' required/>  "+parseFloat(height).toFixed(2).replace(/\.0+$/,'')+ extra_option_hint;
@@ -841,7 +846,7 @@
 							if(height != undefined && height != 0 && width != undefined && width != 0){
 								matrialElement += " x ";
 							}else if(height != undefined && height != 0 && length != undefined && length != 0){
-								matrialElement += " x ";
+								matrialElement += " x ";								
 							}
 
 							if(width != undefined && width != 0){
@@ -851,30 +856,30 @@
 							if(width != undefined && width != 0 && length != undefined && length != 0){
 								matrialElement += " x ";
 							}else if(height != undefined && height != 0 && length != undefined && length != 0){
-								matrialElement += " x ";
+								matrialElement += " x ";								
 							}
 
 
 							if(length != undefined && length != 0){
 								matrialElement += "<input type='hidden' name='products["+row_count+"][length]' value='"+parseFloat(length).toFixed(2)+"' required/>  "+parseFloat(length).toFixed(2).replace(/\.0+$/,'')+ extra_option_hint;
 							}
-
+							
 							if(matrialElement != ''){
 								matrialElement += " - ";
 							}
 						}
-
+						
 
 						markup += "<td class='qty'><input type='hidden' name='products["+row_count+"][quantity]' value='"+parseFloat(quantity).toFixed(2)+"' required/>"+matrialElement+parseFloat(quantity).toFixed(2).replace(/\.0+$/,'')+" "+unit+"</td>";
-
+						
 						markup += "<td><input type='hidden' name='products["+row_count+"][price]' value='"+price+"' required/>"+price.toString().replace(/\.0+$/,'')+"</td><td class='total_price'><input type='hidden' name='products["+row_count+"][total_price]' value='"+total_price+"' required/>"+total_price.toString().replace(/\.0+$/,'')+"</td>"+
 						"<td><button type='button' id='delete_row_["+row_count+"]' class='deleteRow pull-right btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></button></td>"+
 						"</tr>";
 						tableBody = $("#order_products_table tbody");
 						tableBody.append(markup);
-						calculateGrandTotal();
-
-						products_table.find('.unit').text('');
+						calculateGrandTotal();	
+						
+						products_table.find('#product_unit').val('');
 						$(".is_sub_product_select").select2().val('').trigger('change');
 						if($("#addNewSubProduct").find("i").hasClass("fa-remove")){
 							$("#addNewSubProduct").find("i").toggleClass("fa-plus fa-remove");
@@ -883,9 +888,10 @@
 						$('.sub_product').remove();
 
 						$(".price").val('0');
-						$('.sub_total').text('0');
+						$("#product_quantity").val('0');
+						$('#product_amount').val('0');
 						$('.update_price').val('0');
-
+				
 						$(".price").parent().parent().parent().removeClass('col-lg-1');
 						$(".price").parent().parent().parent().addClass('col-lg-3');
 
@@ -902,25 +908,203 @@
 						$('#price_error').text('Price should not be zero.');
 					}
 				}else{
-					$('<p id="quantity_error" style="color:red; font-size:12px;">Please enter quantity.</p>').insertAfter($('.quantity'));
+					// $('<p id="quantity_error" style="color:red; font-size:12px;">Please enter quantity.</p>').insertAfter($('.quantity'));
+                    $('#quantity_error').removeClass('d-none');
+                    $('#quantity_error').text('Please enter quantity.');
+                    return false;
 				}
 			}
 		}
+	});
 
+    $(document).on('click','#addDesBtn',function(e){
+        $('select.products').siblings('p#products_error').remove();
+        $('select.products').siblings('.jquery-validation-error').remove();
+
+        var products_table = $('#products_table');
+
+        var product_id 	= $(".products option:selected").val();
+        var product_name = $(".products option:selected").attr('data-name');
+        if(product_id == ''){
+            $('<p id="products_error" style="color:red; font-size:12px;">Please select product.</p>').insertAfter($('select.products').siblings('.select2-container'));
+        }else{
+            Swal.fire({
+                title: 'Add Description',
+                input: 'textarea',
+                inputLabel: 'Description',
+                inputValue: productObject.description,
+                inputAttributes: {
+                    name: 'description',
+                    autocomplete:'off',
+                },
+                confirmButtonText:'Save',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if(!(value.length <= 100)){
+                        return 'The description should be 100 maximum character!'
+                    }
+                    if (!value) {
+                        return 'The description is required!'
+                    }
+                }
+            }).then(function(res) {
+                if(res.isConfirmed){
+                    // console.log(res.value);
+                    productObject.description = res.value;
+                }
+            });
+
+            // console.log(productObject.description);
+        }
     });
 
+    $(document).on('input','.swal2-textarea',function(){
+        var str = $(this).val();
+        if(!(str.length <= 100)){
+            $(this).addClass('swal2-inputerror');
+            $(this).siblings('div.swal2-validation-message').css('display','flex');
+            $(this).siblings('div.swal2-validation-message').html("The description should be 100 maximum character!");
+        }else{
+            $(this).removeClass('swal2-inputerror');
+            $(this).siblings('div.swal2-validation-message').css('display','none');
+            $(this).siblings('div.swal2-validation-message').html("");
+        }
+    });
 
+    $(document).on('change','#isAddShipping',function(e){
+        if($(this).is(':checked')){
+            var shippingTrHtml = '<tr>'+
+                                '<th colspan="4" class="text-right">Shipping Amount</th>'+
+                                '<td colspan="2">'+
+                                    '<input type="number" name= "shipping_amount" value="{{$order->shipping_amount ?? number_format(config("constant.shipping_amount"),2) }}" class="form-control shipping_amount" min="0" max="999999" onkeydown="javascript: return ["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Period","NumpadDecimal"].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=="Space" && this.value.length <= 10"  required/>'+
+                                '</td>'+
+                                '</tr>';
+            $(shippingTrHtml).insertBefore($('#order_products_table').children('tfoot').children('tr:nth-child(1)'));
+        
+        }else{
+            $('#order_products_table').children('tfoot').children('tr:nth-child(1)').remove();
+        }
 
-    // calulate total amount based on quantity and price.
-    $('#product_quantity').keyup(function() {
-        var product_quantity 	= $('#product_quantity').val();
-        var product_price       = $("#product_price").val();
-        var total = product_quantity * product_price;
-        $("#product_amount").val(total);
+        calculateGrandTotal();
+    });
+
+    $(document).on('input','.shipping_amount',function(e){
+		calculateGrandTotal();
+    });
+
+    $(document).on('click', '.deleteRow', function(e){
+		var orderTable = document.querySelectorAll('#order_products_table tbody tr');
+		if(orderTable.length == 1){
+			$('.table-for-data').html('<tr id="tmptr"><td colspan="6"></td></tr>');
+		}
+       	$(this).closest('tr').remove();
+       	calculateGrandTotal();
+    });
+
+    function numberWithCommas(x) {
+        x = x.toString();
+        var pattern = /(-?\d+)(\d{3})/;
+        while (pattern.test(x))
+            x = x.replace(pattern, "$1,$2");
+        return x;
+    }
+
+    $(document).on('click','button[type=submit]',function(e){
+        $('input[name=submit]').val($(this).attr('value'));
+    });
+
+    $(document).on('submit','#productForm',function(e){
+		e.preventDefault();
+
+        // var customerCreditAmount = parseFloat($(".customers option:selected").attr('data-credit'));
+        // var customerDebitAmount  = parseFloat($(".customers option:selected").attr('data-debit'));
+        // var customerCreditLimit  = parseFloat($(".customers option:selected").attr('data-limit'));
+
+        // var grandTotal = parseFloat($('#grandTotalSpan').text());
+        // var remmainCreditLimit = customerCreditAmount - customerDebitAmount;
+        // // var remmainCreditLimit = customerCreditLimit - customerDebitAmount;
+    
+        // if(!(customerCreditLimit > remmainCreditLimit && customerCreditLimit > grandTotal) && customerCreditLimit != 0){
+        //     // Toast.fire({
+        //     // 	icon: 'error',
+        //     // 	title: 'Note:Credit limit has been exceeds!',
+        //     // });
+
+        //     $('#credit-limit-alert').text('Note:Credit limit has been exceeds!');
+
+        // }else{
+        //     $('#credit-limit-alert').text('');
+        // }
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': "{!! csrf_token() !!}"
+            }
+        });
+        $.ajax({
+            type: $(this).attr('method'),
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function (response,status, xhr) {
+                // console.log(response);
+                if(response.success){
+                    Swal.fire(
+                        'Success!',
+                        response.message,
+                        'success'
+                    ).then(function() {
+                        
+                        // window.open(response.printPdfUrl, '_blank')
+                    
+                        window.location.replace(response.redirectUrl);
+                    });
+                }
+            },
+            error: function (response) {
+                // console.log(response);
+                var errorArray = response.responseJSON.errors;
+                $.each(errorArray, function(index, item) {
+                    console.log(index, item);
+                    $('.error_'+index).html(item);
+                    if(index == 'products'){
+                        $('.error_product_id').html('Add at least 1 product');
+                    }
+                    // Swal.fire('Error!', item[0], 'error');
+                });
+            }
+        });
+	});
+
+    $(document).on('input','.price',function(e){
+		
+        if($(this).hasClass('price')){
+            var priceVal = $(this).val();
+            
+
+            if(priceVal != 'n'){
+                var MinSalePrice = parseFloat($('.min-sale-price').text());
+                var inputPrice = !isNaN(parseFloat(priceVal)) ? parseFloat(priceVal) : 0;
+
+                if(!(MinSalePrice <= inputPrice) && inputPrice != 0){
+                    $('#price_error').removeClass('d-none');
+                    $('#price_error').text('Price should be greater or equal to min sale price.');
+                }else{
+                    $('#price_error').addClass('d-none');
+                    $('#price_error').text('');
+                }
+
+                $(this).attr('maxlength',20);
+            }else{
+                $('#price_error').addClass('d-none');
+                $('#price_error').text('');
+                $(this).attr('maxlength',1);
+            }
+
+        }
+
+        calculateProducts();
+        
     });
 
 </script>
-
-
-
 @endsection

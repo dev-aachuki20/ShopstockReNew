@@ -8,6 +8,7 @@ return [
     'g_height'               => 'Height',
     'g_width'                 => 'Width',
     'g_length'                => 'Length',
+    'g_number_of_item'=>'Number of item',
     'product' => [
         'seo_title_product_master'             => 'Product Master',
         'product_recycle_master'             => 'Product Recycle Master',
@@ -31,6 +32,7 @@ return [
         'unit_type'             => 'Unit Type',
         'extra_option'          => 'Extra Option',
         'is_sub_product'        => 'Is Sub Product',
+        'sub_product'           => 'Sub Product',
         'enter_hint'            => 'Enter Hint',
         'hint'                  => 'Hint',
         'purchase_price'        => 'Purchase Price',

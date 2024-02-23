@@ -32,4 +32,5 @@ return [
 		'cartoon'	=> 'CARTOON',
 	],
     'product_category_id' => [2,3],
+	'shipping_amount' => '150',
 ];
