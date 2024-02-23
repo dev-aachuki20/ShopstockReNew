@@ -262,6 +262,84 @@ if (!function_exists('getTotalCredit')) {
 
     }
 }
+if (!function_exists('getNewInvoiceNumber')) {
+    /**
+     * Return the total number of areas in table.
+     *
+     * @return string
+     */
+    function getNewInvoiceNumber($orderId='',$reqRouteName='new',$checkInvoiceNumber=''){
+        $invoiceNumber ='';
+        if((!empty($orderId) && !empty($checkInvoiceNumber)) || $reqRouteName == 'new_edit'){                       
+            $invoiceNumber = Order::where('id','!=',$orderId)->where('invoice_number',$checkInvoiceNumber)->exists();
+        }else{
+            
+            // Find the latest invoice number in the database
+            $currentMonth = strtoupper(date('M'));
+            if($reqRouteName == 'return'){
+                $currentMonth = $currentMonth.'-R';
+            }else if($reqRouteName == 'new_cash_receipt'){
+                $currentMonth = $currentMonth.'-CR';
+            }else if($reqRouteName == 'new'){
+                $currentMonth = $currentMonth.'-';
+            }
+
+            if($reqRouteName == 'new_cash_receipt'){
+                $latestInvoice = PaymentTransaction::select('voucher_number')->where('voucher_number','like',$currentMonth.'%')->withTrashed()->orderByRaw('CAST(SUBSTRING(voucher_number, 7) AS UNSIGNED) DESC')
+                ->orderBy('voucher_number', 'DESC')->first();
+            }else if($reqRouteName == 'new'){
+                
+                $matchingPattern = $currentMonth.'[0-9]{4}';
+                $latestInvoice = Order::select('invoice_number')->where('invoice_number', 'REGEXP', $matchingPattern)->withTrashed()
+                ->orderByRaw('CAST(SUBSTRING(invoice_number, 5) AS UNSIGNED) DESC')
+                ->orderBy('invoice_number', 'DESC')->first();
+                //dd($latestInvoice);
+            }else if($reqRouteName == 'return'){
+                $latestInvoice = Order::select('invoice_number')->where('invoice_number','like',$currentMonth.'%')->withTrashed()
+                ->orderByRaw('CAST(SUBSTRING(invoice_number, 6) AS UNSIGNED) DESC')
+                ->orderBy('invoice_number', 'DESC')->first();
+            }
+            
+           //dd($latestInvoice->invoice_number);
+            if ($latestInvoice) {
+               
+                if($reqRouteName == 'new' || $reqRouteName == 'return'){
+                    $lastInvoiceNumber = $latestInvoice->invoice_number;
+                }else if($reqRouteName == 'new_cash_receipt'){
+                    $lastInvoiceNumber = $latestInvoice->voucher_number;
+                }
+
+                $stringRegexCondition = '/([A-Z]+)-/';
+                // $numericRegexCondition = '/-(\d+)$/';
+                if($reqRouteName == 'new_cash_receipt' || $reqRouteName == 'return'){
+                    $stringRegexCondition = '/([A-Z]+-[A-Z]+)/';
+                }
+
+                // Extract string portion (e.g., 'AUG-CR')
+                preg_match($stringRegexCondition, $lastInvoiceNumber, $matches);
+                $stringPortion = $matches[0];
+
+                // Extract numeric portion (e.g., '0999')
+                preg_match('/\d+$/', $lastInvoiceNumber, $matches);
+                $numericPortion = (int) $matches[0];
+
+                $defaultNumericLength = strlen($numericPortion) > 4 ? strlen($numericPortion) : 4;
+
+                $newNumericPortion = str_pad($numericPortion + 1, $defaultNumericLength, '0', STR_PAD_LEFT);
+
+                $invoiceNumber = $stringPortion . $newNumericPortion;
+
+                // dd($lastInvoiceNumber,$numericPortion,$newNumericPortion,$invoiceNumber);
+
+            }else{
+                $invoiceNumber = $currentMonth.'0001';
+            }
+        }
+       
+       return $invoiceNumber;
+
+    }
+}
 
 if (!function_exists('getNewInvoiceNumber')) {
     /**

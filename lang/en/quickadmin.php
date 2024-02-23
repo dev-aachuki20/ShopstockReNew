@@ -321,7 +321,22 @@ return [
 			'list' 	=> 'Manage Estimates',
 		],
 	],
-
+	'transaction-management' => [
+		'title' 	=> 'Payment Management',
+		'fields' 	=> [
+			'new_case_reciept' 	=> 'New Cash Reciept',
+			'add' 	=> 'Add New',
+			'list' 	=> 'List All',
+			'case_reciept' => 'Cash Reciept',
+			'sales'	=> 'Estimate',
+			'sales_return' => 'Estimates Return',
+			'draft_invoice' => 'Draft Estimate',
+			'cancel_estimate' => 'Cancelled Estimate',
+			'current_estimate' => 'Current Estimate',
+			'modified_sales' => 'Modified Estimate',
+			
+		],
+	],
 	'order'  => [
 		'title'  => 'Orders',
 		'order'  => 'Order',

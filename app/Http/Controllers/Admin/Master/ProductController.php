@@ -58,10 +58,10 @@ class ProductController extends Controller
             'sub_group_id' => 'required|numeric',
             'calculation_type' => 'required|numeric',
             'unit_type' => 'required|string|max:50',
-            'price' => 'required|numeric',
-            'min_sale_price' => 'required|numeric',
-            'wholesaler_price' => 'required|numeric',
-            'retailer_price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
+            'min_sale_price' => 'required|numeric|min:0',
+            'wholesaler_price' => 'required|numeric|min:0',
+            'retailer_price' => 'required|numeric|min:0',
             'extra_option_hint' => 'required|string|max:50',
             'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
         ]);
@@ -137,10 +137,10 @@ class ProductController extends Controller
             'sub_group_id' => 'required|numeric',
             'calculation_type' => 'required|numeric',
             'unit_type' => 'required|string|max:50',
-            'price' => 'required|numeric',
-            'min_sale_price' => 'required|numeric',
-            'wholesaler_price' => 'required|numeric',
-            'retailer_price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
+            'min_sale_price' => 'required|numeric|min:0',
+            'wholesaler_price' => 'required|numeric|min:0',
+            'retailer_price' => 'required|numeric|min:0',
             'extra_option_hint' => 'required|string|max:50',
             'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
         ]);
@@ -252,6 +252,14 @@ class ProductController extends Controller
 
     public function updateProductPrice(Request $request){
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $validator = Validator::make($request->all(), [
+            'newValue' => 'required|numeric|min:0'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors()->toArray()
+            ]);
+        }
         if($request->ajax()){
             $rowId = $request->input('rowId');
             $fieldName = $request->input('fieldName');
@@ -288,7 +296,7 @@ class ProductController extends Controller
             foreach($product_id as $row){
                 $product = Product::findOrFail($row);
                 $oldvalue = $product->getOriginal();
-                if($price_type == "increment" || $price_type == "decrement"){
+                if($price_type == "increment"){
                     $product->$price_type('price', $request->amount);
                     $product->$price_type('min_sale_price', $request->amount);
                     $product->$price_type('wholesaler_price', $request->amount);
@@ -298,6 +306,37 @@ class ProductController extends Controller
                     $newValue = $product->refresh();
                     addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue);
                 }
+
+                if($price_type == "decrement"){
+                    if(($product->price - $request->amount) < 0){
+                        $product->price = 0;
+                    }else{
+                        $product->$price_type('price', $request->amount);
+                    }
+
+                    if(($product->min_sale_price - $request->amount) < 0){
+                        $product->min_sale_price = 0;
+                    }else{
+                        $product->$price_type('min_sale_price', $request->amount);
+                    }
+
+                    if(($product->wholesaler_price - $request->amount) < 0){
+                        $product->wholesaler_price = 0;
+                    }else{
+                        $product->$price_type('wholesaler_price', $request->amount);
+                    }
+
+                    if(($product->retailer_price - $request->amount) < 0){
+                        $product->retailer_price = 0;
+                    }else{
+                        $product->$price_type('retailer_price', $request->amount);
+                    }          
+                    $product->updated_by =  Auth::id();
+                    $product->save();
+                    $newValue = $product->refresh();
+                    addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue);
+                }
+
             }
             return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
         }

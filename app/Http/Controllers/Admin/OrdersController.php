@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Http\Requests\Order\StoreOrdersRequest;
 use App\Models\PaymentTransaction;
 use App\Models\Product;
+use App\Models\PaymentTransaction;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -375,6 +376,31 @@ class OrdersController extends Controller
         return response()->json(array('status' => false, 'data' => ''), 200);
     }
 
+<<<<<<< HEAD
+    public function checkInvoiceNumber(Request $request){
+        $orderId = '';
+        $exists = true;
+        
+        if(isset($request->orderId) && !empty($request->orderId)){
+            $orderId = $request->orderId;
+        }
+        
+        if($request->routeName == 'new_edit'){
+            $exists  = getNewInvoiceNumber($orderId,$request->routeName,$request->invoice_number);
+        }else if($request->routeName == 'new_cash_receipt'){
+            $invoiceNumber = getNewInvoiceNumber($orderId,$request->routeName,$request->voucher_number);
+           
+            $exists = PaymentTransaction::where('voucher_number',$request->voucher_number)->exists();
+           
+        }else{
+            $invoiceNumber = getNewInvoiceNumber($orderId,$request->routeName,$request->invoice_number);
+           
+            $exists = Order::where('invoice_number',$request->invoice_number)->exists();
+        }
+
+        return response()->json(!$exists);
+       
+=======
     public function addGlassProductView(Request $request)
     {
         if($request->ajax()){
@@ -392,5 +418,6 @@ class OrdersController extends Controller
 			return response()->json(array('status' => true,'html' =>$html), 200);
 
         }
+>>>>>>> f3a39e71ca3e8df72db0a348ee0e6bba54ac5ad0
     }
 }
