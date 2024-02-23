@@ -376,7 +376,6 @@ class OrdersController extends Controller
         return response()->json(array('status' => false, 'data' => ''), 200);
     }
 
-<<<<<<< HEAD
     public function checkInvoiceNumber(Request $request){
         $orderId = '';
         $exists = true;
@@ -399,8 +398,9 @@ class OrdersController extends Controller
         }
 
         return response()->json(!$exists);
+    }
        
-=======
+
     public function addGlassProductView(Request $request)
     {
         if($request->ajax()){
@@ -418,6 +418,5 @@ class OrdersController extends Controller
 			return response()->json(array('status' => true,'html' =>$html), 200);
 
         }
->>>>>>> f3a39e71ca3e8df72db0a348ee0e6bba54ac5ad0
     }
 }
