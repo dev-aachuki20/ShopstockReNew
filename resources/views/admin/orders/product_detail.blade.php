@@ -7,7 +7,7 @@
                     @if($orders->count() > 0)
                         <a href="javascript: void(0);" id="addNewSubProduct" class="add-inline-btn" style="float: right;"><i class="fa fa-plus {{$orders->count() > 0 ? 'selectBox':'textBox'}}"></i></a>
                         {{-- <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5" required> --}}
-                        <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5">
+                        <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select">
                             <option value="" data-order_id="" data-price="0">{{ trans('quickadmin.qa_please_select') }}</option>
                             @foreach($orders as $value)
                                 <option  value="{{ $value->is_sub_product }}" data-order_id="{{ $value->id }}" data-price="{{ $value->price }}">{{ $value->is_sub_product }}</option>

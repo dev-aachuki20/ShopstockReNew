@@ -275,7 +275,7 @@ if (!function_exists('getNewInvoiceNumber')) {
         }else{
             
             // Find the latest invoice number in the database
-            $currentMonth = strtoupper(date('M'));
+            $currentMonth = strtoupper(date('M')).date('y');
             if($reqRouteName == 'return'){
                 $currentMonth = $currentMonth.'-R';
             }else if($reqRouteName == 'new_cash_receipt'){
@@ -300,7 +300,7 @@ if (!function_exists('getNewInvoiceNumber')) {
                 ->orderBy('invoice_number', 'DESC')->first();
             }
             
-           //dd($latestInvoice->invoice_number);
+        //    dd($latestInvoice->invoice_number);
             if ($latestInvoice) {
                
                 if($reqRouteName == 'new' || $reqRouteName == 'return'){
@@ -309,15 +309,19 @@ if (!function_exists('getNewInvoiceNumber')) {
                     $lastInvoiceNumber = $latestInvoice->voucher_number;
                 }
 
-                $stringRegexCondition = '/([A-Z]+)-/';
+                $stringRegexCondition = '/([A-Z]+)(\d+)/';
+                // $stringRegexCondition = '/([A-Z]+)-/';
                 // $numericRegexCondition = '/-(\d+)$/';
                 if($reqRouteName == 'new_cash_receipt' || $reqRouteName == 'return'){
                     $stringRegexCondition = '/([A-Z]+-[A-Z]+)/';
                 }
 
                 // Extract string portion (e.g., 'AUG-CR')
-                preg_match($stringRegexCondition, $lastInvoiceNumber, $matches);
-                $stringPortion = $matches[0];
+                preg_match($stringRegexCondition, $lastInvoiceNumber, $matches); 
+                $stringPortion = '';
+                if($matches){
+                    $stringPortion = $matches[0];
+                }
 
                 // Extract numeric portion (e.g., '0999')
                 preg_match('/\d+$/', $lastInvoiceNumber, $matches);
@@ -327,7 +331,8 @@ if (!function_exists('getNewInvoiceNumber')) {
 
                 $newNumericPortion = str_pad($numericPortion + 1, $defaultNumericLength, '0', STR_PAD_LEFT);
 
-                $invoiceNumber = $stringPortion . $newNumericPortion;
+                $invoiceNumber = $stringPortion .'-'. $newNumericPortion;
+                // $invoiceNumber = $stringPortion . $newNumericPortion;
 
                 // dd($lastInvoiceNumber,$numericPortion,$newNumericPortion,$invoiceNumber);
 

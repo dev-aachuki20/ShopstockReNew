@@ -1,95 +1,183 @@
-
-.update_product div.table-responsive>div.dataTables_wrapper>div.row {
+.update_product div.table-responsive > div.dataTables_wrapper > div.row {
     width: 100%;
-  }
-.update_product  .update_price span{ width: 75%;    display: inline-block;}
-
-.select_2_add_btn{
-  position: absolute;
-  top: 53px;
-  left: 0px;
-  width: 100%;
 }
-.select_2_add_btn .btns{
-  color: #d30000 !important;
-  border: 0 !important;
-  padding: 0 !important;
-  background-color: transparent;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 60px;
-  width: 100%;
-  text-align: left;
-  padding-left: 6px !important;
+.update_product .update_price span {
+    width: 75%;
+    display: inline-block;
 }
 
-.fa-circle-check.user_icon{font-size: 19px;}
-.active_inactive_user{
-  margin-top: 4px;
-  margin-left: 5px;
+.select_2_add_btn {
+    position: absolute;
+    top: 53px;
+    left: 0px;
+    width: 100%;
+}
+.select_2_add_btn .btns {
+    color: #d30000 !important;
+    border: 0 !important;
+    padding: 0 !important;
+    background-color: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 60px;
+    width: 100%;
+    text-align: left;
+    padding-left: 6px !important;
 }
 
-.active_inactive_user i{
-  font-size: 18px;
+.fa-circle-check.user_icon {
+    font-size: 19px;
 }
-#roles-table tbody tr td:last-child{
-  justify-content: left;
+.active_inactive_user {
+    margin-top: 4px;
+    margin-left: 5px;
+}
+
+.active_inactive_user i {
+    font-size: 18px;
+}
+#roles-table tbody tr td:last-child {
+    justify-content: left;
     padding-left: 7px;
 }
-#select2-calculation_type-results{
-  margin-top: -34px;
+#select2-calculation_type-results {
+    margin-top: -34px;
 }
-.add_group.circlebtn:hover{
-  background: #2159d7 !important;
-}
-
-
-
-aside, .main-sidebar, .main-sidebar .dropdown, .main-sidebar .sidebar-menu li.active a  {
-  background: #062142 !important;
+.add_group.circlebtn:hover {
+    background: #2159d7 !important;
 }
 
-.main-sidebar .sidebar-brand a , .main-sidebar .sidebar-menu li a{
-  color: #fff !important;
+aside,
+.main-sidebar,
+.main-sidebar .dropdown,
+.main-sidebar .sidebar-menu li.active a {
+    background: #062142 !important;
 }
 
-.update_data_table_responsive{
-  overflow: hidden;
-}
-.update_data_table_responsive .dataTables_wrapper>div:nth-child(2)>div {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.update_data_table_responsive .dataTables_wrapper>div:nth-child(2)>div table {
-  white-space: nowrap;
-width: 100% !important;
+.main-sidebar .sidebar-brand a,
+.main-sidebar .sidebar-menu li a {
+    color: #fff !important;
 }
 
-.section-body .select2-container{
-  width: 100% !important;
+.update_data_table_responsive {
+    overflow: hidden;
+}
+.update_data_table_responsive .dataTables_wrapper > div:nth-child(2) > div {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.update_data_table_responsive
+    .dataTables_wrapper
+    > div:nth-child(2)
+    > div
+    table {
+    white-space: nowrap;
+    width: 100% !important;
 }
 
-
+.section-body .select2-container {
+    width: 100% !important;
+}
 
 /* 12-02-24 css */
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-  line-height: 42px;
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+    line-height: 42px;
 }
-.select2-container .select2-selection--single .select2-selection__rendered{
-  padding-left: 0.75rem;
-  font-size: 15px;
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 0.75rem;
+    font-size: 15px;
 }
-.select2-container .select2-selection--single .select2-selection__rendered[title]{
-  color: #6c757d;
+.select2-container
+    .select2-selection--single
+    .select2-selection__rendered[title] {
+    color: #6c757d;
 }
 
-.table:not(.table-sm):not(.table-md):not(.dataTable) td, .table:not(.table-sm):not(.table-md):not(.dataTable) th{
-  border: 1px solid #fff;
+.table:not(.table-sm):not(.table-md):not(.dataTable) td,
+.table:not(.table-sm):not(.table-md):not(.dataTable) th {
+    border: 1px solid #fff;
 }
 
-.theme-white .btn-primary{
-  padding: 0px 30px;
+.theme-white .btn-primary {
+    padding: 0px 30px;
 }
-.edit_product_price:focus{
-  background-color: #2159d7 !important;
+.edit_product_price:focus {
+    background-color: #2159d7 !important;
+}
+.order_create_btnarea .btn-info:hover,
+.order_create_btnarea .btn-info:focus,
+.order_create_btnarea .btn-info:active {
+    background-color: #31b8cd !important;
+    border-color: #31b8cd !important;
+}
+.table-for-data {
+    border: none !important;
+    background: #e9ecef !important;
+    margin-bottom: 0 !important;
+    height: 150px;
+    border-bottom: 20px solid #fff !important;
+}
+#order_products_table .order_create td {
+    padding-right: 0;
+}
+.table:not(.table-sm):not(.table-md):not(.dataTable) .table-for-data tr td {
+    vertical-align: top !important;
+    border: none !important;
+    padding: 10px !important;
+    line-height: 1.42857143;
+}
+
+#addGlassProductDetailModal .modal-body {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 0;
+}
+#addGlassProductDetailModal .modal-footer {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#addGlassProductDetailModal .modal-body .deleteGlassRow {
+    background-color: #db5102 !important;
+    color: #fff;
+}
+.sub_product_div .form-control {
+    transition: inherit;
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1499px) {
+    .product-detail {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .add-product button {
+        padding: 6px 20px !important;
+    }
+    #products_table .row > div:first-child {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding-right: 15px !important;
+    }
+    #products_table .row > div:nth-child(2),
+    #products_table .row > div:nth-child(3) {
+        flex: 0 0 10%;
+        max-width: 10%;
+    }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+    .add-product button {
+        padding: 6px 8px !important;
+    }
+    #products_table .row > div:first-child {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding-right: 15px !important;
+    }
+    #products_table .row > div:nth-child(2),
+    #products_table .row > div:nth-child(3) {
+        flex: 0 0 14%;
+        max-width: 14%;
+    }
 }

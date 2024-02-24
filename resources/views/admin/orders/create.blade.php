@@ -2,6 +2,11 @@
 @section('title')@lang('admin_master.new_estimate.seo_title') @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
+<style>
+  .select2-results{
+    padding-top: 0 !important;
+  }
+</style>
 @endsection
 @section('main-content')
 <section class="section">

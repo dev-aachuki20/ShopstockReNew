@@ -45,26 +45,38 @@ class OrdersController extends Controller
      */
     public function store(StoreOrdersRequest $request)
     { 
-        $isDraft = $request->get('submit') == 'draft' ? true : false;
-		$invoiceNumber = getNewInvoiceNumber('','new'); 
-        $inputs = array(
-            'customer_id'    => $request->get('customer_id'),
-            'order_type'     => $request->get('order_type'),
-            'invoice_number' => $invoiceNumber,
-            'area_id'        => $request->get('area_id'),
-            'invoice_date'   => $request->get('invoice_date'),
-            'shipping_amount'=> (float)str_replace(',','',$request->get('shipping_amount')) ?? null,
-            'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',','',$request->get('total_amount'))),
-            'remark'         => $request->get('remark'),
-            'sold_by'        => $request->get('sold_by'),
-            'created_by'     => Auth::user()->id,
-            'is_draft'       => $isDraft ? 1 : 0,
-			'is_add_shipping'=> $request->get('is_add_shipping') == 'on'?1:0
-        );
-        
-        // $order = Order::create($inputs);
-        $orderId = Order::insertGetId($inputs);
-        $order = Order::find($orderId);
+        $isDraft = $request->submit == 'draft' ? true : false;
+        $checkOrder = Order::where(['customer_id'=>$request->customer_id,'invoice_date'=>$request->invoice_date,'is_draft'=> $isDraft,'order_type'=> $request->order_type])->first(); 
+        if(!$checkOrder){
+            $invoiceNumber = getNewInvoiceNumber('','new'); 
+            $inputs = array(
+                'customer_id'    => $request->customer_id,
+                'order_type'     => $request->order_type,
+                'invoice_number' => $invoiceNumber,
+                'area_id'        => $request->area_id,
+                'invoice_date'   => $request->invoice_date,
+                'shipping_amount'=> (float)str_replace(',','',$request->shipping_amount) ?? null,
+                'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',','',$request->total_amount)),
+                'remark'         => $request->remark,
+                'sold_by'        => $request->sold_by,
+                'created_by'     => Auth::user()->id,
+                'is_draft'       => $isDraft ? 1 : 0,
+                'is_add_shipping'=> $request->is_add_shipping == 'on'?1:0
+            );
+            
+            $order = Order::create($inputs);
+        }else{
+            $shippingAmount = (float)str_replace(',','',$request->shipping_amount) ?? 0.00;
+            $totalAmount = round((float)str_replace(',','',$request->total_amount));
+            $checkOrder->update([
+                'shipping_amount'=> $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null,
+                'total_amount'   => $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount),
+                'remark'         => $request->remark,
+                'sold_by'        => $request->sold_by,
+                'is_add_shipping'=> $request->is_add_shipping == 'on'?1:0
+            ]);
+            $order = $checkOrder;
+        }
         
         // dd($inputs,$order);
         
@@ -91,18 +103,25 @@ class OrdersController extends Controller
         }
        
         if(!$isDraft){
-            $transaction = [
-                'order_id'      => $order->id, 
-                'customer_id'   => $order->customer_id,
-                'payment_type'  => ($order->order_type == 'return')?'debit':'credit',
-                'payment_way'   => 'order_'.$order->order_type,
-                'voucher_number' => $invoiceNumber,
-                'amount'        => round((float)str_replace(',','',$order->total_amount)),
-                'created_by'    => Auth::user()->id,
-                'entry_date'    => date('Y-m-d',strtotime($request->get('invoice_date'))),
-                'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
-            ];
-            PaymentTransaction::create($transaction);
+            $checkPaymentTransaction = PaymentTransaction::where('order_id',$order->id)->first();
+            if(!$checkPaymentTransaction){
+                $transaction = [
+                    'order_id'      => $order->id, 
+                    'customer_id'   => $order->customer_id,
+                    'payment_type'  => ($order->order_type == 'return')?'debit':'credit',
+                    'payment_way'   => 'order_'.$order->order_type,
+                    'voucher_number' => $invoiceNumber,
+                    'amount'        => round((float)str_replace(',','',$order->total_amount)),
+                    'created_by'    => Auth::user()->id,
+                    'entry_date'    => date('Y-m-d',strtotime($request->invoice_date)),
+                    'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+                ];
+                PaymentTransaction::create($transaction);
+            }else{
+                $checkPaymentTransaction->update([
+                    'amount'        => round((float)str_replace(',','',$order->total_amount)) + (float)$checkPaymentTransaction->$checkPaymentTransaction
+                ]);
+            }
         }
 
         if($order->order_type == 'return'){

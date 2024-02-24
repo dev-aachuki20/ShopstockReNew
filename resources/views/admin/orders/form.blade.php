@@ -153,7 +153,6 @@
                         <td colspan="6"></td>
                     </tr>
                 </tbody>
-
                 <tfoot class="order_create mt-5">
                     <tr>
                         <th colspan="4" class="grand total text-right">GRAND TOTAL</th>
@@ -182,7 +181,7 @@
             <input type="checkbox" name="is_add_shipping" class="is_add_shipping" id="isAddShipping">
             <label for="isAddShipping">Add Shipping</label>
         </div>
-        <div class="text-right order_create">
+        <div class="text-right order_create order_create_btnarea">
             <input type="hidden" name="submit" value="">
             <button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft" disabled="">Save as Draft</button>
             <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">Save Estimate</button>
@@ -936,8 +935,8 @@
 	});
 
     $(document).on('click','#addNewSubProduct',function(e){
-		$('.is_sub_product_text').toggle('1000');
-		$('.is_sub_product_select').toggle('900');
+		$('.is_sub_product_text').toggle('0');
+		$('.is_sub_product_select').toggle('0');
 		icon = $(this).find("i");
 		icon.toggleClass("fa-plus fa-remove");
 
@@ -1109,7 +1108,7 @@
         });
 	});
 
-    $(document).on('input','.update_price,.price',function(e){
+    $(document).on('input','#product_quantity,.update_price,.price',function(e){
 		
         if($(this).hasClass('price')){
             var priceVal = $(this).val();
