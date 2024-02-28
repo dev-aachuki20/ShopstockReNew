@@ -87,15 +87,11 @@
         <label>@lang('admin_master.product.extra_option') <span class="text-danger {{ (isset($product) && $product->calculation_type == 1) ? 'd-none' : '' }}">*</span></label>
     </div>
     <div class="ml-3">
-        <label class="form-check-label height" for="is_height">
-            <input class="form-check-input extra_option" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}}>
-            @lang('admin_master.g_height')
-        </label>
+        <label class="form-check-label height">@lang('admin_master.g_height')</label>
+        <input class="form-check-input extra_option height" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}} readonly>
 
-        <label class="form-check-label pl-5 width" for="is_width">
-            <input class="form-check-input extra_option" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}}>
-            @lang('admin_master.g_width')
-        </label>
+        <label class="form-check-label pl-5 width">@lang('admin_master.g_width')</label>
+        <input class="form-check-input extra_option width" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}} readonly>
 
         {{--<label class="form-check-label pl-5" for="is_length">
             <input class="form-check-input extra_option" name="is_length" type="checkbox" id="is_length" value="1" {{(($product->is_length??'') == 1)?'checked':''}}>
@@ -108,7 +104,7 @@
         </label>
     </div>
     <div class="extra_option_hint mt-2" style="display: none;">
-        <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')">
+        <input type="text" class="form-control " name="extra_option_hint" value="{{ isset($product) ? $product->extra_option_hint : '' }}" id="extra_option_hint" autocomplete="false" placeholder="@lang('admin_master.product.enter_hint')" readonly>
     </div>
     <div><span class="error_extra_option_hint text-danger error"></span></div>
 
@@ -168,15 +164,15 @@
 @section('customJS')
 <script type="text/javascript">
     $(document).ready(function() {
-        $('input.extra_option').change(function() {
-            if ($('.extra_option').filter(':checked').length >= 1) {
-                $('div.extra_option_hint').show();
-                $('.extra_option_hint input').attr("required", true);
-            } else {
-                $('.extra_option_hint input').attr("required", false);
-                $('div.extra_option_hint').hide();
-            }
-        }).change();
+        // $('input.extra_option').change(function() {
+        //     if ($('.extra_option').filter(':checked').length >= 1) {
+        //         $('div.extra_option_hint').show();
+        //         $('.extra_option_hint input').attr("required", true);
+        //     } else {
+        //         $('.extra_option_hint input').attr("required", false);
+        //         $('div.extra_option_hint').hide();
+        //     }
+        // }).change();
 
         $(document).on('input', '.only_integer', function(evt) {
             var inputValue = $(this).val();
@@ -436,11 +432,11 @@
         //calculation type
 
         $(document).on('change', '#calculation_type', function() {
-            calculationProcess($(this).val(),'add');
+            calculationProcess($(this).val(), 'add');
         });
 
         @if(isset($product))
-            calculationProcess('{{$product->calculation_type}}','edit');
+        calculationProcess('{{$product->calculation_type}}', 'edit');
         @endif
 
     });
@@ -451,46 +447,40 @@
         });
     }
 
-    function calculationProcess(value,type) {
+    function calculationProcess(value, type) {
         $('.extra_options').show();
+        $('#extra_option_hint').val('').prop('required', false);
+        $('#is_sub_product, #is_height, #is_width').prop("checked", false);
+        $('#unit_type').attr("readonly", false);
+        $('.unit_type span.text-danger, .extra_options span.text-danger').addClass('d-none');
+
         if (value == 1) {
-            $('.height,.width,.extra_option_hint').hide();
+            $('.height, .width, .extra_option_hint').hide();
             $('.sub_product').show();
-            $('#extra_option_hint').val('').attr('required', false);
-            $('.unit_type span.text-danger,.extra_options span.text-danger').addClass('d-none');
-            $('#is_height').is(":checked") && $('#is_height').prop("checked", false);
-            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
-        } else if (value == 2) {
-            $('.height,.width').show();
+        }else if (value == 2){
+            $('.height, .width, .extra_option_hint').show();
             $('.sub_product').hide();
-            $('.unit_type span.text-danger,.extra_options span.text-danger').removeClass('d-none');
             type == 'add' && $('#unit_type').val('11').trigger('change');
-            $('.extra_option_hint').show();
             type == 'add' && $('#extra_option_hint').val('Inch');
-            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
-        } else if (value == 3) {
-            $('.height').show();
-            $('.sub_product,.width').hide();
-            $('.unit_type span.text-danger,.extra_options span.text-danger').removeClass('d-none');
+            $('#is_height, #is_width').prop("checked", true);
+            $('#unit_type').attr("readonly", true);
+            $('.unit_type span.text-danger, .extra_options span.text-danger').removeClass('d-none');
+        }else if (value == 3){
+            $('.height, .extra_option_hint').show();
             type == 'add' && $('#unit_type').val('12').trigger('change');
-            $('.extra_option_hint').show();
             type == 'add' && $('#extra_option_hint').val('Ft');
-            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
-            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
-        } else if (value == 4) {
-            $('.height,.width').show();
+            $('#is_height').prop("checked", true);
+            $('.sub_product, .width').hide();
+            $('#unit_type').attr("readonly", true);
+            $('.unit_type span.text-danger, .extra_options span.text-danger').removeClass('d-none');
+        }else if (value == 4){
+            $('.height, .width, .extra_option_hint').show();
             $('.sub_product').hide();
             $('.extra_options span.text-danger').removeClass('d-none');
-            $('.unit_type span.text-danger').addClass('d-none');
-            $('.extra_option_hint').show();
             type == 'add' && $('#extra_option_hint').val('Ft');
-            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
-        } else {
+            $('#is_height, #is_width').prop("checked", true);
+        }else{
             $('.extra_options').hide();
-            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
-            $('#is_height').is(":checked") && $('#is_height').prop("checked", false);
-            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
-            $('#extra_option_hint').val('').attr('required', false);
             $('.unit_type span.text-danger').removeClass('d-none');
         }
     }
