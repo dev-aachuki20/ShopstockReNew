@@ -389,6 +389,7 @@ return [
             'edit' => 'Edit Invoice',
             'from_date' => 'From Date',
 			'to_date' => 'To Date',
+			'estimate_date'	=> 'Estimate Date'
 		],
 	],
 

@@ -69,6 +69,9 @@ class CustomerController extends Controller
             'area_id' => ['required','numeric'], 
             'is_type' => ['required','string','max:50'], 
             'opening_blance' => ['required','numeric'],
+        ],[
+            'area_id.required' => 'The area address field is required.',
+            'is_type.required' => 'The type field is required.',
         ]); 
         if ($validator->fails()) {
             return response()->json([

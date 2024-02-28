@@ -56,6 +56,19 @@
              </ul>
         </li>
 
+        <li class="dropdown">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.transaction-management.title')</span>
+            </a>
+            <ul class="dropdown-menu">
+                    <li class="{{ Request::is('admin/transaction/sales') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.transactions.type',['sales']) }}">
+                            @lang('quickadmin.transaction-management.fields.sales')
+                        </a>
+                    </li>
+             </ul>
+        </li>
 
 
         <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
 
 class PaymentTransactionsController extends Controller
@@ -65,5 +66,9 @@ class PaymentTransactionsController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function typeFilter(PaymentTransactionDataTable $dataTable, $type){
+        return $dataTable->with(['type' => $type])->render('admin.payment_transactions.index');
     }
 }

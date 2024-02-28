@@ -34,4 +34,11 @@ return [
     'product_category_id' => [2,3],
 	'shipping_amount' => '150',
 	'glass_range' => 10006,
+	'paymentModifyWays' => [
+		'order_create'	=>	'Estimates',
+		'order_return'	=> 	'Estimate Return',
+		'by_cash'		=>  'Cash Reciept',
+		'by_check'		=>  'Check Reciept',
+		'by_account'	=>  'Account Reciept',
+	],	
 ];

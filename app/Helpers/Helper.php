@@ -16,12 +16,13 @@ if (!function_exists('getCommonValidationRuleMsgs')) {
 	{
 		return [
             'currentpassword.required'=>'The current password is required.',
+			'currentpassword.min' => 'The current password must be at least :min characters',
 			'password.required' => 'The new password is required.',
-			'password.min' => 'The new password must be at least 8 characters',
+			'password.min' => 'The new password must be at least :min characters',
 			'password.different' => 'The new password and current password must be different.',
 			'password.confirmed' => 'The password confirmation does not match.',
 			'password_confirmation.required' => 'The new password confirmation is required.',
-			'password_confirmation.min' => 'The new password confirmation must be at least 8 characters',
+			'password_confirmation.min' => 'The new password confirmation must be at least :min characters',
 			'email.required' => 'Please enter email address.',
 			'email.email' => 'Email is not valid. Enter email address for example test@gmail.com',
             'email.exists' => "Please Enter Valid Registered Email!",
@@ -342,6 +343,65 @@ if (!function_exists('getNewInvoiceNumber')) {
         }
        
        return $invoiceNumber;
+
+    }
+}
+
+if(! function_exists('removeTrailingZeros')){
+    function removeTrailingZeros($number): string
+    {
+      $number = number_format($number,2);
+      $number_string = strval($number);
+     
+      if (substr($number_string, -3) === ".00") {
+        return substr($number_string, 0, -3);
+      } else {
+        return $number_string;
+      }
+    }
+}
+
+if (! function_exists('glassProductMeasurement')) {
+    /**
+     * Generate a route name for the previous request.
+     *
+     * @return string|null
+     */
+    function glassProductMeasurement($object,$type='new_line'){ 
+        $glassProductMeasurementList = ($type == 'new_line') ? '' : [];
+        if($object){
+            foreach(json_decode($object,true) as $key=>$otherDetail){
+                $productMeasurement = ' ';
+                $extra_option_hint = $otherDetail['extra_option_hint'] ?? '';
+                if(isset($otherDetail['height']) && isset($otherDetail['width'])){
+                    $productMeasurement = $otherDetail['height'].' '.$extra_option_hint.' × '.$otherDetail['width'].' '.$extra_option_hint.' - '.$otherDetail['qty'].' pc';
+
+                }else if(isset($otherDetail['width']) && isset($otherDetail['length'])){
+                    $productMeasurement = $otherDetail['width'].' '.$extra_option_hint.' × '.$otherDetail['length'].' '.$extra_option_hint.' - '.$otherDetail['qty'].' pc';
+
+                }else if(isset($otherDetail['height']) && isset($otherDetail['length'])){
+                    $productMeasurement = $otherDetail['height'].' '.$extra_option_hint.' × '.$otherDetail['length'].' '.$extra_option_hint.' - '.$otherDetail['qty'].' pc';
+
+                }else if(isset($otherDetail['height']) && isset($otherDetail['width']) && isset($otherDetail['length'])){
+                    $productMeasurement = $otherDetail['height'].' '.$extra_option_hint.' × '.$otherDetail['width'].' '.$extra_option_hint.' × '.$otherDetail['length'].'inch - '.$otherDetail['qty'].' pc';
+
+                }else if(isset($otherDetail['height']) && !isset($otherDetail['width']) && !isset($otherDetail['length'])){
+                    $productMeasurement = $otherDetail['height'].' '.$extra_option_hint.' - '.$otherDetail['qty'].' pc';
+                }
+
+                if($type == 'new_line'){
+                    $glassProductMeasurementList .= "<p style='margin-bottom: 0px;'>".$productMeasurement ."</p>";
+                }else if($type == 'one_line'){
+                    $glassProductMeasurementList[$key]= $productMeasurement;
+                }
+            }
+        }
+
+        if($type == 'new_line'){
+            return $glassProductMeasurementList;
+        }else if($type == 'one_line'){
+            return implode(' , ',$glassProductMeasurementList);
+        }
 
     }
 }

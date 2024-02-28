@@ -34,7 +34,7 @@
             </div>
             <div class="card-header d-flex justify-content-between align-items-center" id="userhead">
               <h4>@lang('quickadmin.profile.fields.personal_detail')</h4>
-              <a role="button" class="text-info" id="editButton"><i class="fas fa-edit"></i> @lang('quickadmin.qa_edit')</a>
+              <a role="button" class="text-info" id="editButton" href="javascript:void(0);"><i class="fas fa-edit"></i> @lang('quickadmin.qa_edit')</a>
             </div>
             <div class="card-body" id="userbody">
               <div>

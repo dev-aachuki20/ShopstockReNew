@@ -183,6 +183,8 @@ class UserController extends Controller
             // 'email' => ['required','email','unique:users,email,' . $user->id],
             'phone' => ['nullable','digits:10','numeric'],
             'address_id' => ['required','numeric'],
+        ],[
+            'address_id.required' => 'The city field is required.'
         ]);
         //dd($validatedData);
         $user->update($validatedData);

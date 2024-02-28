@@ -25,7 +25,7 @@
             <div class="form-group">
                 <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="product_unit" value="{{ (isset($product) && $product->product_unit) ? $product->product_unit->name : '' }}" id="product_unit" autocomplete="true" readonly>
+                    <input type="text" class="form-control" name="product_unit" value="{{ (isset($product) && $product->product_unit) ? $product->product_unit->name : ((isset($product) && $product->product->product_unit) ? $product->product->product_unit->name : '') }}" id="product_unit" autocomplete="true" readonly>
                 </div>
                 <div class="error_product_unit text-danger error"></div>
             </div>
@@ -34,7 +34,7 @@
         <div class="col-lg-1 col-md-12 pr-0">
             <div class="form-group">
                 <label>@lang('admin_master.new_estimate.quantity') <span class="text-danger">*</span></label>
-                <div class="input-group">
+                <div class="input-group"> 
                     <input type="number" class="form-control" name="product_quantity" value="{{ isset($product) ? $product->quantity : 0 }}" min="0" max="999999" id="product_quantity" autocomplete="false">
                 </div>
                 <span id="quantity_error" class="text-danger  d-none" role="alert" style="font-size:12px;"></span>
@@ -63,14 +63,14 @@
                 }
 
                 $productAtr = 0;
-                if(isset($product) && !in_array($product->calculation_type,config('constant.product_category_id'))){
-                    if($product->is_height){
+                if(isset($product) && ((isset($product->calculation_type) && !in_array($product->calculation_type,config('constant.product_category_id'))) || (isset($product->product->calculation_type) && !in_array($product->product->calculation_type,config('constant.product_category_id'))))){
+                    if($product->is_height || $product->product->is_height){ 
                         $productAtr++;
                     }
-                    if($product->is_width){
+                    if($product->is_width || $product->product->is_width){
                         $productAtr++;
                     }
-                    if($product->is_length){
+                    if($product->is_length || $product->product->is_length){
                         $productAtr++;
                     }
                 } 
@@ -78,11 +78,10 @@
 
         <div class="col-xs-2 {{ $productAtr != 0 ? 'col-lg-4' : 'col-lg-2'}} col-md-12 col-sm-12 pr-xl-0">
             <div class="quantity-content">
-
                 @if(isset($editRow) && $editRow)   
                     <input type="hidden" name="extra_option_hint" class="extra_option_hint" value="{{$product->product->extra_option_hint ?? '' }}">
 
-                    @if(isset($product->product) && !in_array($product->product->product_category_id,config('constant.product_category_id')))
+                    @if(isset($product->product) && !in_array($product->product->calculation_type,config('constant.product_category_id')))
                          @if($product->product->is_height)   
                             <div class="form-group">
                                 <label for="height">@lang('admin_master.g_height')</label>
@@ -109,9 +108,9 @@
 
                     @endif
 
-                @else
+                @else 
                     <input type="hidden" name="extra_option_hint" class="extra_option_hint" value="{{$product->extra_option_hint ?? '' }}">
-
+                    
                     @if(isset($product) && !in_array($product->calculation_type,config('constant.product_category_id')))
                         @if(isset($product) && $product->is_height)
                         <div class="form-group">
