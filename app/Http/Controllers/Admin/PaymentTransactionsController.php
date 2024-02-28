@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\MessageBag;
 class PaymentTransactionsController extends Controller
 {
     /**
@@ -42,7 +43,13 @@ class PaymentTransactionsController extends Controller
         ]);
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
-      
+
+        $voucherAlredyExit = PaymentTransaction::where('voucher_number',$request->voucher_number)->withTrashed()->first();
+         if($voucherAlredyExit){
+            $errors = new MessageBag(['voucher_number' => ['This estimate number is already exists.']]);
+            return redirect()->back()->withErrors($errors)->withInput();
+        }
+        
         $payment = PaymentTransaction::create($inputs);
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
