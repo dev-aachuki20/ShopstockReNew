@@ -112,9 +112,9 @@ class GroupDataTable extends DataTable
     {
         return [
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
+            Column::make('name')->title(trans('quickadmin.group_master.fields.name'))->orderable(false),
            // Column::make('parent_id')->title(trans('quickadmin.group_master.fields.sub_group')),
-            Column::make('products_count')->title(trans('admin_master.product.products')),
+            Column::make('products_count')->title(trans('admin_master.product.products'))->orderable(false),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

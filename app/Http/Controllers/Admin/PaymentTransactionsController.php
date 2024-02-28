@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
-
+use App\Models\PaymentTransaction;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 class PaymentTransactionsController extends Controller
 {
     /**
@@ -14,7 +16,7 @@ class PaymentTransactionsController extends Controller
      */
     public function index()
     {
-        //
+        dd('yes');
     }
 
     /**
@@ -33,7 +35,17 @@ class PaymentTransactionsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'voucher_number' => 'required',
+            'customer_id' => 'required',
+            'amount' => 'required',
+            'payment_way' => 'required'
+        ]);
+        $inputs = $request->all();
+        $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
+      
+        $payment = PaymentTransaction::create($inputs);
+        return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
 
     /**
