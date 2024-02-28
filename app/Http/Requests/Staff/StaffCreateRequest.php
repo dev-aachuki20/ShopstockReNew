@@ -27,8 +27,8 @@ class StaffCreateRequest extends FormRequest
     {
         return [
             'name' => ['required','string','max:150','unique:users,name', new TitleValidationRule],
-            'username' => ['required','string','max:40','unique:users,username'],
-            'email' => ['required','email','unique:users,email'],
+            'username' => ['required','string','max:40','unique:users,username','regex:/^[a-zA-Z0-9_-]+$/'],
+            'email' => ['required','regex:/^.+@.+\..+$/i','unique:users,email'],
             'phone' => ['nullable','digits:10','numeric'],
             'role_id'=>['required','numeric'],
             'password'   => ['required', 'string', 'min:4','confirmed'],
@@ -43,7 +43,8 @@ class StaffCreateRequest extends FormRequest
             'name.string' => 'The name should be a valid string.',
             'name.max' => 'The name should not exceed 150 characters.',
             'email.required' => 'The email field is required.',
-            'email.email' => 'Please provide a valid email address.',
+            'email.regex' => 'Please provide a valid email address.',
+            'username.regex' => 'Please provide a valid username.',
             'email.unique' => 'This email is already in use.',
             'password.confirmed' => 'Password and Confirm Password should match.',
             'role_id.required'=> 'Role is required',

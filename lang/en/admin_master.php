@@ -56,7 +56,8 @@ return [
         'price'             => 'Price',
         'amount'            => 'Amount',
         'seo_title'         => 'Add Order',
-
+        'edit_seo_title'    => 'Edit Order',
+        'estimate_view'     => 'View Estimate',
 
     ]
 ]

@@ -47,7 +47,7 @@
                         </a>
                     </li>
 
-                   <li>
+                   <li class="{{ Request::is('admin/transactions/create') ? 'active' : '' }}">
                         <a href="{{ route('admin.transactions.create') }}">
                             <span>@lang('quickadmin.transaction-management.fields.new_case_reciept')</span>
                         </a>
@@ -56,6 +56,24 @@
              </ul>
         </li>
 
+        <li class="dropdown">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.transaction-management.title')</span>
+            </a>
+            <ul class="dropdown-menu">
+                    <li class="{{ Request::is('admin/transaction/sales') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.transactions.type',['sales']) }}">
+                            @lang('quickadmin.transaction-management.fields.sales')
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/transaction/cash_reciept') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.transactions.type',['cash_reciept']) }}">
+                            @lang('quickadmin.transaction-management.fields.case_reciept')
+                        </a>
+                    </li>
+             </ul>
+        </li>
 
 
         <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">

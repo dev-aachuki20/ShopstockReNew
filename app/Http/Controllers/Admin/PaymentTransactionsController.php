@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\MessageBag;
+
 class PaymentTransactionsController extends Controller
 {
     /**
@@ -24,10 +26,10 @@ class PaymentTransactionsController extends Controller
      */
     public function create()
     {
-        $customers = Customer::select('id','name','credit_limit','is_type')->orderBy('id','desc')->get();
-        $paymentTypes = array(''=>trans('quickadmin.qa_please_select_customer'),'credit' => 'Credit','debit'=>'Debit');
-        $paymentWays = array('by_cash' => 'By Cash','by_check' => 'By Check','by_account' => 'By Account');
-        return view('admin.payment_transactions.create',compact('customers','paymentTypes','paymentWays'));
+        $customers = Customer::select('id', 'name', 'credit_limit', 'is_type')->orderBy('id', 'desc')->get();
+        $paymentTypes = array('' => trans('quickadmin.qa_please_select_customer'), 'credit' => 'Credit', 'debit' => 'Debit');
+        $paymentWays = array('by_cash' => 'By Cash', 'by_check' => 'By Check', 'by_account' => 'By Account');
+        return view('admin.payment_transactions.create', compact('customers', 'paymentTypes', 'paymentWays'));
     }
 
     /**
@@ -84,5 +86,10 @@ class PaymentTransactionsController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function typeFilter(PaymentTransactionDataTable $dataTable, $type)
+    {
+        return $dataTable->with(['type' => $type])->render('admin.payment_transactions.index');
     }
 }

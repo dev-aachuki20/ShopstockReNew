@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductExport;
 use Illuminate\Support\Facades\View;
 use Auth, DataTables;
+
 class ProductController extends Controller
 {
     /**
@@ -42,8 +43,8 @@ class ProductController extends Controller
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-		$groups = Group::where('parent_id',0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.create',compact('groups','product_unit'));
+        $groups = Group::where('parent_id', 0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.create', compact('groups', 'product_unit'));
     }
 
     /**
@@ -52,19 +53,24 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-       $validator = Validator::make($request->all(), [
+        $rules = [
             'name' => 'required|string|max:250',
             'group_id' => 'required|numeric',
             'sub_group_id' => 'required|numeric',
             'calculation_type' => 'required|numeric',
-            'unit_type' => 'required|string|max:50',
             'price' => 'required|numeric|min:0',
             'min_sale_price' => 'required|numeric|min:0',
             'wholesaler_price' => 'required|numeric|min:0',
             'retailer_price' => 'required|numeric|min:0',
-            'extra_option_hint' => 'required|string|max:50',
-            'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
-        ]);
+            'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048',
+        ];
+        
+        if ($request->calculation_type != 1) {
+            $rules['unit_type'] = 'required|string|max:50';
+            $rules['extra_option_hint'] = 'required|string|max:50';
+        }
+        $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -86,16 +92,16 @@ class ProductController extends Controller
             'min_sale_price' => $request->min_sale_price,
             'wholesaler_price' => $request->wholesaler_price,
             'retailer_price' => $request->retailer_price,
-            'created_by'=> Auth::id(),
-            'is_active'=> 1
+            'created_by' => Auth::id(),
+            'is_active' => 1
         ];
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = $image->store('product','public');
+            $filename = $image->store('product', 'public');
             $data['image'] = $filename;
         }
         $product =  Product::create($data);
-        addToLog($request,'Product','Create', $product);
+        addToLog($request, 'Product', 'Create', $product);
         return response()->json(['success' => 'Product Created successfully.']);
     }
 
@@ -105,10 +111,10 @@ class ProductController extends Controller
     public function show(Request $request, string $id)
     {
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->ajax()){
+        if ($request->ajax()) {
             $id = decrypt($id);
-            $product = Product::where('id',$id)->first();
-            $html = View::make('admin.master.product.show',compact('product'))->render();
+            $product = Product::where('id', $id)->first();
+            $html = View::make('admin.master.product.show', compact('product'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
     }
@@ -121,8 +127,8 @@ class ProductController extends Controller
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product = Product::findOrFail($id);
         $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-		$groups = Group::where('parent_id',0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.edit', compact('product_unit','groups','product'));
+        $groups = Group::where('parent_id', 0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.edit', compact('product_unit', 'groups', 'product'));
     }
 
     /**
@@ -169,12 +175,12 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = $image->store('product','public');
+            $filename = $image->store('product', 'public');
             $product->image = $filename;
         }
         $product->save();
         $newValue = $product->refresh();
-        addToLog($request,'Product','Edit', $newValue ,$oldvalue);
+        addToLog($request, 'Product', 'Edit', $newValue, $oldvalue);
         return response()->json(['success' => 'Product Update successfully.']);
     }
 
@@ -189,7 +195,7 @@ class ProductController extends Controller
         $record->updated_by = Auth::id();
         $record->save();
         $newValue = $record->refresh();
-        addToLog($request,'Product','Delete', $newValue ,$oldvalue);
+        addToLog($request, 'Product', 'Delete', $newValue, $oldvalue);
         $record->delete();
         return response()->json(['success' => 'Product Delete successfully.']);
     }
@@ -197,60 +203,62 @@ class ProductController extends Controller
     public function viewUpdateProductPrice(Request $request)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $product_groups = Group::Where('parent_id','0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.update_product_prices',compact('product_groups'));
+        $product_groups = Group::Where('parent_id', '0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.update_product_prices', compact('product_groups'));
     }
 
 
-    public function productPriceList(Request $request){
+    public function productPriceList(Request $request)
+    {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->ajax()){
+        if ($request->ajax()) {
             $searchValue = $request->search['value'];
             $paginationValue = $request->length;
-              $products = Product::select(['products.*']);
-              $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
-              $products->whereNull('groups.deleted_at')->orderBy('name','asc');
+            $products = Product::select(['products.*']);
+            $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
+            $products->whereNull('groups.deleted_at')->orderBy('name', 'asc');
 
 
-            if(isset($request->group_id) && $request->group_id != ''){
-                $products = $products->where('group_id',$request->group_id);
+            if (isset($request->group_id) && $request->group_id != '') {
+                $products = $products->where('group_id', $request->group_id);
             }
-            if(isset($request->sub_group_id) && $request->sub_group_id != ''){
-                $products = $products->where('sub_group_id',$request->sub_group_id);
+            if (isset($request->sub_group_id) && $request->sub_group_id != '') {
+                $products = $products->where('sub_group_id', $request->sub_group_id);
             }
-            if(!empty($searchValue)){
-                $products = $products->where(function($query) use($searchValue){
-                    $query->where('products.name','like','%'.$searchValue.'%')
-                    ->orWhere('products.price','like',$searchValue.'%')
-                    ->orWhere('products.min_sale_price','like',$searchValue.'%')
-                    ->orWhere('products.wholesaler_price','like',$searchValue.'%')
-                    ->orWhere('products.retailer_price','like',$searchValue.'%');
+            if (!empty($searchValue)) {
+                $products = $products->where(function ($query) use ($searchValue) {
+                    $query->where('products.name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('products.price', 'like', $searchValue . '%')
+                        ->orWhere('products.min_sale_price', 'like', $searchValue . '%')
+                        ->orWhere('products.wholesaler_price', 'like', $searchValue . '%')
+                        ->orWhere('products.retailer_price', 'like', $searchValue . '%');
                 });
             }
             $products =  $products->get();
 
             return DataTables::of($products)
                 ->editColumn('select_p', function ($row) {
-                    return '<input type="checkbox" class="selected_product" name="products[]" value="'.$row->id.'">';
+                    return '<input type="checkbox" class="selected_product" name="products[]" value="' . $row->id . '">';
                 })
                 ->editColumn('price', function ($row) {
-                    return '<i class="fa fa-inr"></i> <span data-field="price" data-product="'.$row->id.'">'.$row->price ?? 0.00.'</span>';
+                    return '<i class="fa fa-inr"></i> <span data-field="price" data-product="' . $row->id . '">' . $row->price ?? 0.00 . '</span>';
                 })
                 ->editColumn('min_sale_price', function ($row) {
-                    return '<i class="fa fa-inr"></i> <span data-field="min_sale_price" data-product="'.$row->id.'">'.$row->min_sale_price ?? 0.00.'</span>';
+                    return '<i class="fa fa-inr"></i> <span data-field="min_sale_price" data-product="' . $row->id . '">' . $row->min_sale_price ?? 0.00 . '</span>';
                 })
                 ->editColumn('wholesaler_price', function ($row) {
-                    return '<i class="fa fa-inr"></i> <span data-field="wholesaler_price" data-product="'.$row->id.'">'.$row->wholesaler_price ?? 0.00.'</span>';
+                    return '<i class="fa fa-inr"></i> <span data-field="wholesaler_price" data-product="' . $row->id . '">' . $row->wholesaler_price ?? 0.00 . '</span>';
                 })
                 ->editColumn('retailer_price', function ($row) {
-                    return '<i class="fa fa-inr"></i> <span data-field="retailer_price" data-product="'.$row->id.'">'.$row->retailer_price ?? 0.00.'</span>';
+                    return '<i class="fa fa-inr"></i> <span data-field="retailer_price" data-product="' . $row->id . '">' . $row->retailer_price ?? 0.00 . '</span>';
                 })
-                ->rawColumns(['select_p','price','min_sale_price','wholesaler_price','retailer_price'])->toJson();
+                ->rawColumns(['select_p', 'price', 'min_sale_price', 'wholesaler_price', 'retailer_price'])->toJson();
         }
     }
 
 
-    public function updateProductPrice(Request $request){
+    public function updateProductPrice(Request $request)
+    {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'newValue' => 'required|numeric|min:0'
@@ -260,7 +268,7 @@ class ProductController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
-        if($request->ajax()){
+        if ($request->ajax()) {
             $rowId = $request->input('rowId');
             $fieldName = $request->input('fieldName');
             $newValue = $request->input('newValue');
@@ -271,7 +279,7 @@ class ProductController extends Controller
                 $product->updated_by =  Auth::id();
                 $product->save();
                 $newValue = $product->refresh();
-                addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue);
+                addToLog($request, 'Product', 'Update Product Price', $newValue, $oldvalue);
 
                 return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
             } catch (\Exception $e) {
@@ -279,9 +287,10 @@ class ProductController extends Controller
             }
         }
     }
-    public function updateProductPriceGroup(Request $request){
+    public function updateProductPriceGroup(Request $request)
+    {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->ajax()){
+        if ($request->ajax()) {
             $validator = Validator::make($request->all(), [
                 'price_type' => 'required|string',
                 'amount' => 'required|numeric',
@@ -293,10 +302,10 @@ class ProductController extends Controller
             }
             $product_id = $request->product_ids;
             $price_type = $request->price_type;
-            foreach($product_id as $row){
+            foreach ($product_id as $row) {
                 $product = Product::findOrFail($row);
                 $oldvalue = $product->getOriginal();
-                if($price_type == "increment"){
+                if ($price_type == "increment") {
                     $product->$price_type('price', $request->amount);
                     $product->$price_type('min_sale_price', $request->amount);
                     $product->$price_type('wholesaler_price', $request->amount);
@@ -304,50 +313,51 @@ class ProductController extends Controller
                     $product->updated_by =  Auth::id();
                     $product->save();
                     $newValue = $product->refresh();
-                    addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue);
+                    addToLog($request, 'Product', 'Update Product Price', $newValue, $oldvalue);
                 }
 
-                if($price_type == "decrement"){
-                    if(($product->price - $request->amount) < 0){
+                if ($price_type == "decrement") {
+                    if (($product->price - $request->amount) < 0) {
                         $product->price = 0;
-                    }else{
+                    } else {
                         $product->$price_type('price', $request->amount);
                     }
 
-                    if(($product->min_sale_price - $request->amount) < 0){
+                    if (($product->min_sale_price - $request->amount) < 0) {
                         $product->min_sale_price = 0;
-                    }else{
+                    } else {
                         $product->$price_type('min_sale_price', $request->amount);
                     }
 
-                    if(($product->wholesaler_price - $request->amount) < 0){
+                    if (($product->wholesaler_price - $request->amount) < 0) {
                         $product->wholesaler_price = 0;
-                    }else{
+                    } else {
                         $product->$price_type('wholesaler_price', $request->amount);
                     }
 
-                    if(($product->retailer_price - $request->amount) < 0){
+                    if (($product->retailer_price - $request->amount) < 0) {
                         $product->retailer_price = 0;
-                    }else{
+                    } else {
                         $product->$price_type('retailer_price', $request->amount);
-                    }          
+                    }
                     $product->updated_by =  Auth::id();
                     $product->save();
                     $newValue = $product->refresh();
-                    addToLog($request,'Product','Update Product Price', $newValue ,$oldvalue);
+                    addToLog($request, 'Product', 'Update Product Price', $newValue, $oldvalue);
                 }
-
             }
             return response()->json(['success' => true, 'message' => 'Product price updated successfully']);
         }
     }
 
-    public function export($product_id = null){
+    public function export($product_id = null)
+    {
         abort_if(Gate::denies('product_export'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return Excel::download(new ProductExport($product_id), 'product-list.xlsx');
     }
 
-    public function undoGroup(Request $request){
+    public function undoGroup(Request $request)
+    {
         abort_if(Gate::denies('product_undo'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($request->recycle_id);
 
@@ -357,84 +367,85 @@ class ProductController extends Controller
         $deletedData->updated_by =  Auth::id();
         $deletedData->save();
         $newValue = $deletedData->refresh();
-        addToLog($request,'Product','Undo', $newValue ,$oldvalue);
+        addToLog($request, 'Product', 'Undo', $newValue, $oldvalue);
         return response()->json(['success' => 'Undo successfully.']);
     }
 
     public function viewUpdateProductGroup(Request $request)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $product_groups = Group::Where('parent_id','0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.update_product_group',compact('product_groups'));
+        $product_groups = Group::Where('parent_id', '0')->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        return view('admin.master.product.update_product_group', compact('product_groups'));
     }
 
-    public function productUpdateGroupList(Request $request){
+    public function productUpdateGroupList(Request $request)
+    {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if($request->ajax()){
+        if ($request->ajax()) {
             $searchValue = $request->search['value'];
             $paginationValue = $request->length;
-              $products = Product::select(['products.*']);
-              $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
-              $products->whereNull('groups.deleted_at')->orderBy('name','asc');
+            $products = Product::select(['products.*']);
+            $products->leftJoin('groups', 'groups.id', '=', 'products.group_id');
+            $products->whereNull('groups.deleted_at')->orderBy('name', 'asc');
 
 
-            if(isset($request->product_type) && $request->product_type != ''){
-                $products = $products->where('group_id',$request->product_type);
+            if (isset($request->product_type) && $request->product_type != '') {
+                $products = $products->where('group_id', $request->product_type);
             }
-            if(!empty($searchValue)){
-                $products = $products->where(function($query) use($searchValue){
-                    $query->where('products.name','like','%'.$searchValue.'%');
+            if (!empty($searchValue)) {
+                $products = $products->where(function ($query) use ($searchValue) {
+                    $query->where('products.name', 'like', '%' . $searchValue . '%');
                 });
             }
             $products =  $products->get();
 
             return DataTables::of($products)
-               ->editColumn('group_id', function ($row) {
-                    $allGroup = Group::Where('parent_id','0')->get();
+                ->editColumn('group_id', function ($row) {
+                    $allGroup = Group::Where('parent_id', '0')->get();
                     $html = "";
-                    $html .= '<select class="group_list select2" id="group_$row->id" data-porduct_id="'.$row->id.'">';
-                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
-                    foreach($allGroup  as $group){
+                    $html .= '<select class="group_list select2" id="group_$row->id" data-porduct_id="' . $row->id . '">';
+                    $html .= '<option value="">' . trans('admin_master.g_please_select') . '</option>';
+                    foreach ($allGroup  as $group) {
                         $selected = "";
-                        if($group->id == $row->group_id){
+                        if ($group->id == $row->group_id) {
                             $selected = "selected";
                         }
-                        $html .= '<option value="'.$group->id.'" '.$selected.'>'.$group->name.'</option>';
+                        $html .= '<option value="' . $group->id . '" ' . $selected . '>' . $group->name . '</option>';
                     }
-                    $html .='</select>';
+                    $html .= '</select>';
                     return $html;
                 })
                 ->editColumn('sub_group_id', function ($row) {
-                    $allGroup = Group::Where('parent_id',$row->group_id)->get();
+                    $allGroup = Group::Where('parent_id', $row->group_id)->get();
                     $html = "";
-                    $html .= '<select class="sub_group select2" id="sub_group_'.$row->id.'" data-porduct_id="'.$row->id.'">';
-                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
-                    foreach($allGroup  as $group){
+                    $html .= '<select class="sub_group select2" id="sub_group_' . $row->id . '" data-porduct_id="' . $row->id . '">';
+                    $html .= '<option value="">' . trans('admin_master.g_please_select') . '</option>';
+                    foreach ($allGroup  as $group) {
                         $selected = "";
-                        if($group->id == $row->sub_group_id){
+                        if ($group->id == $row->sub_group_id) {
                             $selected = "selected";
                         }
-                        $html .= '<option value="'.$group->id.'" '.$selected.'>'.$group->name.'</option>';
+                        $html .= '<option value="' . $group->id . '" ' . $selected . '>' . $group->name . '</option>';
                     }
-                    $html .='</select>';
+                    $html .= '</select>';
                     return $html;
                 })
                 ->editColumn('unit_type', function ($row) {
                     $allUnit = ProductUnit::get();
                     $html = "";
-                    $html .= '<select class="product_unit select2" id="product_unit_'.$row->id.'" data-porduct_id="'.$row->id.'">';
-                    $html .= '<option value="">'.trans('admin_master.g_please_select').'</option>';
-                    foreach($allUnit  as $unit){
+                    $html .= '<select class="product_unit select2" id="product_unit_' . $row->id . '" data-porduct_id="' . $row->id . '">';
+                    $html .= '<option value="">' . trans('admin_master.g_please_select') . '</option>';
+                    foreach ($allUnit  as $unit) {
                         $selected = "";
-                        if($unit->id == $row->unit_type){
+                        if ($unit->id == $row->unit_type) {
                             $selected = "selected";
                         }
-                        $html .= '<option value="'.$unit->id.'" '.$selected.'>'.$unit->name.'</option>';
+                        $html .= '<option value="' . $unit->id . '" ' . $selected . '>' . $unit->name . '</option>';
                     }
-                    $html .='</select>';
+                    $html .= '</select>';
                     return $html;
                 })
-                ->rawColumns(['group_id','sub_group_id','unit_type'])->toJson();
+                ->rawColumns(['group_id', 'sub_group_id', 'unit_type'])->toJson();
         }
     }
 
@@ -452,22 +463,21 @@ class ProductController extends Controller
         }
         $product = Product::findOrFail($request->porduct_id);
         $oldvalue = $product->getOriginal();
-        if($request->group_sub_group == "Group"){
+        if ($request->group_sub_group == "Group") {
             $product->group_id = $request->group_id;
             $product->sub_group_id = 0;
         }
-        if($request->group_sub_group == "SubGroup"){
-             $product->sub_group_id = $request->group_id;
+        if ($request->group_sub_group == "SubGroup") {
+            $product->sub_group_id = $request->group_id;
         }
-        if($request->group_sub_group == "Unit"){
-             $product->unit_type = $request->group_id;
+        if ($request->group_sub_group == "Unit") {
+            $product->unit_type = $request->group_id;
         }
         $product->updated_by = Auth::id();
         $product->save();
         $newValue = $product->refresh();
-        $group_sub_group = 'Update Product '.$request->group_sub_group;
-        addToLog($request,'Product',$group_sub_group, $newValue ,$oldvalue);
+        $group_sub_group = 'Update Product ' . $request->group_sub_group;
+        addToLog($request, 'Product', $group_sub_group, $newValue, $oldvalue);
         return response()->json(['success' => 'Product Update successfully.']);
     }
-
 }

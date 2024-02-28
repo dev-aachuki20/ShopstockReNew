@@ -273,6 +273,16 @@
             }
         });
 }
+
+$(document).on('keypress', '#name', function(event) {
+    var keyCode = event.keyCode || event.which;
+    var inputValue = $(this).val();
+    if (keyCode === 32) {
+      if (inputValue.slice(-1) === ' ') {
+        event.preventDefault();
+      }
+    }
+});
 </script>
 
 @endsection

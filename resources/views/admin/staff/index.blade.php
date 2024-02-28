@@ -342,9 +342,9 @@ $(document).ready(function () {
         });
     });
 
-// active inactive user
- // rejoin or restore
- $(document).on('click', '.active_inactive_user', function(e) {
+    // active inactive user
+    // rejoin or restore
+    $(document).on('click', '.active_inactive_user', function(e) {
         e.preventDefault();
         var active_inactive = $(this).data('active_inactive');
         var _id = $(this).data('id');
@@ -384,10 +384,27 @@ $(document).ready(function () {
         }
         });
     });
-// active inactive user
+    // active inactive user
 
+    $(document).on('click','.password-toggle-icon i',function(){
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $("#password");
+        if (input.attr("type") === "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
+    });
 
-
+    $(document).on('click','.confirm-password-toggle-icon i',function(){
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $("#password_confirmation");
+        if (input.attr("type") === "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
+    });
 
 });
 

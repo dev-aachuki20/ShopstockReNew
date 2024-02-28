@@ -12,7 +12,7 @@
             <div class="form-group">
                 <label for="username">@lang('quickadmin.users.fields.usernameid')</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="username" value="{{ isset($user) ? $user->username : old('username') }}" id="username" autocomplete="true">
+                    <input type="text" class="form-control" name="username" value="{{ isset($user) ? $user->username : old('username') }}" id="username" autocomplete="true" onkeypress="return event.charCode != 32">
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label for="phone">@lang('quickadmin.users.fields.phone')</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" name="phone" value="{{ isset($user) ? $user->phone : old('phone') }}" id="phone" autocomplete="true">
+                    <input type="text" class="form-control" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" name="phone" value="{{ isset($user) ? $user->phone : old('phone') }}" id="phone" autocomplete="true">
                 </div>
             </div>
         </div>
@@ -70,6 +70,7 @@
                         </div>
                     </div>
                     <input type="password" value="{{ old('password') }}" id="password" class="form-control @error('password') is-invalid @enderror" name="password" tabindex="1" autofocus>
+                    <span class="password-toggle-icon"><i class="fas fa-eye"></i></span>
                 </div>
             </div>
         </div>
@@ -83,6 +84,7 @@
                         </div>
                     </div>
                     <input type="password" value="{{ old('password_confirmation') }}" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" tabindex="1" autofocus>
+                    <span class="confirm-password-toggle-icon"><i class="fas fa-eye"></i></span>
                 </div>
             </div>
         </div>

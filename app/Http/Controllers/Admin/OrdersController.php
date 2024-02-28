@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Http\Requests\Order\StoreOrdersRequest;
+use App\Http\Requests\Order\UpdateProductRequest;
+use App\Http\Requests\Order\UpdateOrdersRequest;
 use App\Models\PaymentTransaction;
 use App\Models\Product;
+use App\Models\OrderProduct;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -110,7 +113,7 @@ class OrdersController extends Controller
                     'customer_id'   => $order->customer_id,
                     'payment_type'  => ($order->order_type == 'return')?'debit':'credit',
                     'payment_way'   => 'order_'.$order->order_type,
-                    'voucher_number' => $invoiceNumber,
+                    'voucher_number' => $invoiceNumber ?? $order->invoice_number,
                     'amount'        => round((float)str_replace(',','',$order->total_amount)),
                     'created_by'    => Auth::user()->id,
                     'entry_date'    => date('Y-m-d',strtotime($request->invoice_date)),
@@ -119,7 +122,7 @@ class OrdersController extends Controller
                 PaymentTransaction::create($transaction);
             }else{
                 $checkPaymentTransaction->update([
-                    'amount'        => round((float)str_replace(',','',$order->total_amount)) + (float)$checkPaymentTransaction->$checkPaymentTransaction
+                    'amount'        => round((float)str_replace(',','',$order->total_amount)) + (float)$checkPaymentTransaction->amount
                 ]);
             }
         }
@@ -143,11 +146,11 @@ class OrdersController extends Controller
      * Display the specified resource.
      */
     public function show(Request $request, string $id)
-    {
+    { 
         if ($request->ajax()) {
             $id = decrypt($id);
-            $product = Product::where('id', $id)->first();
-            $html = View::make('admin.master.product.show', compact('product'))->render();
+            $order = Order::where('id', $id)->first();
+            $html = View::make('admin.orders.prev_order_modal', compact('order'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
     }
@@ -156,16 +159,184 @@ class OrdersController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
-        //
+    { 
+        $orderType = 'edit';
+        $order = Order::findOrFail($id);
+        $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')->orderBy('name', 'asc')->get();
+        return view('admin.orders.edit', compact('customers','order','orderType','products'));
+    }
+
+    public function EditProduct(UpdateProductRequest $request){
+        if($request->ajax()){			
+            $dataRowIndex = $request->dataRowIndex;
+            $product = OrderProduct::findOrFail($request->opid);
+			$order 	 = Order::select('order_products.price','orders.id')
+							->join('order_products','orders.id','order_products.order_id')
+							->where('orders.customer_id',$request->customer_id)
+							->where('order_products.product_id',$request->product_id)
+							->orderBy('order_products.id','desc')
+							->first();
+			$customer = Customer::findOrFail($request->customer_id);
+            // $unit = config('constant.unitTypes')[strtolower($product->product->unit_type)];
+            $unit = $product->product_unit ? $product->product_unit->name : '';
+            $purchase_price = $product->product->purchase_price_encode;
+			$last_order_price = $order->price ?? '';
+          // dd($product->product->product_category_id);
+            $rowData['order']            = !is_null($order) ? encrypt($order->id) : '';
+            $rowData['customer_type']    = $customer->is_type ?? '';
+            $rowData['product_name']     = $product->product->name;
+
+            $rowData['product_description']   = $product->description ?? '';
+            $rowData['other_details']    = $product->other_details ?? '';
+            $rowData['totalQty']         = $product->quantity ?? 0;
+
+            $rowData['purchase_price']   = $purchase_price ?? 0.00;
+            $rowData['min_sale_price']   = $product->product->min_sale_price ?? 0.00;
+            // $rowData['sale_price']       = $product->product->sale_price ?? 0.00;
+            $rowData['retailer_price']   = ($customer->is_type == 'retailer') ? $product->product->retailer_price : 0.00;
+            $rowData['wholesaler_price'] = ($customer->is_type == 'wholesaler') ? $product->product->wholesaler_price : 0.00;
+            $rowData['last_order_price'] = $last_order_price ?? 0.00;
+            $rowData['unit'] = $unit;           
+
+            $rowData['price'] = $product->price;
+            $rowData['sub_total'] = $product->total_price ?? 0.00;
+            $rowData['extra_option_hint'] = $product->product->extra_option_hint ?? '';           
+            $editRow = true;          
+
+            $productDetail =  view('admin.orders.product_detail',compact('product','customer','last_order_price','unit','editRow','dataRowIndex'))->render();
+			return response()->json(array('status' => true,'data' =>$productDetail,'rowData'=>$rowData), 200);
+
+        }
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateOrdersRequest $request, $id)
     {
-        //
+        $type = 'sales'; //sales
+        $isDraft = $request->submit == 'draft' ? true : false;
+      
+        $order = $checkProductOrder = Order::findOrFail($id);
+        $beforIs_draft=$order['is_draft'];
+        $inputs = array(
+            'invoice_date'   => $request->invoice_date,
+            'shipping_amount'=> isset($request->shipping_amount) ? (float)str_replace(',','',$request->shipping_amount) : null,
+            'total_amount'   => $isDraft ? 0.00 : round($request->total_amount),
+            'remark'         => $request->remark,
+            'sold_by'        => $request->sold_by,
+            'created_by'     => Auth::user()->id,
+            'is_draft'       => $isDraft ? 1 : 0,
+            'is_add_shipping'=> (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
+        );
+        if($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date){
+            $inputs['updated_by'] = Auth::user()->id;
+            $order->update($inputs);
+        }else{
+            $checkOrder = Order::where(['customer_id'=>$request->customer_id,'invoice_date'=>$request->invoice_date,'is_draft'=> $isDraft])->first(); 
+            if($checkOrder){
+                $shippingAmount = (float)str_replace(',','',$request->shipping_amount) ?? 0.00;
+                $totalAmount = round((float)str_replace(',','',$request->total_amount));
+                $inputs['shipping_amount'] = $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null;
+                $inputs['total_amount']   = $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount);
+                $inputs['updated_by'] = Auth::user()->id;
+                $order->delete();
+                $checkOrder->update($inputs);
+                $order = $checkOrder;
+            }else{
+                $inputs['customer_id'] = $request->customer_id;
+                $inputs['area_id'] = $request->area_id;
+                $inputs['invoice_number'] = getNewInvoiceNumber('','new'); 
+                $order = Order::create($inputs);
+            }
+        }
+        
+        
+        $orderProducts = $request->products;
+        $allProducts = array();
+        $existedOrderProductId = array();
+        $couter = 0;
+        if(count($orderProducts) > 0){
+            foreach($orderProducts as $oProduct){
+               // dd($orderProducts);
+                $updateOrCreateOrderProduct = [
+                    'product_id' => $oProduct['product_id'],
+                    'quantity'   => $oProduct['quantity'],
+                    'price'      => (float)str_replace(',','',$oProduct['price']) ?? null,
+                    'height'     => $oProduct['height'] ?? null,
+                    'width'      => $oProduct['width'] ?? null,
+                    'length'     => $oProduct['length'] ?? null,
+                    'is_draft'   => $oProduct['is_draft'] ?? 0,
+                    'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] :null,
+                    'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'],true)) :null,
+                    'total_price'   => round((float)str_replace(',','',$oProduct['total_price'])) ?? 0.00,
+                ];
+                //dd($updateOrCreateOrderProduct);
+                if(isset($oProduct['opid']) && !empty($oProduct['opid'])){
+                    if($id != $order->id){
+                        $updateOrCreateOrderProduct['order_id'] = $order->id;
+                    }
+                    $existedOrderProductId[] = $oProduct['opid'];
+                    OrderProduct::where('id', $oProduct['opid'])->update($updateOrCreateOrderProduct);
+                }else{
+                    $allProducts[] = $updateOrCreateOrderProduct;
+                }
+            }
+        }
+
+        $delproids= explode(",",$request->deleted_opids);
+       
+        if(count($delproids) > 0){    
+            $orderProductsToDelete = OrderProduct::whereIn('id', $delproids)->get();
+            foreach ($orderProductsToDelete as $orderProduct) {
+                $orderProduct->delete(); 
+            }
+        }
+
+
+        if(count($allProducts) > 0){
+            foreach($allProducts as $oproduct){
+                $order->orderProduct()->create($oproduct);
+            }
+            
+        }
+        $transaction = [
+            'customer_id'    => $order->customer_id,
+            'voucher_number' => $order->invoice_number,
+            'amount'         => round((float)str_replace(',','',$order->total_amount)),
+            'extra_details'  => 'order update with total_amount '.$order->total_amount.' updated_by='. Auth::user()->id,
+            'entry_date'    => $request->invoice_date, 
+            'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+        ];
+
+        if(!$isDraft){   
+            if($id != $order->id){
+                $lastPaymentTransaction = PaymentTransaction::where(['order_id'=>$id,'entry_date'=>$checkProductOrder->invoice_date])->first();
+                if($lastPaymentTransaction) {
+                    $lastPaymentTransaction->delete();
+                }
+                $checkNewOrderPaymentTransaction = PaymentTransaction::where(['order_id'=>$order->id,'entry_date'=>$order->invoice_date])->first();
+
+                if($checkNewOrderPaymentTransaction){
+                    $checkNewOrderPaymentTransaction->update([
+                        'amount'        => round((float)str_replace(',','',$lastPaymentTransaction->amount)) + (float)$checkNewOrderPaymentTransaction->amount
+                    ]);
+                }else{
+                    $transaction['order_id'] = $order->id;
+                    PaymentTransaction::create($transaction); 
+                }
+            }else{
+                PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number],$transaction); 
+            }
+        }
+
+        return response()->json(['success' => true,
+            'message'     => 'Successfully Updated!',
+            'redirectUrl' => route('admin.transactions.type',$type),
+        ]);
+
     }
 
     /**

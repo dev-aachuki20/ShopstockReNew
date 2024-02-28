@@ -18,7 +18,7 @@
    
      
     <div class="col-md-6 form-group">  
-        {!! Form::label('area_id', trans('quickadmin.customers.fields.area_address'), ['class' => 'control-label']) !!}    
+        {!! Form::label('area_id', trans('quickadmin.customers.fields.area_address'), ['class' => 'control-label']) !!}  <span class="text-danger">*</span>  
         {!! Form::select('area_id', $areas,  $customer->area_id ?? '', ['id'=>'areaList','class' => 'form-control select2']) !!}
         <p class="help-block red" id="area_id_error"></p>
         <div class="error_area_id text-danger error"></div>   
@@ -126,7 +126,7 @@
         
         $(document).on('input','.only_integer', function(evt) {
             var inputValue = $(this).val();
-                $(this).val(inputValue.replace(/[^0-9.]/g, ''));
+                $(this).val(inputValue.replace(/[^0-9]/g, ''));
         }); 
     
         $.ajaxSetup({
