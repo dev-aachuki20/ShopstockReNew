@@ -145,6 +145,32 @@ aside,
 .sub_product_div .form-control {
     transition: inherit;
 }
+.edit_profile{
+    position: relative;
+    overflow: hidden;
+}
+.edit_profile input{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    z-index: 1;
+}
+#editButton:hover{
+    text-decoration: none;
+}
+#EditprofileForm .input-group .input-group-prepend{
+    flex: 0 0 40px;
+    -webkit-flex: 0 0 40px;
+}
+#EditprofileForm .input-group .input-group-prepend>div{
+    width: 100%;
+}
+#EditprofileForm .input-group .select2-container{
+    flex: 1 1 0;
+    -webkit-flex: 1 1 0;
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {
