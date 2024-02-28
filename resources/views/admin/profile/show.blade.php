@@ -15,20 +15,19 @@
             <div class="row mt-sm-4 background-imagebody chooseFileGroup px-4">
                 <div class="col-md8 col-12 col-lg8 boxcenter">
                     <form id="EditProfileImageForm" method="post" enctype="multipart/form-data" action="{{route('profile-image.update')}}">
-                    <input type="file" id="profile_image" name="profile_image" hidden>
-                    <label for="profile_image" class="row author-box align-items-center gap-4 " id="profile_error">
-                        <div class="col-auto px-1">
-                            <div class="rounded-circle author-box-picture box-center shadow-none">
-                                <img alt="image" src=" {{ $user->profile_image_url ? $user->profile_image_url : asset('admintheme/assets/img/user.png') }}" alt="profile" class="w-100 h-100 rounded-circle profile-image" >
-                            </div>
-                        </div>
-                        <div class="col px-2">
-                            <div class="page-inner box-center text-left align-center">
-                                <div class="profileName"><a href="#" class="text-dark">{{ $user->name }}</a></div>
-                                <div class="edit_profile btn-outline-primary btn">@lang('quickadmin.profile.change')</div>
-                            </div>
-                        </div>
-                    </label>
+                      <div class="row author-box align-items-center gap-4 " id="profile_error">
+                          <div class="col-auto px-1">
+                              <div class="rounded-circle author-box-picture box-center shadow-none">
+                                  <img alt="image" src=" {{ $user->profile_image_url ? $user->profile_image_url : asset('admintheme/assets/img/user.png') }}" alt="profile" class="w-100 h-100 rounded-circle profile-image" >
+                              </div>
+                          </div>
+                          <div class="col px-2">
+                              <div class="page-inner box-center text-left align-center">
+                                  <div class="profileName"><a href="#" class="text-dark">{{ $user->name }}</a></div>
+                                  <div class="edit_profile btn-outline-primary btn">@lang('quickadmin.profile.change') <input type="file" id="profile_image" name="profile_image"></div>
+                              </div>
+                          </div>
+                      </div>
                     </form>
                 </div>
             </div>
