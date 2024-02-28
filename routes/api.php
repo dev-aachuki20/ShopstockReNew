@@ -26,40 +26,40 @@ use App\Http\Controllers\Api\ProductController;
 
 
 Route::group(['middleware' => 'checkDevice'], function () {
-    Route::controller(LoginController::class)->group(function(){
-        Route::post('login', 'login');
-        Route::post('forgot-password', 'forgotPassword');
-        Route::post('password/verify-otp', 'verifyOtp');
-        Route::post('password/reset', 'resetPassword');
-    });
+    // Route::controller(LoginController::class)->group(function(){
+    //     Route::post('login', 'login');
+    //     Route::post('forgot-password', 'forgotPassword');
+    //     Route::post('password/verify-otp', 'verifyOtp');
+    //     Route::post('password/reset', 'resetPassword');
+    // });
 
     Route::middleware(['auth:sanctum'])->group(function () {
 
-        Route::post('/device/login', [LoginController::class, 'LoginWithPin']);
-        Route::post('/logout', [LogoutController::class, 'logout']);
+        // Route::post('/device/login', [LoginController::class, 'LoginWithPin']);
+        // Route::post('/logout', [LogoutController::class, 'logout']);
 
-        Route::group(['prefix' => 'customers'], function () {
-            Route::get('/index', [CustomerController::class, 'todayInvoiceGroupList']);
-            Route::get('/party-list', [CustomerController::class, 'AllCustomerList']);
-            Route::post('/store', [CustomerController::class, 'store']);
-            Route::get('/order-details', [CustomerController::class, 'PartyOrderDetail']);
-            Route::post('/phone-validate',[CustomerController::class,'PhoneValidation']);
-        });
+        // Route::group(['prefix' => 'customers'], function () {
+        //     Route::get('/index', [CustomerController::class, 'todayInvoiceGroupList']);
+        //     Route::get('/party-list', [CustomerController::class, 'AllCustomerList']);
+        //     Route::post('/store', [CustomerController::class, 'store']);
+        //     Route::get('/order-details', [CustomerController::class, 'PartyOrderDetail']);
+        //     Route::post('/phone-validate',[CustomerController::class,'PhoneValidation']);
+        // });
 
-        Route::group(['prefix' => 'orders'], function () {
-            Route::post('/store', [OrderController::class, 'store']);
-            Route::delete('/{order}', [OrderController::class, 'destroy']);
-            Route::put('/{order}', [OrderController::class, 'update']);
-            Route::get('/generate-pdf/{order}{type?}',[OrderController::class,'generateInvoicePdf']);
-            Route::get('/party-invoice-pdf/{customer_id}',[OrderController::class,'generatePartyAllInvoicePdf']);
-        });
+        // Route::group(['prefix' => 'orders'], function () {
+        //     Route::post('/store', [OrderController::class, 'store']);
+        //     Route::delete('/{order}', [OrderController::class, 'destroy']);
+        //     Route::put('/{order}', [OrderController::class, 'update']);
+        //     Route::get('/generate-pdf/{order}{type?}',[OrderController::class,'generateInvoicePdf']);
+        //     Route::get('/party-invoice-pdf/{customer_id}',[OrderController::class,'generatePartyAllInvoicePdf']);
+        // });
 
-        Route::post('products/store', [ProductController::class, 'store']);
-        Route::get('/get-products', [ProductController::class, 'AllProducts']);
-        Route::get('/get-categories', [ProductController::class, 'AllCategories']);
+        // Route::post('products/store', [ProductController::class, 'store']);
+        // Route::get('/get-products', [ProductController::class, 'AllProducts']);
+        // Route::get('/get-categories', [ProductController::class, 'AllCategories']);
 
-        Route::get('/get-cities', [AddressController::class, 'AllCities']);
-        Route::post('address/store', [AddressController::class, 'store']);
+        // Route::get('/get-cities', [AddressController::class, 'AllCities']);
+        // Route::post('address/store', [AddressController::class, 'store']);
     });
 
 });

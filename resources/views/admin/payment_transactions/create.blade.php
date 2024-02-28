@@ -15,6 +15,7 @@
             <div class="card-body">
             <form action="{{ route('admin.transactions.store') }}"  id="cash-reciept-form" method="POST"  name="productForm" enctype="multipart/form-data">
               <div class="row">
+                @csrf
                 @include('admin.payment_transactions.form')
               </div>
             </form>

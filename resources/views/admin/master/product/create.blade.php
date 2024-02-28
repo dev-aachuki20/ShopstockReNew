@@ -11,6 +11,7 @@
           <div class="card">
             <div class="card-body">
             <form action="{{ route('admin.master.products.store') }}"  id="productForm" method="POST"  name="productForm" enctype="multipart/form-data">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <div class="row">
                 @include('admin.master.product.form')
               </div>
