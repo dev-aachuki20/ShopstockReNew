@@ -20,7 +20,7 @@
 
           <li class="dropdown"><a href="#" data-toggle="dropdown"
               class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="{{ asset('admintheme/assets/img/user.png') }}" class="user-img-radious-style">
+              <img alt="image" src="{{ auth()->user()->profile_image_url ? auth()->user()->profile_image_url :asset('admintheme/assets/img/user.png') }}" class="user-img-radious-style">
               <span class="d-sm-none d-lg-inline-block"></span></a>
             <div class="dropdown-menu dropdown-menu-right">
               <div class="dropdown-title">Hello {{ Auth::user()->name }}</div>
