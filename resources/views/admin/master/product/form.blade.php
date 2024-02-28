@@ -436,11 +436,11 @@
         //calculation type
 
         $(document).on('change', '#calculation_type', function() {
-            calculationProcess($(this).val());
+            calculationProcess($(this).val(),'add');
         });
 
         @if(isset($product))
-        calculationProcess('{{$product->calculation_type}}');
+            calculationProcess('{{$product->calculation_type}}','edit');
         @endif
 
     });
@@ -451,24 +451,47 @@
         });
     }
 
-    function calculationProcess(value) {
+    function calculationProcess(value,type) {
         $('.extra_options').show();
         if (value == 1) {
             $('.height,.width,.extra_option_hint').hide();
             $('.sub_product').show();
-            $('#extra_option_hint').val('');
+            $('#extra_option_hint').val('').attr('required', false);
             $('.unit_type span.text-danger,.extra_options span.text-danger').addClass('d-none');
-            $('#is_height').is(":checked") && $('#is_height').prop( "checked", false );
-            $('#is_width').is(":checked") && $('#is_width').prop( "checked", false );
+            $('#is_height').is(":checked") && $('#is_height').prop("checked", false);
+            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
+        } else if (value == 2) {
+            $('.height,.width').show();
+            $('.sub_product').hide();
+            $('.unit_type span.text-danger,.extra_options span.text-danger').removeClass('d-none');
+            type == 'add' && $('#unit_type').val('11').trigger('change');
+            $('.extra_option_hint').show();
+            type == 'add' && $('#extra_option_hint').val('Inch');
+            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
         } else if (value == 3) {
             $('.height').show();
             $('.sub_product,.width').hide();
             $('.unit_type span.text-danger,.extra_options span.text-danger').removeClass('d-none');
-            $('#unit_type').val('12').trigger('change');
+            type == 'add' && $('#unit_type').val('12').trigger('change');
             $('.extra_option_hint').show();
-            $('#extra_option_hint').val('Ft');
-            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop( "checked", false );
-            $('#is_width').is(":checked") && $('#is_width').prop( "checked", false );
+            type == 'add' && $('#extra_option_hint').val('Ft');
+            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
+            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
+        } else if (value == 4) {
+            $('.height,.width').show();
+            $('.sub_product').hide();
+            $('.extra_options span.text-danger').removeClass('d-none');
+            $('.unit_type span.text-danger').addClass('d-none');
+            $('.extra_option_hint').show();
+            type == 'add' && $('#extra_option_hint').val('Ft');
+            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
+        } else {
+            $('.extra_options').hide();
+            $('#is_sub_product').is(":checked") && $('#is_sub_product').prop("checked", false);
+            $('#is_height').is(":checked") && $('#is_height').prop("checked", false);
+            $('#is_width').is(":checked") && $('#is_width').prop("checked", false);
+            $('#extra_option_hint').val('').attr('required', false);
+            $('.unit_type span.text-danger').removeClass('d-none');
         }
     }
     // add new dropdown

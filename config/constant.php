@@ -3,13 +3,14 @@ return [
 	'calculationType' => [
 		'1'		=> 'Simple',
 		'2'		=> 'Glass',
-		'3'		=> 'Cheep'
+		'3'		=> 'Cheep',
+		'4'		=> 'SQFT'
 	],
 	'customer_types' 	=> [
 		'wholesaler' 	=> 'Wholesaler',
 		'retailer' 		=> 'Retailer',
 	],
-    'unitTypes' => [
+	'unitTypes' => [
 		'dor'		=> 'DOR',
 		'doz'		=> 'DOZ',
 		'kg'		=> 'KG',
@@ -31,7 +32,7 @@ return [
 		'bundle'	=> 'BUNDLE',
 		'cartoon'	=> 'CARTOON',
 	],
-    'product_category_id' => [2,3],
+	'product_category_id' => [2, 3],
 	'shipping_amount' => '150',
 	'glass_range' => 10006,
 	'paymentModifyWays' => [
@@ -40,5 +41,5 @@ return [
 		'by_cash'		=>  'Cash Reciept',
 		'by_check'		=>  'Check Reciept',
 		'by_account'	=>  'Account Reciept',
-	],	
+	],
 ];

@@ -64,9 +64,11 @@ class ProductController extends Controller
             'retailer_price' => 'required|numeric|min:0',
             'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048',
         ];
-        
-        if ($request->calculation_type != 1) {
+
+        if (in_array($request->calculation_type, [2, 3])) {
             $rules['unit_type'] = 'required|string|max:50';
+            $rules['extra_option_hint'] = 'required|string|max:50';
+        } else if ($request->calculation_type == 4) {
             $rules['extra_option_hint'] = 'required|string|max:50';
         }
         $validator = Validator::make($request->all(), $rules);
@@ -137,19 +139,26 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'name' => 'required|string|max:250',
             'group_id' => 'required|numeric',
             'sub_group_id' => 'required|numeric',
             'calculation_type' => 'required|numeric',
-            'unit_type' => 'required|string|max:50',
             'price' => 'required|numeric|min:0',
             'min_sale_price' => 'required|numeric|min:0',
             'wholesaler_price' => 'required|numeric|min:0',
             'retailer_price' => 'required|numeric|min:0',
-            'extra_option_hint' => 'required|string|max:50',
-            'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048'
-        ]);
+            'image' => 'image|mimes:jpeg,png,jpg,PNG,JPG|max:2048',
+        ];
+
+        if (in_array($request->calculation_type, [2, 3])) {
+            $rules['unit_type'] = 'required|string|max:50';
+            $rules['extra_option_hint'] = 'required|string|max:50';
+        } else if ($request->calculation_type == 4) {
+            $rules['extra_option_hint'] = 'required|string|max:50';
+        }
+        $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
