@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
 			$table->integer('group_id')->unsigned();
 			$table->integer('sub_group_id')->unsigned();
-			$table->integer('calculation_type')->unsigned(); 
+			$table->integer('calculation_type')->unsigned()->comment('1=>Simple, 2=>Glass, 3=>Cheep, 4=>Sqft');
 			$table->integer('unit_type')->unsigned()->nullable();
             $table->decimal('price',10,2);
             $table->decimal('min_sale_price',10,2);

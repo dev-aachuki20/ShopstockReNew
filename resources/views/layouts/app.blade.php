@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>@yield('title')</title>
+  <title>{{ config('app.app_name') }} | @yield('title')</title>
   <meta name="description" content="@yield('metdescp')">
- @include('partials.hscript')
- @yield('customCss')
+  
+  @include('partials.hscript')
+
+  @yield('customCss')
 
 </head>
 
