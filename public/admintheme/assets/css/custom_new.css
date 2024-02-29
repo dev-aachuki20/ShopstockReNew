@@ -171,6 +171,9 @@ aside,
     flex: 1 1 0;
     -webkit-flex: 1 1 0;
 }
+.extra_options .form-check-input.extra_option{
+    left: 4px;
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {

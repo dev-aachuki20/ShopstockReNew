@@ -86,7 +86,7 @@
     <div>
         <label>@lang('admin_master.product.extra_option') <span class="text-danger {{ (isset($product) && $product->calculation_type == 1) ? 'd-none' : '' }}">*</span></label>
     </div>
-    <div class="ml-3">
+    <div class="ml-3 position-relative">
         <label class="form-check-label height">@lang('admin_master.g_height')</label>
         <input class="form-check-input extra_option height" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}} readonly>
 
