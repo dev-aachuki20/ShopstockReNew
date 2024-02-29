@@ -238,20 +238,20 @@
                 </tbody>
                 <tfoot class="order_create mt-5">
                     <tr>
-                        <th colspan="6" class="grand total text-right">GRAND TOTAL</th>
+                        <th colspan="4" class="grand total text-right">GRAND TOTAL</th>
                         <td colspan="2" class="grand total">
                             <input type="hidden" name="total_amount" class="grandTotalHidden">
                             <span class="form-control grand_total" id="grandTotalSpan">0</span>
                         </td>
                     </tr>
                     <tr class="remark">
-                        <th colspan="6" class="total text-right">Remark</th>
+                        <th colspan="4" class="total text-right">Remark</th>
                         <td colspan="2">
                             <input class="form-control" placeholder="Enter order remark" name="remark" type="text" value="{{(isset($order) && $order) ? $order->remark : ''}}">
                         </td>
                     </tr>
                     <tr class="sold_by">
-                        <th colspan="6" class="total text-right">Sold By</th>
+                        <th colspan="4" class="total text-right">Sold By</th>
                         <td colspan="2">
                             <input class="form-control" placeholder="Sold By" name="sold_by" type="text" value="{{(isset($order) && $order) ? $order->sold_by : ''}}">
                         </td>
