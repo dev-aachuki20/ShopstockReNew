@@ -15,6 +15,8 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 
 class OrdersController extends Controller
@@ -32,6 +34,7 @@ class OrdersController extends Controller
      */
     public function create()
     {
+        abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'create';
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         // $products  = Product::select('id', 'name', 'price', 'group_id')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
@@ -48,6 +51,7 @@ class OrdersController extends Controller
      */
     public function store(StoreOrdersRequest $request)
     {
+        abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $isDraft = $request->submit == 'draft' ? true : false;
         $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
         if (!$checkOrder) {
@@ -149,6 +153,7 @@ class OrdersController extends Controller
      */
     public function show(Request $request, string $id)
     {
+        abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if ($request->ajax()) {
             $id = decrypt($id);
             $order = Order::findOrFail($id);
@@ -162,6 +167,7 @@ class OrdersController extends Controller
      */
     public function edit($type, string $id)
     {
+        abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'edit';
         $order = Order::findOrFail($id);
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
@@ -223,6 +229,7 @@ class OrdersController extends Controller
      */
     public function update(UpdateOrdersRequest $request, $id)
     {
+        abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $type = $request->type; //sales
         $isDraft = $request->submit == 'draft' ? true : false;
 
@@ -351,7 +358,7 @@ class OrdersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        abort_if(Gate::denies('estimate_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
     }
 
 

@@ -55,13 +55,20 @@ class PaymentTransactionDataTable extends DataTable
                 // if (Gate::check('product_edit')) {
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                 if ($this->type == 'sales' || $this->type == 'sales_return') {
-                    $editUrl = route("admin.orders.edit", [$this->type, $row->order_id]);
-                    $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                    if(Gate::check('estimate_edit')){
+                        $action .= '<a href="' .route("admin.orders.edit", [$this->type, $row->order_id]). '" class="btn btn-icon btn-info m-1 edit_product" data-id="' . encrypt($row->order_id) . '">' . $editIcon . '</a>';
+                    } 
+                    if(Gate::check('estimate_access')){
+                        $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                    }
                 } else if ($this->type == 'cash_reciept') {
-                    $editUrl = route("admin.transactions.edit", $row->id);
-                    $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                    if(Gate::check('transaction_edit')){
+                        $action .= '<a href="' . route("admin.transactions.edit", $row->id) . '" class="btn btn-icon btn-info m-1 edit_product" data-id="' . encrypt($row->order_id) . '">' . $editIcon . '</a>';
+                    } 
+                    if(Gate::check('transaction_access')){
+                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                    }
                 }
-                $action .= '<a href="' . $editUrl . '" class="btn btn-icon btn-info m-1 edit_product" data-id="' . encrypt($row->order_id) . '">' . $editIcon . '</a>';
                 // }
                 // if (Gate::check('product_delete')) {
                 // $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
