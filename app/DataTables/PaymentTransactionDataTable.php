@@ -50,18 +50,18 @@ class PaymentTransactionDataTable extends DataTable
                 $action = '';
                 // if (Gate::check('product_access')) {
                 $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-                
+
                 // }
                 // if (Gate::check('product_edit')) {
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                if ($this->type == 'sales') {
-                    $editUrl = route("admin.orders.edit", ['order' => $row->order_id]);
-                    $action .= '<a data-order="'.encrypt($row->order_id).'" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >'.$viewIcon.'</a>';
+                if ($this->type == 'sales' || $this->type == 'sales_return') {
+                    $editUrl = route("admin.orders.edit", [$this->type, $row->order_id]);
+                    $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
                 } else if ($this->type == 'cash_reciept') {
                     $editUrl = route("admin.transactions.edit", $row->id);
-                    $action .= '<a data-order="'.encrypt($row->id).'" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >'.$viewIcon.'</a>';
+                    $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
                 }
-                $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1 edit_product" data-id="'.encrypt($row->order_id).'">'.$editIcon.'</a>';
+                $action .= '<a href="' . $editUrl . '" class="btn btn-icon btn-info m-1 edit_product" data-id="' . encrypt($row->order_id) . '">' . $editIcon . '</a>';
                 // }
                 // if (Gate::check('product_delete')) {
                 // $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
@@ -81,7 +81,9 @@ class PaymentTransactionDataTable extends DataTable
         if ($this->type == 'sales') {
             $model = $model->where('payment_way', 'order_create')->orderBy('entry_date', 'desc');
         } else if ($this->type == 'cash_reciept') {
-            $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance');
+            $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->orderBy('entry_date', 'desc');
+        } else if ('sales_return') {
+            $model = $model->where('payment_way', 'order_return')->orderBy('entry_date', 'desc');
         }
         return $model;
     }

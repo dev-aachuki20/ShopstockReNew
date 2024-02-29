@@ -51,7 +51,7 @@ class OrdersController extends Controller
         $isDraft = $request->submit == 'draft' ? true : false;
         $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
         if (!$checkOrder) {
-            $invoiceNumber = getNewInvoiceNumber('', 'new');
+            $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
             $inputs = array(
                 'customer_id'    => $request->customer_id,
                 'order_type'     => $request->order_type,
@@ -131,7 +131,7 @@ class OrdersController extends Controller
             return response()->json([
                 'success' => true,
                 'message'     => 'Successfully created!',
-                'printPdfUrl' => route('admin.orders.printPdf', encrypt($order->id)),
+                // 'printPdfUrl' => route('admin.orders.printPdf', encrypt($order->id)),
                 'redirectUrl' => route('admin.orders.return'),
             ], 200);
         }
@@ -151,7 +151,7 @@ class OrdersController extends Controller
     {
         if ($request->ajax()) {
             $id = decrypt($id);
-            $order = Order::where('id', $id)->first();
+            $order = Order::findOrFail($id);
             $html = View::make('admin.orders.prev_order_modal', compact('order'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
@@ -160,7 +160,7 @@ class OrdersController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($type, string $id)
     {
         $orderType = 'edit';
         $order = Order::findOrFail($id);
@@ -223,7 +223,7 @@ class OrdersController extends Controller
      */
     public function update(UpdateOrdersRequest $request, $id)
     {
-        $type = 'sales'; //sales
+        $type = $request->type; //sales
         $isDraft = $request->submit == 'draft' ? true : false;
 
         $order = $checkProductOrder = Order::findOrFail($id);
@@ -601,10 +601,9 @@ class OrdersController extends Controller
     public function addGlassProductView(Request $request)
     {
         if ($request->ajax()) {
-
             if (isset($request->otherDetails) && !is_null($request->otherDetails)) {
                 $otherDetails = json_decode($request->otherDetails, true);
-                $product = Product::where('id', $request->product_id)->pluck('product_category_id');
+                $product = Product::where('id', $request->product_id)->pluck('calculation_type');
                 $html =  view('admin.orders.partials.editGlassProductDetails', compact('otherDetails', 'product'))->render();
             } else {
                 $customer = Customer::findOrFail($request->customer_id);
@@ -614,5 +613,16 @@ class OrdersController extends Controller
 
             return response()->json(array('status' => true, 'html' => $html), 200);
         }
+    }
+
+    public function returnCreate()
+    {
+        $orderType = 'return';
+        $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
+        $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('admin.orders.create', compact('customers', 'products', 'orderType'));
     }
 }

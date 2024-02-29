@@ -57,8 +57,8 @@ class PaymentTransactionsController extends Controller
      */
     public function show(Request $request,string $id)
     {
-        if ($request->ajax()) {
-            $id = decrypt($request->id);            
+        if ($request->ajax()) { 
+            $id = decrypt($id);            
             $transaction = PaymentTransaction::withTrashed()->find($id);
             $html = View::make('admin.payment_transactions.show', compact('transaction'))->render();
             return response()->json(['success' => true, 'html' => $html]);
@@ -95,6 +95,6 @@ class PaymentTransactionsController extends Controller
 
     public function typeFilter(PaymentTransactionDataTable $dataTable, $type)
     {
-        return $dataTable->with(['type' => $type])->render('admin.payment_transactions.index');
+        return $dataTable->with(['type' => $type])->render('admin.payment_transactions.index',compact('type'));
     }
 }

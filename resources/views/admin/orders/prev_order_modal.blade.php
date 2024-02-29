@@ -1,24 +1,27 @@
-<style> 
-    .invoice-title h2, .invoice-title h3 {
+<style>
+    .invoice-title h2,
+    .invoice-title h3 {
         display: inline-block;
     }
 
-    .table > tbody > tr > .no-line {
+    .table>tbody>tr>.no-line {
         border-top: none;
     }
 
-    .table > thead > tr > .no-line {
+    .table>thead>tr>.no-line {
         border-bottom: none;
     }
 
-    .table > tbody > tr > .thick-line {
+    .table>tbody>tr>.thick-line {
         /* border-top: 2px solid; */
         border-top: 2px solid #f5f5f5;
     }
+
     .pre-order-content .panel-body.cancel-watermark {
         position: relative;
     }
-    .pre-order-content .panel-body.cancel-watermark:after{
+
+    .pre-order-content .panel-body.cancel-watermark:after {
         content: "";
         background: url("{{ asset('images/cancel-watermark.png') }}") no-repeat center center;
         background-size: 70%;
@@ -31,10 +34,12 @@
         transform: translate(-50%, -50%);
         background-repeat: no-repeat;
     }
+
     .pre-order-content .panel-body.split-watermark {
         position: relative;
     }
-    .pre-order-content .panel-body.split-watermark:after{
+
+    .pre-order-content .panel-body.split-watermark:after {
         content: "";
         background: url("{{ asset('images/split-watermark.png') }}") no-repeat center center;
         background-size: 70%;
@@ -48,169 +53,169 @@
         background-repeat: no-repeat;
     }
 
-    @media(max-width:400px){
-        .pre-order-content .panel-body.cancel-watermark:after{
+    @media(max-width:400px) {
+        .pre-order-content .panel-body.cancel-watermark:after {
             background-size: 50%;
         }
-        .pre-order-content .panel-body.split-watermark:after{
+
+        .pre-order-content .panel-body.split-watermark:after {
             background-size: 50%;
         }
     }
-
 </style>
-   {{--<a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;">
-        <i class="fa fa-print"></i> Print
-    </a>--}} 
-    @php
-    $isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
-    $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->deleted_at : null;
-    @endphp
-    
-    <div class="panel panel-default">        
-        <div class="panel-body {{ !is_null($order->deleted_at) ? 'cancel-watermark' : '' }} {{ !is_null($isSplit)&& is_null($order->deleted_at) && !is_null($paytdeleted_at) ? 'split-watermark' : '' }}">
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="invoice-title">
-                        <h2>@lang('quickadmin.transaction-management.fields.sales')</h2>
+{{--<a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;">
+<i class="fa fa-print"></i> Print
+</a>--}}
+@php
+$isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
+$paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->deleted_at : null;
+@endphp
+
+<div class="panel panel-default">
+    <div class="panel-body {{ !is_null($order->deleted_at) ? 'cancel-watermark' : '' }} {{ !is_null($isSplit)&& is_null($order->deleted_at) && !is_null($paytdeleted_at) ? 'split-watermark' : '' }}">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="invoice-title">
+                    <h2>@lang('quickadmin.transaction-management.fields.sales')</h2>
+                </div>
+                <div class="row" style="padding-top:30px;">
+                    <div class="col-xs-6">
+                        <address>
+                            <strong>Billed To:</strong><br>
+                            {{ $order->customer->name ?? '' }}<br>
+                            {{-- {{ $order->customer->phone_number ?? '' }} --}}
+                            {{ $order->customer->area->address ?? '' }}
+                        </address>
                     </div>
-                    <div class="row" style="padding-top:30px;">
-                        <div class="col-xs-6">
-                            <address>
-                                <strong>Billed To:</strong><br>
-                                {{ $order->customer->name ?? '' }}<br>
-                                {{-- {{ $order->customer->phone_number ?? '' }} --}}                                
-                                {{ $order->customer->area->address ?? '' }}
-                            </address>
-                        </div>
-                        <div class="col-xs-6 text-right">
-                            <address>
+                    <div class="col-xs-6 text-right">
+                        <address>
                             <strong> @lang('quickadmin.transaction-management.fields.sales') #:</strong> {{ $order->invoice_number }} <br>
                             @php
-                                $orderType = $order->order_type;
-                                if($orderType == 'create'){
-                                    $orderType = 'Estimate';
-                                }else if($orderType == 'return'){
-                                    $orderType = 'Estimate Return';
-                                }
+                            $orderType = $order->order_type;
+                            if($orderType == 'create'){
+                            $orderType = 'Estimate';
+                            }else if($orderType == 'return'){
+                            $orderType = 'Estimate Return';
+                            }
                             @endphp
-                            <strong> @lang('quickadmin.type'):</strong> {{  $orderType }} <br>
+                            <strong> @lang('quickadmin.type'):</strong> {{ $orderType }} <br>
                             <strong> @lang('quickadmin.date'):</strong> {{ date('d-m-Y', strtotime($order->invoice_date)) }} <br>
-                            </address>
-                        </div>
+                        </address>
                     </div>
-                    
                 </div>
+
             </div>
-            
-            <div class="row">
-                <div class="col-md-12">
-                    <div style="margin-top: 40px;">
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-condensed">
-                                    <thead>
-                                        <tr>
-                                            <th>@lang('quickadmin.order.fields.sno')</th>
-                                            <th>@lang('quickadmin.order.fields.product_name')</th>
-                                            <th>@lang('quickadmin.order.fields.quantity')</th>
-                                            <th>@lang('quickadmin.order.fields.price')</th>
-                                            <th>@lang('quickadmin.order.fields.sub_total')</th> 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        
-                                        @php
-                                            $sno = 0;
-                                        @endphp
-                                       @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_at')->get() as $item) 
-                                        <tr>
-                                            <td class="text-center">{{ ++$sno }}</td>
-                                            <td>
-                                                {{ ucfirst($item->product->name) }}
-                                                @if(!is_null($item->is_sub_product))
-                                                    ({{ $item->is_sub_product ?? '' }})
-                                                @endif
-                                               
-                                                @if(in_array($item->product->product_category_id, config('constant.product_category_id')) && !is_null($item->other_details))
-                                                  {!! glassProductMeasurement($item->other_details,'new_line') !!}
-                                                @endif
+        </div>
 
-                                                @if(!is_null($item->description))
-                                                <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $quantityString = '';
-                                                    if(!in_array($item->product->product_category_id,config('constant.product_category_id'))){
-                                                        if(!is_null($item->height)){
-                                                            $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
-                                                        }
+        <div class="row">
+            <div class="col-md-12">
+                <div style="margin-top: 40px;">
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>@lang('quickadmin.order.fields.sno')</th>
+                                        <th>@lang('quickadmin.order.fields.product_name')</th>
+                                        <th>@lang('quickadmin.order.fields.quantity')</th>
+                                        <th>@lang('quickadmin.order.fields.price')</th>
+                                        <th>@lang('quickadmin.order.fields.sub_total')</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                                        if(!is_null($item->height) && !is_null($item->width)){
-                                                            $quantityString .= ' x ';                                                            
-                                                        }else if(!is_null($item->height) && !is_null($item->length)){
-                                                            $quantityString .= ' x ';                                                            
-                                                        }
+                                    @php
+                                    $sno = 0;
+                                    @endphp
+                                    @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_at')->get() as $item)
+                                    <tr>
+                                        <td class="text-center">{{ ++$sno }}</td>
+                                        <td>
+                                            {{ ucfirst($item->product->name) }}
+                                            @if(!is_null($item->is_sub_product))
+                                            ({{ $item->is_sub_product ?? '' }})
+                                            @endif
 
-                                                        if(!is_null($item->width)){
-                                                            $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
-                                                        }
+                                            @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && !is_null($item->other_details))
+                                            {!! glassProductMeasurement($item->other_details,'new_line') !!}
+                                            @endif
 
-                                                        if(!is_null($item->length) && !is_null($item->width)){
-                                                            $quantityString .= ' x ';                                                            
-                                                        }else if(!is_null($item->height) && !is_null($item->length)){
-                                                            $quantityString .= ' x ';                                                            
-                                                        }
+                                            @if(!is_null($item->description))
+                                            <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @php
+                                            $quantityString = ''; 
+                                            if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
+                                            if(!is_null($item->height)){
+                                            $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
+                                            }
 
-                                                        if(!is_null($item->length)){
-                                                            $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
-                                                        }
+                                            if(!is_null($item->height) && !is_null($item->width)){
+                                            $quantityString .= ' x ';
+                                            }else if(!is_null($item->height) && !is_null($item->length)){
+                                            $quantityString .= ' x ';
+                                            }
 
-                                                        if($quantityString !=''){
-                                                            $quantityString .= ' - ';
-                                                        }
-                                                    }
+                                            if(!is_null($item->width)){
+                                            $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
+                                            }
 
-                                                    if(!is_null($item->quantity)){
-                                                        $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->unit_type).' ';
-                                                    }
-                                                @endphp
+                                            if(!is_null($item->length) && !is_null($item->width)){
+                                            $quantityString .= ' x ';
+                                            }else if(!is_null($item->height) && !is_null($item->length)){
+                                            $quantityString .= ' x ';
+                                            }
 
-                                                {{ $quantityString }}
-                                            </td>
-                                            <td><i class="fa fa-inr" aria-hidden="true"></i> {{ removeTrailingZeros($item->price) }}</td>
-                                            <td><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format(round($item->total_price),0) }}</td>
-                                        </tr>
-                                        @endforeach
-                                        
-                                        @if($order->is_add_shipping)
-                                        <tr>
-                                            <td class="thick-line text-right" colspan="4"><strong>@lang('quickadmin.order.fields.shipping_amount')</strong></td>
-                                            <td class="thick-line text-left" colspan="1"> <span><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format($order->shipping_amount,0) ?? 0}}</span></td>
-                                        </tr>
-                                        @endif
-                                        
-                                        <tr>
-                                            <!-- <td class="thick-line"></td>
+                                            if(!is_null($item->length)){
+                                            $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
+                                            }
+
+                                            if($quantityString !=''){
+                                            $quantityString .= ' - ';
+                                            }
+                                            }
+
+                                            if(!is_null($item->quantity)){
+                                            $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name).' ';
+                                            }
+                                            @endphp
+
+                                            {{ $quantityString }}
+                                        </td>
+                                        <td><i class="fa fa-inr" aria-hidden="true"></i> {{ removeTrailingZeros($item->price) }}</td>
+                                        <td><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format(round($item->total_price),0) }}</td>
+                                    </tr>
+                                    @endforeach
+
+                                    @if($order->is_add_shipping)
+                                    <tr>
+                                        <td class="thick-line text-right" colspan="4"><strong>@lang('quickadmin.order.fields.shipping_amount')</strong></td>
+                                        <td class="thick-line text-left" colspan="1"> <span><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format($order->shipping_amount,0) ?? 0}}</span></td>
+                                    </tr>
+                                    @endif
+
+                                    <tr>
+                                        <!-- <td class="thick-line"></td>
                                             <td class="thick-line"></td>
                                             <td class="thick-line"></td> -->
-                                            <td class="thick-line text-right" colspan="4"><strong>@lang('quickadmin.order.fields.grand_total')</strong></td>
-                                            <td class="thick-line text-left" colspan="1"> 
-                                                <!-- <span class="amount_data"> -->
-                                                <span><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format(round($order->total_amount),0) ?? 0}}</span>
-                                            </td>
-                                        </tr>
+                                        <td class="thick-line text-right" colspan="4"><strong>@lang('quickadmin.order.fields.grand_total')</strong></td>
+                                        <td class="thick-line text-left" colspan="1">
+                                            <!-- <span class="amount_data"> -->
+                                            <span><i class="fa fa-inr" aria-hidden="true"></i> {{ number_format(round($order->total_amount),0) ?? 0}}</span>
+                                        </td>
+                                    </tr>
 
-                                    </tbody>
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- <div class="row">
+        <!-- <div class="row">
                 <div class="col-md-6">
                     <address style="padding-top:0px;font-size: 18px;">
                     <strong>Shipped To:</strong>
@@ -233,33 +238,37 @@
                     </address>
                 </div>
             </div> -->
-            <div class="row">
-                <div class="col-md-12">
-                    <strong>THANK YOU</strong>
-                </div>
+        <div class="row">
+            <div class="col-md-12">
+                <strong>THANK YOU</strong>
             </div>
-
-            @if(!empty($order->remark))
-            <div class="row">
-                <div class="col-md-12">
-                    <p class="text-justify">
-                        <strong>@lang('quickadmin.transaction.fields.remark')<strong> : {{ $order->remark ?? ''}}
-                    </p>
-                </div>
-            </div>
-            @endif
-
-            @if(!empty($order->sold_by))
-            <div class="row">
-                <div class="col-md-12">
-                    <strong>@lang('quickadmin.order.fields.sold_by')<strong> : {{ $order->sold_by ?? ''}}
-                </div>
-            </div>
-            @endif
-
         </div>
+
+        @if(!empty($order->remark))
+        <div class="row">
+            <div class="col-md-12">
+                <p class="text-justify">
+                    <strong>@lang('quickadmin.transaction.fields.remark')<strong> : {{ $order->remark ?? ''}}
+                </p>
+            </div>
+        </div>
+        @endif
+
+        @if(!empty($order->sold_by))
+        <div class="row">
+            <div class="col-md-12">
+                <strong>@lang('quickadmin.order.fields.sold_by')<strong> : {{ $order->sold_by ?? ''}}
+            </div>
+        </div>
+        @endif
+
     </div>
+</div>
 
-    <div class="row" style="padding: 0px 15px;"><div class="col-md-12"><strong> Created By : {{$order->createdBy->name ?? ""}}</strong></div></div>
+<div class="row" style="padding: 0px 15px;">
+    <div class="col-md-12"><strong> Created By : {{$order->createdBy->name ?? ""}}</strong></div>
+</div>
 
-    <div class="row"><div class="col-md-12"><strong> Created Time : {{date('d-m-Y H:i',strtotime($order->created_at))}}</strong></div></div>
+<div class="row">
+    <div class="col-md-12"><strong> Created Time : {{date('d-m-Y H:i',strtotime($order->created_at))}}</strong></div>
+</div>

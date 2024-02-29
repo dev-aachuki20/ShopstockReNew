@@ -171,8 +171,10 @@
 
             <button title="Add Description" type="button" id='addDesBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addDes pull-right btn btn-primary"><i class="fa fa-commenting"></i></button>
 
-            {{-- @if(isset($product) && (in_array($product->product_category_id,config('constant.product_category_id')) || in_array($product->product->product_category_id,config('constant.product_category_id')))) --}}
-            @if(isset($product) && in_array($product->calculation_type,config('constant.product_category_id')))
+            {{-- @if(isset($product) && (in_array($product->product_category_id,config('constant.product_category_id')) || in_array($product->product->product_category_id,config('constant.product_category_id')))) 
+            @if(isset($product) && in_array($product->calculation_type,config('constant.product_category_id')))--}}
+
+            @if(isset($product) && ((isset($product->calculation_type) && in_array($product->calculation_type,config('constant.product_category_id'))) || (isset($product->product->calculation_type) && in_array($product->product->calculation_type,config('constant.product_category_id')))))
             <button title="Fill Product Details" type="button" id='glassProductBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="pull-right btn btn-primary"><i class="fa fa-plus"></i> Details</button>
             @endif
         </div>

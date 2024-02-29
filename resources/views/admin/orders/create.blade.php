@@ -15,7 +15,7 @@
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card">
             <div class="card-header">
-              <h3>{{ trans('admin_master.new_estimate.seo_title') }}
+              <h3>{{ trans('quickadmin.order.title-'.$orderType) }}
             </div>
             <div class="card-body">
             <form action="{{ route('admin.orders.store') }}"  id="productForm" method="POST"  name="productForm" enctype="multipart/form-data">

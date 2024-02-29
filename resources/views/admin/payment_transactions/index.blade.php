@@ -1,38 +1,40 @@
 @extends('layouts.app')
 @section('title')@lang('quickadmin.transaction-management.fields.sales') @endsection
 @section('customCss')
-<meta name="csrf-token" content="{{ csrf_token() }}" >
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
 @endsection
 @section('main-content')
 
 <section class="section roles" style="z-index: unset">
-    <div class="section-body">
-          <div class="row">
-            <div class="col-12">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.transaction-management.fields.sales')</h4>   
-                </div>
-                </div>
-                <div class="card-body">
-                  <div class="table-responsive fixed_Search">
-                    {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>
+              @lang('quickadmin.transaction.'.$type.'_title')
+            </h4>
           </div>
         </div>
-  </section>
+        <div class="card-body">
+          <div class="table-responsive fixed_Search">
+            {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
 
-  
+
 <!-- view Modal -->
 <div class="modal fade" id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">@lang('admin_master.new_estimate.estimate_view') </h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -52,31 +54,28 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script type="text/javascript">
-$(document).ready(function(){
-  var DataaTable = $('#payment_transaction-table').DataTable();
-  $.ajaxSetup({
-    headers: {
-    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-  });
+  $(document).ready(function() {
+    var DataaTable = $('#payment_transaction-table').DataTable();
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
 
-  $(document).on('click','.view_detail',function(){ 
-    $("#view_model_Modal").modal('show');
-    $('.show_html').html('');
-    var _id = $(this).data('order');
-    if(_id){
-      var post_url = "{{ route('admin.transactions.show',['transaction'=> ':viewId']) }}";
-      post_url = post_url.replace(':viewId', _id);
-      $.ajax({
-        type: "GET",
-        url: post_url,
-        data: {id: _id},
-        success: function(data) {
-          $('.show_html').html(data.html);
-        }
-      });
-    }
+    $(document).on('click', '.view_detail', function() {
+      $("#view_model_Modal").modal('show');
+      $('.show_html').html('');
+      var url = $(this).data('url');
+      if (url) {
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data) {
+            $('.show_html').html(data.html);
+          }
+        });
+      }
+    });
   });
-});
 </script>
 @endsection

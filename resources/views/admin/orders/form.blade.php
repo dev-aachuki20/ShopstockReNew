@@ -3,6 +3,7 @@
         <label>@lang('admin_master.new_estimate.customer_name') <span class="text-danger">*</span></label>
         <div class="input-group">
             {!! Form::hidden('order_type', $orderType) !!}
+            {!! Form::hidden('type', optional(request())->route('type')) !!}
             {!! Form::hidden('deleted_opids') !!}
             {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
         </div>
@@ -283,8 +284,14 @@
     </div>
     <div class="text-right order_create order_create_btnarea">
         <input type="hidden" name="submit" value="">
-        <button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft" disabled="">Save as Draft</button>
-        <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">Save Estimate</button>
+        @if($orderType=='create')<button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft" disabled="">Save as Draft</button>@endif
+        <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">
+            @if($orderType == 'return')
+            {{ trans('quickadmin.qa_save_invoice_return') }}
+            @else
+            {{ trans('quickadmin.qa_save_estimate') }}
+            @endif
+        </button>
     </div>
 </div>
 {{-- end table html --}}
@@ -661,6 +668,7 @@
             // var total_price   = parseFloat(products_table.find('.sub_total').text()).toFixed(0);
             var total_price = products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('#product_amount').val()).toFixed(2);
             var extra_option_hint = products_table.find('.extra_option_hint').val();
+            console.log(extra_option_hint);
 
             icon = products_table.find('#addNewSubProduct i');
             var is_sub_product_value = '';
@@ -839,7 +847,7 @@
                                                 } else if (productCategory == '3' && product.height != 0) {
                                                     productMeasurement += product.height + " " + product.extra_option_hint + " - " + product.qty + " pc";
                                                 } else if (productCategory == '4' && product.height != 0 && product.width != 0) {
-                                                    productMeasurement += product.height + " " + extra_option_hint + " × " + product.width + " " + extra_option_hint + " - " + product.qty + " pc";
+                                                    productMeasurement += product.height + " " + product.extra_option_hint + " × " + product.width + " " + product.extra_option_hint + " - " + product.qty + " pc";
                                                 }
 
                                                 glassProductSizeList += "<p style='margin-bottom: 0px;'>" + productMeasurement + "</p>";
@@ -1253,8 +1261,8 @@
                             // Start to store value in object
                             productObject.description = response.rowData.product_description;
 
-                            if (productCategory == '2' || productCategory == '3') {
-                                glassProduct.products = JSON.parse(response.rowData.other_details);
+                            if (productCategory == '2' || productCategory == '3' || productCategory == '4') {
+                                glassProduct.products = response.rowData.other_details != '' && JSON.parse(response.rowData.other_details);
                                 glassProduct.totalQty = response.rowData.totalQty;
                                 addGlassProductViewRender(customer_id, product_id, 'html', response.rowData.other_details);
                             }
@@ -1264,7 +1272,7 @@
                             $('.purchase-price').text(response.rowData.purchase_price);
                             $('.min-sale-price').text(response.rowData.min_sale_price);
                             $('.addRow').data('product_name', response.rowData.product_name);
-                            $('.addRow').html('<i class="fa fa-pencil-square-o"></i>');
+                            $('.addRow').html('<i class="fa fa-pencil"></i>');
                             $("select.products").focus();
                             $('.editRow').focusout();
                             calculateProducts();
@@ -1424,7 +1432,7 @@
     }
 
     //Render glass product item 
-    function addGlassProductViewRender(customer_id, product_id, renderType = 'html') {
+    function addGlassProductViewRender(customer_id, product_id, renderType = 'html', otherDetails = null) {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1436,6 +1444,7 @@
             data: {
                 customer_id: customer_id,
                 product_id: product_id,
+                otherDetails: otherDetails,
             },
             success: function(response) {
                 if (response.status) {
