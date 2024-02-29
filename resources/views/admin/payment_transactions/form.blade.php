@@ -1,17 +1,6 @@
+
 <div class="panel panel-default col-md-12">
     <div class="panel-body col-md-12">
-        <div class="row">
-            <div class="col-md-6 form-group formValidate">
-                {!! Form::label('voucher_number', trans('quickadmin.transaction.fields.voucher_number').'*', ['class' => 'control-label']) !!}
-                {{ Form::text('voucher_number', old('voucher_number',getNewInvoiceNumber('','new_cash_receipt')), ['class' => 'form-control voucher-number', 'required' => '','autocomplete'=>'off']) }}
-                 <p class="help-block red text-danger">
-                    @if($errors->has('voucher_number'))
-                        {{ $errors->first('voucher_number') }}
-                    @endif
-                </p>
-            </div>
-        </div>
-
         <div class="row">
             <div class="col-md-6 form-group formValidate">
                 {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
@@ -84,9 +73,9 @@
         </div>
         
         <div class="row">
-            <div class="col-md-6 form-group">
+            <div class="col-md-6 form-group date_main_show">
                 {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}               
-                <input type="date" class="form-control" name="entry_date" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+                <input type="date" class="form-control dateshow" name="entry_date" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
                 <p class="help-block red text-danger">
                     @if($errors->has('entry_date'))
                         {{ $errors->first('entry_date') }}
@@ -104,18 +93,6 @@
         $('#cash-reciept-form').validate({
             focusInvalid: false,
             rules: {
-                'voucher_number':{
-                    required: true,
-                    remote: {
-						url: "{{ route('admin.orders.checkInvoiceNumber') }}",
-						type: 'POST',
-						data: {
-							routeName:"new_cash_receipt",
-							invoice_number: $('#voucher_number').val(),
-							_token: $('meta[name="csrf-token"]').attr('content')
-						},
-					},
-                },
                 'customer_id': {
                     required: true,
                 },
@@ -130,11 +107,6 @@
                 customer_id: {
                     required: "This field is required",
                 },
-                voucher_number: {
-					required: "This field is required",
-					remote:"This estimate number is already exists.",
-					// equalTo:"This estimate number is already exists.",
-				}
             },
 
             // Errors //
@@ -220,6 +192,5 @@
                 }
             }
         });
-
 </script>
 @endsection

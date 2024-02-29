@@ -8,10 +8,9 @@ use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
 use App\Http\Requests\PaymentTransactions\StoreUpdatePaymentTransactionsRequest;
 use App\Models\PaymentTransaction;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\View;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class PaymentTransactionsController extends Controller
 {
@@ -28,7 +27,8 @@ class PaymentTransactionsController extends Controller
      */
     public function create()
     {
-        $customers = Customer::select('id', 'name', 'credit_limit', 'is_type')->orderBy('id', 'desc')->get();
+        abort_if(Gate::denies('transaction_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+         $customers = Customer::select('id', 'name', 'credit_limit', 'is_type')->orderBy('id', 'desc')->get();
         $paymentTypes = array('' => trans('quickadmin.qa_please_select_customer'), 'credit' => 'Credit', 'debit' => 'Debit');
         $paymentWays = array('by_cash' => 'By Cash', 'by_check' => 'By Check', 'by_account' => 'By Account');
         return view('admin.payment_transactions.create', compact('customers', 'paymentTypes', 'paymentWays'));
@@ -39,16 +39,13 @@ class PaymentTransactionsController extends Controller
      */
     public function store(StoreUpdatePaymentTransactionsRequest $request)
     {
+        abort_if(Gate::denies('transaction_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
         $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt');
-        // $voucherAlredyExit = PaymentTransaction::where('voucher_number',$request->voucher_number)->withTrashed()->first();
-        //  if($voucherAlredyExit){
-        //     $errors = new MessageBag(['voucher_number' => ['This estimate number is already exists.']]);
-        //     return redirect()->back()->withErrors($errors)->withInput();
-        // }
-        
+               
         $payment = PaymentTransaction::create($inputs);
+        addToLog($request,'Cash receipt','Create', $payment); 
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
 
@@ -57,6 +54,7 @@ class PaymentTransactionsController extends Controller
      */
     public function show(Request $request,string $id)
     {
+        abort_if(Gate::denies('transaction_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if ($request->ajax()) {
             $id = decrypt($request->id);            
             $transaction = PaymentTransaction::withTrashed()->find($id);
@@ -70,6 +68,7 @@ class PaymentTransactionsController extends Controller
      */
     public function edit(string $id)
     {
+        abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $transaction = PaymentTransaction::findOrFail($id);
         $customers = Customer::orderBy('id','desc')->get()->pluck('name', 'id')->prepend(trans('quickadmin.qa_please_select_customer'), '');
         $paymentTypes = array(''=>trans('quickadmin.qa_please_select_customer'),'credit' => 'Credit','debit'=>'Debit');
@@ -82,7 +81,13 @@ class PaymentTransactionsController extends Controller
      */
     public function update(StoreUpdatePaymentTransactionsRequest $request, $id)
     {
-        //
+        abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $transaction = PaymentTransaction::findOrFail($id);
+        $oldvalue = $transaction->getOriginal();  
+        $transaction->update($request->all());
+        $newValue = $transaction->refresh();
+        addToLog($request,'Cash receipt','Edit', $newValue ,$oldvalue);
+        return response()->json(['success' => 'Update successfully.']);
     }
 
     /**
@@ -90,7 +95,20 @@ class PaymentTransactionsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        abort_if(Gate::denies('transaction_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        
+
+        // if(!is_numeric($id)){
+        //     $id = decrypt($id);
+        // }
+       
+        // $transaction  = PaymentTransaction::findOrFail($id);
+        // if(!is_null($transaction->order)){
+        //     $transaction->order->orderProduct()->delete();
+        //     $transaction->order->delete();
+        // }
+        // $transaction->delete();
+        // return redirect()->back()->with('success', 'Successfully delete!');
     }
 
     public function typeFilter(PaymentTransactionDataTable $dataTable, $type)
