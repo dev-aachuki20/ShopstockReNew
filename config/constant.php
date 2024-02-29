@@ -32,7 +32,7 @@ return [
 		'bundle'	=> 'BUNDLE',
 		'cartoon'	=> 'CARTOON',
 	],
-	'product_category_id' => [2, 3],
+	'product_category_id' => [2, 3, 4],
 	'shipping_amount' => '150',
 	'glass_range' => 10006,
 	'paymentModifyWays' => [

@@ -1,20 +1,20 @@
 <div class="product-table-design" id="products_table">
     <div class="row">
-        @if(isset($product->is_sub_product) && $product->is_sub_product == 1)
+        @if((isset($product->is_sub_product) && $product->is_sub_product == 1) || (isset($product->product->is_sub_product) && $product->product->is_sub_product == 1))
         <div class="col-lg-2 col-md-12 pr-0 sub_product_div">
             <div class="form-group">
                 <label for="sub_product">@lang('admin_master.product.sub_product')</label>
-                @if($orders->count() > 0)
-                <a href="javascript: void(0);" id="addNewSubProduct" class="add-inline-btn" style="float: right;"><i class="fa fa-plus {{$orders->count() > 0 ? 'selectBox':'textBox'}}"></i></a>
+                @if((is_array($orders) && count($orders)>0) || ($orders->count() > 0))
+                <a href="javascript: void(0);" id="addNewSubProduct" class="add-inline-btn" style="float: right;"><i class="fa fa-plus {{(is_array($orders) && count($orders)>0) || ($orders->count() > 0) ? 'selectBox':'textBox'}}"></i></a>
                 {{-- <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5" required> --}}
                 <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select">
                     <option value="" data-order_id="" data-price="0">{{ trans('quickadmin.qa_please_select') }}</option>
                     @foreach($orders as $value)
-                    <option value="{{ $value->is_sub_product }}" data-order_id="{{ $value->id }}" data-price="{{ $value->price }}">{{ $value->is_sub_product }}</option>
+                    <option value="{{ $value->is_sub_product }}" data-order_id="{{ $value->id }}" data-price="{{ $value->price }}" {{$value->is_sub_product == $product->is_sub_product ? 'selected' : ''}}>{{ $value->is_sub_product }}</option>
                     @endforeach
                 </select>
                 @endif
-                <input type="text" name="is_sub_product" id="sub_product" class="form-control sub_product is_sub_product_text" style="display:{{ ($orders->count() > 0)? 'none':''}}" />
+                <input type="text" name="is_sub_product" id="sub_product" class="form-control sub_product is_sub_product_text" style="display:{{ ((is_array($orders) && count($orders)>0) || ($orders->count() > 0) > 0)? 'none':''}}" />
 
             </div>
             <span id="is_sub_product" class="text-danger d-none" role="alert" style="font-size:12px;"></span>
@@ -78,7 +78,7 @@
 
         <div class="col-xs-2 {{ $productAtr != 0 ? 'col-lg-4' : 'col-lg-2'}} col-md-12 col-sm-12 pr-xl-0">
             <div class="quantity-content">
-                @if(isset($editRow) && $editRow)
+                {{--@if(isset($editRow) && $editRow)
                 <input type="hidden" name="extra_option_hint" class="extra_option_hint" value="{{$product->product->extra_option_hint ?? '' }}">
 
                 @if(isset($product->product) && !in_array($product->product->calculation_type,config('constant.product_category_id')))
@@ -138,7 +138,7 @@
 
                 @endif
 
-                @endif
+                @endif--}}
 
                 <div class="form-group">
                     <label for="price">@lang('quickadmin.order.fields.price')</label>
