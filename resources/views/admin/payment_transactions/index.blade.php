@@ -65,7 +65,7 @@ $(document).ready(function(){
     $('.show_html').html('');
     var _id = $(this).data('order');
     if(_id){
-      var post_url = "{{ route('admin.orders.show',['order'=> ':viewId']) }}";
+      var post_url = "{{ route('admin.transactions.show',['transaction'=> ':viewId']) }}";
       post_url = post_url.replace(':viewId', _id);
       $.ajax({
         type: "GET",

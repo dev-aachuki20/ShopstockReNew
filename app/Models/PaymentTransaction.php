@@ -92,9 +92,9 @@ class PaymentTransaction extends Model
         return $this->belongsTo(User::class, 'deleted_by');
     }
     
-    // public function customer(){
-    //     return $this->belongsTo(Customer::class, 'customer_id');
-    // }
+    public function customer(){
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
 
 }
 

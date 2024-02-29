@@ -10,6 +10,7 @@ use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\View;
 
 class PaymentTransactionsController extends Controller
 {
@@ -59,9 +60,14 @@ class PaymentTransactionsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request,string $id)
     {
-        //
+        if ($request->ajax()) {
+            $id = decrypt($request->id);            
+            $transaction = PaymentTransaction::withTrashed()->find($id);
+            $html = View::make('admin.payment_transactions.show', compact('transaction'))->render();
+            return response()->json(['success' => true, 'html' => $html]);
+        }
     }
 
     /**
@@ -69,7 +75,11 @@ class PaymentTransactionsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $transaction = PaymentTransaction::findOrFail($id);
+        $customers = Customer::orderBy('id','desc')->get()->pluck('name', 'id')->prepend(trans('quickadmin.qa_please_select_customer'), '');
+        $paymentTypes = array(''=>trans('quickadmin.qa_please_select_customer'),'credit' => 'Credit','debit'=>'Debit');
+        $paymentWays = array('by_cash' => 'By Cash','by_check' => 'By Check','by_account' => 'By Account');
+        return view('admin.payment_transactions.edit', compact('customers', 'paymentTypes', 'paymentWays','transaction'));
     }
 
     /**
