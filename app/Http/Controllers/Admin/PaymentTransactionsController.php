@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
+use App\Http\Requests\PaymentTransactions\StoreUpdatePaymentTransactionsRequest;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -36,22 +37,16 @@ class PaymentTransactionsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUpdatePaymentTransactionsRequest $request)
     {
-        $validated = $request->validate([
-            'voucher_number' => 'required',
-            'customer_id' => 'required',
-            'amount' => 'required',
-            'payment_way' => 'required'
-        ]);
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
-
-        $voucherAlredyExit = PaymentTransaction::where('voucher_number',$request->voucher_number)->withTrashed()->first();
-         if($voucherAlredyExit){
-            $errors = new MessageBag(['voucher_number' => ['This estimate number is already exists.']]);
-            return redirect()->back()->withErrors($errors)->withInput();
-        }
+        $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt');
+        // $voucherAlredyExit = PaymentTransaction::where('voucher_number',$request->voucher_number)->withTrashed()->first();
+        //  if($voucherAlredyExit){
+        //     $errors = new MessageBag(['voucher_number' => ['This estimate number is already exists.']]);
+        //     return redirect()->back()->withErrors($errors)->withInput();
+        // }
         
         $payment = PaymentTransaction::create($inputs);
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
@@ -85,7 +80,7 @@ class PaymentTransactionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreUpdatePaymentTransactionsRequest $request, $id)
     {
         //
     }

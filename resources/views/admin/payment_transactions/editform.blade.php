@@ -17,36 +17,36 @@
                 <div class="error_payment_way text-danger error"></div>
             </div>
         </div>
-        
-        
-        <div class="row extra_detail_row" style="display: {{ ($transaction->payment_way != '' && $transaction->payment_way !='by_case') ?'block':'none' }}">
+
+
+        <div class="row extra_detail_row" style="display: {{ ($transaction->payment_way != '' && $transaction->payment_way !='by_cash') ?'block':'none' }}">
             <div class="col-md-6 form-group">
                 {!! Form::label('extra_details', trans('quickadmin.transaction.fields.check_account').'*', ['class' => 'extra_detail_label control-label']) !!}
                 {!! Form::text('extra_details', $transaction->extra_details, ['id' => 'extra_details','class' => 'form-control', 'placeholder' => '']) !!}
-                <div class="error_extra_details text-danger error"></div>               
+                <div class="error_extra_details text-danger error"></div>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 form-group">
                 {!! Form::label('remark', trans('quickadmin.transaction.fields.remark'), ['class' => 'control-label']) !!}
                 {!! Form::text('remark', $transaction->remark, ['class' => 'form-control', 'placeholder' => '']) !!}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 form-group">
                 {!! Form::label('amount', trans('quickadmin.transaction.fields.amount').'*', ['class' => 'control-label']) !!}
-                <input type="number" value="{{ $transaction->amount}}" class="form-control"  onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'"  min="0" step=".01" autocomplete="off" name="amount" id="amount">
-                 
+                <input type="number" value="{{ $transaction->amount}}" class="form-control" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min="0" step=".01" autocomplete="off" name="amount" id="amount">
+
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 form-group">
-                {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}               
-                <input type="date" class="form-control" name="entry_date" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
-                <div class="error_entry_date text-danger error"></div> 
+                {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}
+                <input type="date" class="form-control" name="entry_date" value="{{ $transaction->entry_date }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+                <div class="error_entry_date text-danger error"></div>
             </div>
         </div>
         {!! Form::submit(trans('quickadmin.qa_save'), ['class' => 'btn btn-lg btn-success cashReceiptSubmitBtn']) !!}
@@ -55,7 +55,7 @@
 
 @section('customJS')
 <script type="text/javascript">
-  $(document).ready(function() {
+    $(document).ready(function() {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -96,6 +96,18 @@
                 }
             });
         });
+
+        $("select.payment_mode").change(function(e){
+            var payment_mode = $(".payment_mode option:selected").val();
+            if (payment_mode !='' && payment_mode != 'by_cash') {
+                $("#extra_details").prop('required',true);
+                $('.extra_detail_row').show('slow');
+            }else{
+                $("#extra_details").val('');
+                $("#extra_details").prop('required',false);
+                $('.extra_detail_row').hide('slow');
+            }
+        });
     });
 
     function printErrorMsg(msg) {
@@ -103,5 +115,5 @@
             $(`.error_${key}`).html(value);
         });
     }
-
 </script>
+@endsection
