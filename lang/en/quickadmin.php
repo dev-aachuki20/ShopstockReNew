@@ -314,7 +314,8 @@ return [
 		'title' 	=> 'Estimate management',
 		'return-title' 	=> 'Return Order Management',
 		'title-draft' 	=> 'Draft Estimate Management',
-		'title-case-reciept'  => 'Create new cash reciept',
+		'title-case-reciept'  => 'Create new cash receipt',
+		'title-case-reciept-edit'  => 'Edit cash receipt',
 		'fields' 	=> [
 			'add' 	=> 'New Estimate',
 			'list' 	=> 'Manage Estimates',
@@ -330,10 +331,10 @@ return [
 	'transaction-management' => [
 		'title' 	=> 'Payment Management',
 		'fields' 	=> [
-			'new_case_reciept' 	=> 'New Cash Reciept',
+			'new_case_reciept' 	=> 'New Cash Receipt',
 			'add' 	=> 'Add New',
 			'list' 	=> 'List All',
-			'case_reciept' => 'Cash Reciept',
+			'case_reciept' => 'Cash Receipt',
 			'sales'	=> 'Estimate',
 			'sales_return' => 'Estimates Return',
 			'draft_invoice' => 'Draft Estimate',

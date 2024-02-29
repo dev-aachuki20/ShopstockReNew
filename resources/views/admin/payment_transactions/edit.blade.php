@@ -8,6 +8,9 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
+          <div class="panel-heading">
+            <h4> @lang('quickadmin.order-management2.title-case-reciept-edit')</h4>
+         </div>
           <div class="card">
             <div class="card-body">
             <form action="{{ route('admin.transactions.update',['transaction'=>$transaction->id]) }}" method="PUT" id="transactionForm" name="productForm" enctype="multipart/form-data">
