@@ -239,7 +239,7 @@ class CustomerController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        dd('remove from client');
+        // dd('remove from client');
         abort_if(Gate::denies('customer_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Customer::find(decrypt($id));
         $oldvalue = $record->getOriginal(); 

@@ -76,6 +76,47 @@
         });
       }
     });
+
+    $(document).on('click', '.delete_transaction', function(e) {
+      e.preventDefault();
+      var id = $(this).data('id');
+      var delete_url = "{{ route('admin.transactions.destroy',['transaction'=> ':transactionId']) }}";
+      delete_url = delete_url.replace(':transactionId', id);
+      swal({
+        title: "{{ trans('messages.deletetitle') }}",
+        text: "{{ trans('messages.areYouSure') }}",
+        icon: 'warning',
+        buttons: {
+          confirm: 'Yes, delete it',
+          cancel: 'No, cancel',
+        },
+        dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          // If the user confirms, send the DELETE request
+          $.ajax({
+            url: delete_url,
+            type: 'DELETE',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+              var alertType = response['alert-type'];
+              var message = response['message'];
+              var title = "{{ trans('quickadmin.transaction.title_singular') }}";
+              showToaster(title, alertType, message);
+              DataaTable.ajax.reload();
+              // location.reload();
+
+            },
+            error: function(xhr) {
+              // Handle error response
+              swal("{{ trans('quickadmin.transaction.title_singular') }}", 'some mistake is there.', 'error');
+            }
+          });
+        }
+      });
+    });
   });
 </script>
 @endsection

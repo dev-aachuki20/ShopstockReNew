@@ -17,7 +17,7 @@
 
     //$('#centerModal').modal('dispose');
     function showToaster(title,alertType, message) {
-        console.log(alertType);
+        // console.log(alertType);
         var position = 'topRight'; // You can change the default position here
 
         var toastSettings = {

@@ -11,6 +11,7 @@ use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentTransactionsController extends Controller
 {
@@ -69,6 +70,7 @@ class PaymentTransactionsController extends Controller
     public function edit(string $id)
     {
         abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id = decrypt($id);
         $transaction = PaymentTransaction::findOrFail($id);
         $customers = Customer::orderBy('id','desc')->get()->pluck('name', 'id')->prepend(trans('quickadmin.qa_please_select_customer'), '');
         $paymentTypes = array(''=>trans('quickadmin.qa_please_select_customer'),'credit' => 'Credit','debit'=>'Debit');
@@ -84,6 +86,7 @@ class PaymentTransactionsController extends Controller
         abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $transaction = PaymentTransaction::findOrFail($id);
         $oldvalue = $transaction->getOriginal();  
+        $request['updated_by'] = Auth::id();
         $transaction->update($request->all());
         $newValue = $transaction->refresh();
         addToLog($request,'Cash receipt','Edit', $newValue ,$oldvalue);
@@ -95,20 +98,18 @@ class PaymentTransactionsController extends Controller
      */
     public function destroy(string $id)
     {
-        abort_if(Gate::denies('transaction_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        
-
-        // if(!is_numeric($id)){
-        //     $id = decrypt($id);
-        // }
-       
-        // $transaction  = PaymentTransaction::findOrFail($id);
-        // if(!is_null($transaction->order)){
-        //     $transaction->order->orderProduct()->delete();
-        //     $transaction->order->delete();
-        // }
-        // $transaction->delete();
-        // return redirect()->back()->with('success', 'Successfully delete!');
+        // abort_if(Gate::denies('transaction_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id = decrypt($id);
+        $transaction  = PaymentTransaction::findOrFail($id);
+        if(!is_null($transaction->order)){
+            $transaction->order->orderProduct()->delete();
+            $transaction->order->delete();
+        }
+        $transaction->delete();
+        return response()->json([
+            'message' => 'Successfully deleted!',
+            'alert-type'=> trans('quickadmin.alert-type.success')
+        ]);
     }
 
     public function typeFilter(PaymentTransactionDataTable $dataTable, $type)

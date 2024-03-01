@@ -29,6 +29,7 @@
                                     </div>
                                   </div>
                                   <input type="password" value="{{ old('currentpassword') }}" id="currentpassword" class="form-control  @error('currentpassword') is-invalid @enderror" name="currentpassword" tabindex="1"   autofocus>
+                                  <span class="current-password-toggle-icon"><i class="fas fa-eye"></i></span>
                                   @error('currentpassword')
                                   <div class="invalid-feedback">
                                     {{ $message }}
@@ -45,6 +46,7 @@
                                     </div>
                                   </div>
                                   <input type="password" value="{{ old('password') }}" id="password" class="form-control  @error('password') is-invalid @enderror" name="password" tabindex="1"   autofocus>
+                                  <span class="password-toggle-icon"><i class="fas fa-eye"></i></span>
                                   @error('password')
                                   <div class="invalid-feedback">
                                     {{ $message }}
@@ -61,6 +63,7 @@
                                     </div>
                                   </div>
                                   <input type="password" value="{{ old('password_confirmation') }}" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" tabindex="1"   autofocus>
+                                  <span class="confirm-password-toggle-icon"><i class="fas fa-eye"></i></span>
                                   @error('password_confirmation')
                                   <div class="invalid-feedback">
                                     {{ $message }}
@@ -92,5 +95,35 @@
 @endsection
 
 @section('customJS')
+<script>
+  $(document).on('click','.current-password-toggle-icon i',function(){
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    var input = $("#currentpassword");
+    if (input.attr("type") === "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+  });
 
+  $(document).on('click','.password-toggle-icon i',function(){
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    var input = $("#password");
+    if (input.attr("type") === "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+  });
+
+  $(document).on('click','.confirm-password-toggle-icon i',function(){
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    var input = $("#password_confirmation");
+    if (input.attr("type") === "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+  });
+</script>
 @endsection

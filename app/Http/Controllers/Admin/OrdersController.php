@@ -70,8 +70,8 @@ class OrdersController extends Controller
                 'is_draft'       => $isDraft ? 1 : 0,
                 'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
             );
-
             $order = Order::create($inputs);
+            addToLog($request,'Order','Create', $order); 
         } else {
             $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
             $totalAmount = round((float)str_replace(',', '', $request->total_amount));
@@ -124,13 +124,13 @@ class OrdersController extends Controller
                     'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
                 ];
                 PaymentTransaction::create($transaction);
+                addToLog($request,'Estimate','Create', $transaction); 
             } else {
                 $checkPaymentTransaction->update([
                     'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
                 ]);
             }
         }
-
         if ($order->order_type == 'return') {
             return response()->json([
                 'success' => true,
@@ -169,6 +169,7 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'edit';
+        $id = decrypt($id);
         $order = Order::findOrFail($id);
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')->orderBy('name', 'asc')->get();
@@ -248,6 +249,7 @@ class OrdersController extends Controller
         if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date) {
             $inputs['updated_by'] = Auth::user()->id;
             $order->update($inputs);
+            addToLog($request,'Order','Edit', $order ,$checkProductOrder);
         } else {
             $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft])->first();
             if ($checkOrder) {
@@ -259,11 +261,13 @@ class OrdersController extends Controller
                 $order->delete();
                 $checkOrder->update($inputs);
                 $order = $checkOrder;
+                addToLog($request,'Order','Edit', $order ,$checkProductOrder);
             } else {
                 $inputs['customer_id'] = $request->customer_id;
                 $inputs['area_id'] = $request->area_id;
                 $inputs['invoice_number'] = getNewInvoiceNumber('', 'new');
                 $order = Order::create($inputs);
+                addToLog($request,'Order','Create', $order); 
             }
         }
 
@@ -331,15 +335,17 @@ class OrdersController extends Controller
                 if ($lastPaymentTransaction) {
                     $lastPaymentTransaction->delete();
                 }
-                $checkNewOrderPaymentTransaction = PaymentTransaction::where(['order_id' => $order->id, 'entry_date' => $order->invoice_date])->first();
+                $checkNewOrderPaymentTransaction = $oldPaymentTransaction = PaymentTransaction::where(['order_id' => $order->id, 'entry_date' => $order->invoice_date])->first();
 
                 if ($checkNewOrderPaymentTransaction) {
                     $checkNewOrderPaymentTransaction->update([
                         'amount'        => round((float)str_replace(',', '', $lastPaymentTransaction->amount)) + (float)$checkNewOrderPaymentTransaction->amount
                     ]);
+                    addToLog($request,'Order','Edit', $checkNewOrderPaymentTransaction ,$oldPaymentTransaction);
                 } else {
                     $transaction['order_id'] = $order->id;
                     PaymentTransaction::create($transaction);
+                    addToLog($request,'Estimate','Create', $transaction); 
                 }
             } else {
                 PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);

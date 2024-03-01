@@ -402,7 +402,9 @@ return [
 			'edit' => 'Edit Invoice',
 			'from_date' => 'From Date',
 			'to_date' => 'To Date',
-			'estimate_date'	=> 'Estimate Date'
+			'estimate_date'	=> 'Estimate Date',
+			'shipping_amount' => 'Shipping Amount',
+			'sold_by'	=> 'Sold By'
 		],
 	],
 
@@ -434,6 +436,7 @@ return [
 
 	'transaction'  => [
 		'title'  				=> 'Payment transactions',
+		'title_singular'  		=> 'Payment transaction',
 		'cash_reciept_title'  	=> 'Cash reciept transactions',
 		'sales_title'  			=> 'Estimates transactions',
 		'sales_return_title'  	=> 'Estimates return transactions',
