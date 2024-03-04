@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\DataTables\DraftInvoiceDataTable;
 use App\Models\Order;
 use App\Http\Requests\Order\StoreOrdersRequest;
 use App\Http\Requests\Order\UpdateProductRequest;
@@ -71,7 +72,7 @@ class OrdersController extends Controller
                 'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
             );
             $order = Order::create($inputs);
-            addToLog($request,'Order','Create', $order); 
+            addToLog($request, 'Order', 'Create', $order);
         } else {
             $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
             $totalAmount = round((float)str_replace(',', '', $request->total_amount));
@@ -124,7 +125,7 @@ class OrdersController extends Controller
                     'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
                 ];
                 PaymentTransaction::create($transaction);
-                addToLog($request,'Estimate','Create', $transaction); 
+                addToLog($request, 'Estimate', 'Create', $transaction);
             } else {
                 $checkPaymentTransaction->update([
                     'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
@@ -154,10 +155,11 @@ class OrdersController extends Controller
     public function show(Request $request, string $id)
     {
         abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if ($request->ajax()) {
+        if ($request->ajax()) { 
             $id = decrypt($id);
-            $order = Order::findOrFail($id);
-            $html = View::make('admin.orders.prev_order_modal', compact('order'))->render();
+            $order = Order::withTrashed()->find($id);
+            $type = $request->type;
+            $html = View::make('admin.orders.prev_order_modal', compact('order', 'type'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
     }
@@ -212,6 +214,22 @@ class OrdersController extends Controller
             // $rowData['sale_price']       = $product->product->sale_price ?? 0.00;
             $rowData['retailer_price']   = ($customer->is_type == 'retailer') ? $product->product->retailer_price : 0.00;
             $rowData['wholesaler_price'] = ($customer->is_type == 'wholesaler') ? $product->product->wholesaler_price : 0.00;
+            $WSP = 0.00;
+            if (isset($product)) {
+                if ($customer->is_type == 'wholesaler' && $customer->group && $customer->group->group_id == $product->product->group_id) {
+                    $WSP = $product->product->wholesaler_price ?? 0.00;
+                    $priceName = 'WSP';
+                } else if ($customer->is_type == 'retailer' || $customer->is_type == 'wholesaler') {
+                    $WSP = $product->product->retailer_price ?? 0.00;
+                    $priceName = 'RSP';
+                } else {
+                    $WSP = $product->price;
+                }
+            }
+
+            $rowData['WSP'] = $WSP;
+            $rowData['priceName'] = $priceName ?? '';
+
             $rowData['last_order_price'] = $last_order_price ?? 0.00;
             $rowData['unit'] = $unit;
 
@@ -246,10 +264,10 @@ class OrdersController extends Controller
             'is_draft'       => $isDraft ? 1 : 0,
             'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
         );
-        if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date) {
+        if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $isDraft) {
             $inputs['updated_by'] = Auth::user()->id;
             $order->update($inputs);
-            addToLog($request,'Order','Edit', $order ,$checkProductOrder);
+            addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
         } else {
             $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft])->first();
             if ($checkOrder) {
@@ -261,13 +279,13 @@ class OrdersController extends Controller
                 $order->delete();
                 $checkOrder->update($inputs);
                 $order = $checkOrder;
-                addToLog($request,'Order','Edit', $order ,$checkProductOrder);
+                addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
             } else {
                 $inputs['customer_id'] = $request->customer_id;
                 $inputs['area_id'] = $request->area_id;
                 $inputs['invoice_number'] = getNewInvoiceNumber('', 'new');
                 $order = Order::create($inputs);
-                addToLog($request,'Order','Create', $order); 
+                addToLog($request, 'Order', 'Create', $order);
             }
         }
 
@@ -339,17 +357,25 @@ class OrdersController extends Controller
 
                 if ($checkNewOrderPaymentTransaction) {
                     $checkNewOrderPaymentTransaction->update([
-                        'amount'        => round((float)str_replace(',', '', $lastPaymentTransaction->amount)) + (float)$checkNewOrderPaymentTransaction->amount
+                        'amount'        => round((float)str_replace(',', '', $lastPaymentTransaction->amount ?? 0.00)) + (float)$checkNewOrderPaymentTransaction->amount ?? 0.00
                     ]);
-                    addToLog($request,'Order','Edit', $checkNewOrderPaymentTransaction ,$oldPaymentTransaction);
+                    addToLog($request, 'Order', 'Edit', $checkNewOrderPaymentTransaction, $oldPaymentTransaction);
                 } else {
                     $transaction['order_id'] = $order->id;
                     PaymentTransaction::create($transaction);
-                    addToLog($request,'Estimate','Create', $transaction); 
+                    addToLog($request, 'Estimate', 'Create', $transaction);
                 }
             } else {
                 PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);
             }
+        }
+
+        if ($type == 'draft') {
+            return response()->json([
+                'success' => true,
+                'message'     => 'Successfully Updated!',
+                'redirectUrl' => route('admin.orders.draftInvoice'),
+            ]);
         }
 
         return response()->json([
@@ -365,6 +391,12 @@ class OrdersController extends Controller
     public function destroy(string $id)
     {
         abort_if(Gate::denies('estimate_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id = decrypt($id);
+        $order = Order::findOrFail($id);
+        $order->orderProduct()->delete();
+        $order->delete();
+        // PaymentTransaction::where('order_id',$id)->delete();
+        return response()->json(['message' => 'Successfully deleted!', 'alert-type' => 'success']);
     }
 
 
@@ -637,5 +669,12 @@ class OrdersController extends Controller
             ->get();
 
         return view('admin.orders.create', compact('customers', 'products', 'orderType'));
+    }
+
+    public function draftInvoice(DraftInvoiceDataTable $dataTable)
+    {
+        abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $orderType = 'draft';
+        return $dataTable->render('admin.orders.draft', compact('orderType'));
     }
 }

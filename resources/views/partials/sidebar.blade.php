@@ -36,14 +36,14 @@
 
 
 
-    <li class="dropdown {{ (Request::is('admin/orders*') || Request::is('admin/transactions/create') || Request::is('admin/orders-return')) ? 'active' : '' }}">
+    <li class="dropdown {{ ((Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice')) || Request::is('admin/transactions/create') || Request::is('admin/orders-return')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="user" />
             <span>@lang('quickadmin.order-management2.title')</span>
         </a>
         <ul class="dropdown-menu">
             @can('estimate_access')
-            <li class="{{ Request::is('admin/orders/*') ? 'active' : '' }}">
+            <li class="{{ (Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice')) ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.orders.create') }}">
                     <span>@lang('quickadmin.order-management2.fields.add')</span>
                 </a>
@@ -65,30 +65,50 @@
             @endcan
         </ul>
     </li>
-    <li class="dropdown {{ (Request::is('admin/transaction/sales') || Request::is('admin/transaction/cash_reciept') || Request::is('admin/transaction/sales_return')) ? 'active' : '' }}">
+    <li class="dropdown {{ (Request::is('admin/transaction/current_estimate') || Request::is('admin/transaction/sales') || Request::is('admin/transaction/modified_sales') || Request::is('admin/transaction/sales_return') || Request::is('admin/transaction/cash_reciept') || Request::is('admin/orders/draft-invoice') || Request::is('admin/transaction/cancelled')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="user" />
             <span>@lang('quickadmin.transaction-management.title')</span>
         </a>
         <ul class="dropdown-menu">
             @can('estimate_access')
+            <li class="{{ Request::is('admin/transaction/current_estimate') ? 'active' : '' }}">
+                <a href="{{ route('admin.transactions.type',['current_estimate']) }}">
+                    <span>@lang('quickadmin.transaction-management.fields.current_estimate')</span>
+                </a>
+            </li>
             <li class="{{ Request::is('admin/transaction/sales') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.transactions.type',['sales']) }}">
-                    @lang('quickadmin.transaction-management.fields.sales')
+                    <span>@lang('quickadmin.transaction-management.fields.sales')</span>
+                </a>
+            </li>
+            <li class="{{ Request::is('admin/transaction/modified_sales') ? 'active' : '' }}">
+                <a href="{{ route('admin.transactions.type',['modified_sales']) }}">
+                    <span>@lang('quickadmin.transaction-management.fields.modified_sales')</span>
+                </a>
+            </li>
+            <li class="{{ Request::is('admin/transaction/sales_return') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.transactions.type',['sales_return']) }}">
+                    <span>@lang('quickadmin.transaction-management.fields.sales_return')</span>
                 </a>
             </li>
             @endcan
             @can('transaction_access')
             <li class="{{ Request::is('admin/transaction/cash_reciept') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.transactions.type',['cash_reciept']) }}">
-                    @lang('quickadmin.transaction-management.fields.case_reciept')
+                    <span>@lang('quickadmin.transaction-management.fields.case_reciept')</span>
                 </a>
             </li>
             @endcan
             @can('estimate_access')
-            <li class="{{ Request::is('admin/transaction/sales_return') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.transactions.type',['sales_return']) }}">
-                    <span>@lang('quickadmin.transaction-management.fields.sales_return')</span>
+            <li class="{{ Request::is('admin/orders/draft-invoice') ? 'active' : '' }}">
+                <a href="{{ route('admin.orders.draftInvoice') }}">
+                    <span>@lang('quickadmin.transaction-management.fields.draft_invoice')</span>
+                </a>
+            </li>
+            <li class="{{ Request::is('admin/transaction/cancelled') ? 'active' : '' }}">
+                <a href="{{ route('admin.transactions.type',['cancelled']) }}">
+                    <span>@lang('quickadmin.transaction-management.fields.cancelled')</span>
                 </a>
             </li>
             @endcan

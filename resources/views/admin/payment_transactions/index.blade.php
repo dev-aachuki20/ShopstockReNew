@@ -70,6 +70,9 @@
         $.ajax({
           type: "GET",
           url: url,
+          data: {
+            type : '{{$type}}'
+          },
           success: function(data) {
             $('.show_html').html(data.html);
           }

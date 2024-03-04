@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <input type="password" value="{{ old('password') }}" id="password" class="form-control @error('password') is-invalid @enderror" name="password" tabindex="1" autofocus>
-                    <span class="password-toggle-icon"><i class="fas fa-eye"></i></span>
+                    <span class="password-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password');"></i></span>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
                         </div>
                     </div>
                     <input type="password" value="{{ old('password_confirmation') }}" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" tabindex="1" autofocus>
-                    <span class="confirm-password-toggle-icon"><i class="fas fa-eye"></i></span>
+                    <span class="confirm-password-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password_confirmation');"></i></span>
                 </div>
             </div>
         </div>

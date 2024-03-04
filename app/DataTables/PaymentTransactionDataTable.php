@@ -11,6 +11,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+use Carbon\Carbon;
 
 class PaymentTransactionDataTable extends DataTable
 {
@@ -54,25 +55,25 @@ class PaymentTransactionDataTable extends DataTable
                 // }
                 // if (Gate::check('product_edit')) {
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                if ($this->type == 'sales' || $this->type == 'sales_return') {
-                    if(Gate::check('estimate_edit')){
-                        $action .= '<a href="' .route("admin.orders.edit", [$this->type, encrypt($row->order_id)]). '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
-                    } 
-                    if(Gate::check('estimate_access')){
+                if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
+                    if (Gate::check('estimate_edit') && $this->type != 'cancelled') {
+                        $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                    }
+                    if (Gate::check('estimate_access')) {
                         $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
                     }
                 } else if ($this->type == 'cash_reciept') {
-                    if(Gate::check('transaction_edit')){
+                    if (Gate::check('transaction_edit')) {
                         $action .= '<a href="' . route("admin.transactions.edit", encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
-                    } 
-                    if(Gate::check('transaction_access')){
+                    }
+                    if (Gate::check('transaction_access')) {
                         $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
                     }
                 }
                 $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                if ((Gate::check('estimate_delete') && ($this->type == 'sales' || $this->type == 'sales_return')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                }   
+                if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
+                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                }
                 return $action;
             })
             ->rawColumns(['action']);
@@ -83,14 +84,48 @@ class PaymentTransactionDataTable extends DataTable
      */
     public function query(PaymentTransaction $model): QueryBuilder
     {
-        //return $model->newQuery();
-        if ($this->type == 'sales') {
-            $model = $model->where('payment_way', 'order_create')->orderBy('entry_date', 'desc');
-        } else if ($this->type == 'cash_reciept') {
-            $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->orderBy('entry_date', 'desc');
-        } else if ('sales_return') {
-            $model = $model->where('payment_way', 'order_return')->orderBy('entry_date', 'desc');
+        $type = $this->type;
+
+        switch ($type) {
+            case 'sales_return':
+                $model = $model->where('payment_way', 'order_return');
+                break;
+
+            case 'sales':
+                $model = $model->where('payment_way', 'order_create');
+                break;
+
+            case 'modified_sales':
+                $model = $model->with('order')->where('payment_way', 'order_create')->whereHas('order', function ($query) {
+                    $query->whereHas('orderProduct', function ($subquery) {
+                        $subquery->whereDate('updated_at', Carbon::today());
+                    });
+                });
+                break;
+
+            case 'cash_reciept':
+                $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance');
+                break;
+
+            case 'cancelled':
+                $model = $model->where('is_split', 0)->onlyTrashed();
+                break;
+
+            case 'current_estimate':
+                $today = now()->format('Y-m-d');
+                $model = $model->whereDate('created_at', $today)->where('payment_way', 'order_create');
+                break;
+
+            default:
+                // Handle unknown type here  
+                return abort(404);
+                break;
         }
+        // if ($type == 'case_reciept') {
+        //     $model = $model->orderBy('voucher_number', 'desc');
+        // } else {
+        //     $model = $model->orderBy('entry_date', 'asc');
+        // }
         return $model;
     }
 
@@ -131,8 +166,8 @@ class PaymentTransactionDataTable extends DataTable
             Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
             Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type')),
-            Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount')),
-            Column::make('debit_amount')->title(trans('quickadmin.transaction.fields.debit_amount')),
+            Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount'),
+            Column::make('debit_amount')->title(trans('quickadmin.transaction.fields.debit_amount'))->name('amount'),
             Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at')),
 
             Column::computed('action')

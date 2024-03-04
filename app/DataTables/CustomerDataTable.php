@@ -55,7 +55,7 @@ class CustomerDataTable extends DataTable
     public function query(Customer $model): QueryBuilder
     {
         //return $model->newQuery();
-        $query = $model->newQuery()->select(['customers.*'])->orderBy('Name','ASC');
+        $query = $model->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
         return $this->applyScopes($query);
     }
 

@@ -338,7 +338,7 @@ return [
 			'sales'	=> 'Estimate',
 			'sales_return' => 'Estimates Return',
 			'draft_invoice' => 'Draft Estimate',
-			'cancel_estimate' => 'Cancelled Estimate',
+			'cancelled' => 'Cancelled Estimate',
 			'current_estimate' => 'Current Estimate',
 			'modified_sales' => 'Modified Estimate',
 
@@ -353,6 +353,10 @@ return [
 		'view-title-sales'  => 'View order estimate',
 		'view-title-sales_return'  => 'View return order estimate',
 		'view-title-cash_reciept'  => 'View cash reciept',
+		'view-title-draft'  => 'View Draft',
+		'view-title-current_estimate'  => 'View Current Estimate',
+		'view-title-modified_sales'  => 'View Modified Estimate',
+		'view-title-cancelled'  => 'View Cancelled Estimate',
 		'invoice'  => 'Invoice',
 		'recycle'  => 'Recycle',
 		'create_new_order' => 'Create New Order',
@@ -595,6 +599,7 @@ return [
 	'qa_save_estimate' 	=> 'Save Estimate',
 	'qa_save_invoice_return' 	=> 'Save Estimate Return',
 	'qa_save_as_draft_invoice' => 'Save as Draft',
+	'qa_update_as_draft_invoice' => 'Update as Draft',
 
 	'qa_company_name' 	=> 'Kanak Bangles',
 	'qa_save_invoice' 	=> 'Save Invoice',

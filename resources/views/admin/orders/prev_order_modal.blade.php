@@ -76,7 +76,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
         <div class="row">
             <div class="col-xs-12">
                 <div class="invoice-title">
-                    <h2>@lang('quickadmin.transaction-management.fields.sales')</h2>
+                    <h2>@lang('quickadmin.transaction-management.fields.'.$type)</h2>
                 </div>
                 <div class="row" style="padding-top:30px;">
                     <div class="col-xs-6">
@@ -146,7 +146,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                         </td>
                                         <td>
                                             @php
-                                            $quantityString = ''; 
+                                            $quantityString = '';
                                             if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
                                             if(!is_null($item->height)){
                                             $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;

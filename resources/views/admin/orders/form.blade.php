@@ -285,11 +285,17 @@
     <div class="text-right order_create order_create_btnarea">
         <input type="hidden" name="submit" value="">
         @if($orderType=='create')<button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft" disabled="">Save as Draft</button>@endif
+        @if($orderType=='edit')
+        <button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft">
+            {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
+        @endif
         <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">
-            @if($orderType == 'return')
-            {{ trans('quickadmin.qa_save_invoice_return') }}
+            @if($orderType=='create')
+                {{ trans('quickadmin.qa_save_estimate') }}
+            @elseif($orderType == 'return')
+                {{ trans('quickadmin.qa_save_invoice_return') }}
             @else
-            {{ trans('quickadmin.qa_save_estimate') }}
+                {{ trans('quickadmin.qa_update') }}
             @endif
         </button>
     </div>
@@ -439,7 +445,7 @@
 
                             }
                             var priceToDisplay = response.rowData.price;
-                            if (response.rowData.last_order_price) {
+                            if (response.rowData.last_order_price && response.rowData.last_order_price != 0) {
                                 priceToDisplay = response.rowData.last_order_price;
                             }
                             products_table.find('.price').val(priceToDisplay);
@@ -1266,6 +1272,9 @@
                                 glassProduct.totalQty = response.rowData.totalQty;
                                 addGlassProductViewRender(customer_id, product_id, 'html', response.rowData.other_details);
                             }
+
+                            $('.whole-sale-price').text(response.rowData.WSP);
+                            $('.price-name').text(response.rowData.priceName);
 
                             // End to store value in object						
 
