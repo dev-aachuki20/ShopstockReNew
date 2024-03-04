@@ -171,7 +171,7 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'edit';
-        $id = decrypt($id);
+        $id = decrypt($id); 
         $order = Order::findOrFail($id);
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')->orderBy('name', 'asc')->get();
@@ -251,6 +251,7 @@ class OrdersController extends Controller
         abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $type = $request->type; //sales
         $isDraft = $request->submit == 'draft' ? true : false;
+        $checkDraftStatus = $isDraft == true ? 0 : 1;
 
         $order = $checkProductOrder = Order::findOrFail($id);
         $beforIs_draft = $order['is_draft'];
@@ -263,13 +264,13 @@ class OrdersController extends Controller
             'created_by'     => Auth::user()->id,
             'is_draft'       => $isDraft ? 1 : 0,
             'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
-        );
-        if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $isDraft) {
+        ); 
+        if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $checkDraftStatus) {
             $inputs['updated_by'] = Auth::user()->id;
             $order->update($inputs);
             addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
         } else {
-            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft])->first();
+            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $checkDraftStatus])->first();
             if ($checkOrder) {
                 $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
                 $totalAmount = round((float)str_replace(',', '', $request->total_amount));

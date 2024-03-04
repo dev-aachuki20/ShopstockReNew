@@ -291,11 +291,11 @@
         @endif
         <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">
             @if($orderType=='create')
-                {{ trans('quickadmin.qa_save_estimate') }}
+            {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
-                {{ trans('quickadmin.qa_save_invoice_return') }}
+            {{ trans('quickadmin.qa_save_invoice_return') }}
             @else
-                {{ trans('quickadmin.qa_update') }}
+            {{ trans('quickadmin.qa_update') }}
             @endif
         </button>
     </div>
@@ -1088,6 +1088,16 @@
             $('input[name=submit]').val($(this).attr('value'));
         });
 
+        $(document).on('keyup', function(e) {
+            if (e.key === 'Enter') {
+                if ($('#addGlassProductDetailModal').is(':visible')) {
+                    $('.glass-item-save').click();
+                } else {
+                    $('#productForm').submit();
+                }
+            }
+        });
+
         $(document).on('submit', '#productForm', function(e) {
             e.preventDefault();
 
@@ -1181,7 +1191,7 @@
 
         });
 
-        $(document).on('click', '.update_price,.price,.glass-input', function(e) {
+        $(document).on('click', '.update_price,.price,.glass-input,.shipping_amount', function(e) {
             var value = parseInt($(this).val());
             if (value == 0) {
                 $(this).val('');

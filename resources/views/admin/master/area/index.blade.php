@@ -14,11 +14,11 @@
             <h4>@lang('quickadmin.area_master.title')</h4>
             <div class="col-auto  mt-md-0 mt-3 ml-auto">
               <div class="row align-items-center">
-                  <div class="col-auto px-1">
-                      @can('area_create')
-                        <button type="button" class="addnew-btn add_area sm_btn circlebtn" title="@lang('messages.add')" ><x-svg-icon icon="add-device" /></button>
-                      @endcan
-                  </div>
+                <div class="col-auto px-1">
+                  @can('area_create')
+                  <button type="button" class="addnew-btn add_area sm_btn circlebtn" title="@lang('messages.add')"><x-svg-icon icon="add-device" /></button>
+                  @endcan
+                </div>
               </div>
             </div>
           </div>
@@ -48,8 +48,7 @@
           <div class="form-group">
             <label for="naem">Address:</label>
             <input type="hidden" class="area_edit_id">
-            <input type="text" class="form-control area_edit_address" id="address" placeholder="Enter Address"
-              name="name">
+            <input type="text" class="form-control area_edit_address" id="address" placeholder="Enter Address" name="name">
             <span class="error_address text-danger error"></span>
           </div>
         </div>
@@ -74,109 +73,115 @@
 
 <script type="text/javascript">
   // add or edit
-      $(document).ready(function(){
-        var DataaTable = $('#area-table').DataTable();
-          $(document).on('click','.add_area',function(){
-            $('.error').html('');
-            $("#areaModal").modal('show');
-            $(".area_edit_id").val('');
-            $(".area_edit_address").val('');
-            $(".save_btn").html('Save');
-            $(".Add_edit_area").html('Add');
-          })
-          $(document).on('click','.edit_area',function(){
-            $('.error').html('');
-            $("#areaModal").modal('show');
-            $(".area_edit_id").val($(this).data('id'));
-            $(".area_edit_address").val($(this).data('address'));
-            $(".save_btn").html('Update');
-            $(".Add_edit_area").html('Edit');
-          })
-     
-    
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  $(document).ready(function() {
+    var DataaTable = $('#area-table').DataTable();
+    $(document).on('click', '.add_area', function() {
+      $('.error').html('');
+      $("#areaModal").modal('show');
+      $(".area_edit_id").val('');
+      $(".area_edit_address").val('');
+      $(".save_btn").html('Save');
+      $(".Add_edit_area").html('Add');
+    })
+    $(document).on('click', '.edit_area', function() {
+      $('.error').html('');
+      $("#areaModal").modal('show');
+      $(".area_edit_id").val($(this).data('id'));
+      $(".area_edit_address").val($(this).data('address'));
+      $(".save_btn").html('Update');
+      $(".Add_edit_area").html('Edit');
+    })
+
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    $(document).on('keyup', function(e) {
+      if (e.key === 'Enter') {
+        $('#area_form').submit();
+      }
+    });
+    $(document).on('submit', "#area_form", function(e) {
+      e.preventDefault();
+      var address = $("#address").val();
+      var _id = $(".area_edit_id").val();
+      $('.save_btn').prop('disabled', true);
+      var postType = "POST";
+      var post_url = "{{ route('admin.master.areas.store') }}"
+      if (_id) {
+        //  var post_url = "/admin/master/areas/" + _id;
+        var post_url = "{{ route('admin.master.areas.update',['area'=> ':areaId']) }}";
+        post_url = post_url.replace(':areaId', _id);
+        var postType = "PUT";
+      }
+      $.ajax({
+        type: postType,
+        url: post_url,
+        data: {
+          address: address,
+          id: _id,
+        },
+        success: function(data) {
+          $('.save_btn').prop('disabled', false);
+          if ($.isEmptyObject(data.error)) {
+            $("#areaModal").modal('hide');
+            DataaTable.ajax.reload();
+            var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+            var message = data.success;
+            var title = "Area";
+            showToaster(title, alertType, message);
+          } else {
+            printErrorMsg(data.error);
           }
-        });
-          $(document).on('submit', "#area_form", function(e) {
-            e.preventDefault();
-            var address = $("#address").val();
-            var _id = $(".area_edit_id").val();
-            $('.save_btn').prop('disabled', true);
-            var postType = "POST";
-            var post_url = "{{ route('admin.master.areas.store') }}"
-            if(_id){
-              //  var post_url = "/admin/master/areas/" + _id;
-              var post_url = "{{ route('admin.master.areas.update',['area'=> ':areaId']) }}";
-              post_url = post_url.replace(':areaId', _id);
-               var postType = "PUT";
-            }
-            $.ajax({
-              type: postType,
-              url: post_url,
-              data: {
-                address: address,
-                id: _id,
-              },
-              success: function(data) {
-                $('.save_btn').prop('disabled', false);
-                if ($.isEmptyObject(data.error)) {
-                    $("#areaModal").modal('hide');
-                      DataaTable.ajax.reload();
-                      var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                      var message = data.success;
-                      var title = "Area";
-                    showToaster(title,alertType,message);                
-                } else {
-                  printErrorMsg(data.error);
-                }
-              }
-            });
-          });
-          function printErrorMsg(msg) {
-            $.each(msg, function(key, value) {
-              $(`.error_${key}`).html(value);
-            });
-          }
+        }
+      });
+    });
+
+    function printErrorMsg(msg) {
+      $.each(msg, function(key, value) {
+        $(`.error_${key}`).html(value);
+      });
+    }
     // add or edit
     // delete
-          $(document).on('click','.delete_area',function(){   
-            var delete_id = $(this).data('id');
-            var delete_url = "{{ route('admin.master.areas.destroy',['area'=> ':areaId']) }}";
-            delete_url = delete_url.replace(':areaId', delete_id);
-            swal({
-              title: "Are  you sure?",
-              text: "are you sure want to delete?",
-              icon: 'warning',
-              buttons: {
-                confirm: 'Yes, delete',
-                cancel: 'No, cancel',
-              },
-              dangerMode: true,
-            }).then(function(willDelete) {
-              if(willDelete) {  
-                    $.ajax({
-                    type: "DELETE",
-                    url: delete_url,              
-                    success: function(data) {
-                      if ($.isEmptyObject(data.error)) {
-                        DataaTable.ajax.reload();
-                        var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                        var message = "{{ trans('messages.crud.delete_record') }}";
-                        var title = "Area";
-                        showToaster(title,alertType,message);   
-                      } 
-                    },
-                    error: function (xhr) {
-                      swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
-                    }
-                  });
-                }
-              })             
+    $(document).on('click', '.delete_area', function() {
+      var delete_id = $(this).data('id');
+      var delete_url = "{{ route('admin.master.areas.destroy',['area'=> ':areaId']) }}";
+      delete_url = delete_url.replace(':areaId', delete_id);
+      swal({
+        title: "Are  you sure?",
+        text: "are you sure want to delete?",
+        icon: 'warning',
+        buttons: {
+          confirm: 'Yes, delete',
+          cancel: 'No, cancel',
+        },
+        dangerMode: true,
+      }).then(function(willDelete) {
+        if (willDelete) {
+          $.ajax({
+            type: "DELETE",
+            url: delete_url,
+            success: function(data) {
+              if ($.isEmptyObject(data.error)) {
+                DataaTable.ajax.reload();
+                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                var message = "{{ trans('messages.crud.delete_record') }}";
+                var title = "Area";
+                showToaster(title, alertType, message);
+              }
+            },
+            error: function(xhr) {
+              swal("{{ trans('quickadmin.order.invoice') }}", 'Some mistake is there.', 'error');
+            }
           });
+        }
+      })
+    });
     // delete
-})
+  })
 </script>
 
 @endsection

@@ -145,6 +145,11 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
+        $(document).on('keyup', function(e) {
+          if (e.key === 'Enter') {
+            $('#group_form').submit();
+          }
+        });
           $(document).on('submit', "#group_form", function(e) {
             e.preventDefault();
             var parent_id = $("#parent_id").val() ?? 0;
@@ -194,7 +199,7 @@
             var delete_id = $(this).data('id');
             var delete_url = "{{ route('admin.master.groups.destroy',['group'=> ':groupId']) }}";
             delete_url = delete_url.replace(':groupId', delete_id);
-          swal({
+            swal({
             title: "Are  you sure?",
             text: "are you sure want to delete?",
             icon: 'warning',
@@ -228,7 +233,7 @@
     // recycle
           $(document).on('click','.recycle_group',function(){
             var recycle_id = $(this).data('id');
-          swal({
+            swal({
             title: "Are  you sure?",
             text: "are you sure want to Undo?",
             icon: 'warning',

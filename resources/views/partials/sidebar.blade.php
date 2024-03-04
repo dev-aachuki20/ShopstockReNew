@@ -43,7 +43,7 @@
         </a>
         <ul class="dropdown-menu">
             @can('estimate_access')
-            <li class="{{ (Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice')) ? 'active' : '' }}">
+            <li class="{{ (Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice') && !Request::is('admin/orders-return')) ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.orders.create') }}">
                     <span>@lang('quickadmin.order-management2.fields.add')</span>
                 </a>

@@ -200,9 +200,22 @@
             getSubGroup(ifProductGroupId, ifProductSubGroupId);
         }
         // get sub Group
-
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if ($('#add_newModal').is(':visible')) {
+                    $('#add_new_name').blur();
+                    e.preventDefault();
+                    $(".save_add_new").trigger('click');
+                } else {
+                    $('#productForm').submit();
+                }
+            }
+        });
         $(document).on('submit', "#productForm", function(e) {
             e.preventDefault();
+            if (e.keyCode == 13) {
+                return false;
+            }
             $('.error').html('');
             let WSP = parseInt($('#wholesaler_price').val());
             let RSP = parseInt($('#retailer_price').val());
@@ -312,6 +325,7 @@
     $(document).ready(function() {
         $(document).on('click', ".addNewgroupBtn", function() {
             $("#add_new_name").val('');
+            $('.error_new_name').html('');
             $('.save_add_new').prop('disabled', false);
             $('.add_new_drop').html('Group');
             $("#add_newModal").modal('show');
@@ -350,6 +364,7 @@
 
         $(document).on('click', ".addNewSubGroupBtn", function() {
             $("#add_new_name").val('');
+            $('.error_new_name').html('');
             $('.save_add_new').prop('disabled', false);
             $('.add_new_drop').html('Sub Group');
             $("#add_newModal").modal('show');
@@ -457,7 +472,7 @@
         if (value == 1) {
             $('.height, .width, .extra_option_hint').hide();
             $('.sub_product').show();
-        }else if (value == 2){
+        } else if (value == 2) {
             $('.height, .width, .extra_option_hint').show();
             $('.sub_product').hide();
             type == 'add' && $('#unit_type').val('11').trigger('change');
@@ -465,7 +480,7 @@
             $('#is_height, #is_width').prop("checked", true);
             $('#unit_type').attr("readonly", true);
             $('.unit_type span.text-danger, .extra_options span.text-danger').removeClass('d-none');
-        }else if (value == 3){
+        } else if (value == 3) {
             $('.height, .extra_option_hint').show();
             type == 'add' && $('#unit_type').val('12').trigger('change');
             type == 'add' && $('#extra_option_hint').val('Ft');
@@ -473,13 +488,13 @@
             $('.sub_product, .width').hide();
             $('#unit_type').attr("readonly", true);
             $('.unit_type span.text-danger, .extra_options span.text-danger').removeClass('d-none');
-        }else if (value == 4){
+        } else if (value == 4) {
             $('.height, .width, .extra_option_hint').show();
             $('.sub_product').hide();
             $('.extra_options span.text-danger').removeClass('d-none');
             type == 'add' && $('#extra_option_hint').val('Ft');
             $('#is_height, #is_width').prop("checked", true);
-        }else{
+        } else {
             $('.extra_options').hide();
             $('.unit_type span.text-danger').removeClass('d-none');
         }

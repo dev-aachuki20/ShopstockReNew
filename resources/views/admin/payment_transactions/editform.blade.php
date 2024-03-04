@@ -62,6 +62,12 @@
             }
         });
 
+        $(document).on('keyup', function(e) {
+            if (e.key === 'Enter') {
+                $('#transactionForm').submit();
+            }
+        });
+
         $(document).on('submit', "#transactionForm", function(e) {
             e.preventDefault();
             $('.error').html('');

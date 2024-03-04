@@ -94,6 +94,11 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
+        $(document).on('keyup', function(e) {
+          if (e.key === 'Enter') {
+            $('#unit_form').submit();
+          }
+        });
           $(document).on('submit', "#unit_form", function(e) {
             e.preventDefault();
             var name = $("#name").val();
