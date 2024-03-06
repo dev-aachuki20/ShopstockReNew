@@ -188,6 +188,42 @@ aside,
     left: 4px;
 }
 
+/*05-03-2024*/
+.popup_render_div #AddForm .form-group input[type="password"],
+.profile-pass-change .input-group input[type="password"]{
+    padding-right: 34px;
+}
+.password-toggle-icon i,
+.confirm-password-toggle-icon i,
+.pass-toggle-icon i{
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 16px 10px 12px;
+    z-index: 4;
+}
+.order_products_table-design thead th:last-child{
+    min-width: 200px;
+}
+.order_products_table-design .table-for-data tr td:last-child button{
+    background-color: transparent;
+    padding: 0 !important;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    border-radius: 5px;
+}
+.order_products_table-design .table-for-data tr td:last-child button i{
+    color: #284561;
+}
+.order_products_table-design .table-for-data tr td:last-child button:hover i{
+    color: #fff;
+}
+
+
+
+
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {
         flex: 0 0 100%;

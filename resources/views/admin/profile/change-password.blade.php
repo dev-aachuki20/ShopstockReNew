@@ -13,7 +13,7 @@
       <div class="col-12 col-md-12 col-lg-8">
         <div class="card">
           <div class="padding-20">
-            <form method="post" class="needs-validation">
+            <form method="post" class="needs-validation profile-pass-change">
               <div class="card-header">
                 <h4>@lang('quickadmin.qa_reset_password') </h4>
               </div>
@@ -29,7 +29,7 @@
                         </div>
                       </div>
                       <input type="password" value="{{ old('currentpassword') }}" id="currentpassword" class="form-control  @error('currentpassword') is-invalid @enderror" name="currentpassword" tabindex="1" autofocus>
-                      <span class="current-password-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'currentpassword');"></i></span>
+                      <span class="current-password-toggle-icon pass-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'currentpassword');"></i></span>
                       @error('currentpassword')
                       <div class="invalid-feedback">
                         {{ $message }}
@@ -46,7 +46,7 @@
                         </div>
                       </div>
                       <input type="password" value="{{ old('password') }}" id="password" class="form-control  @error('password') is-invalid @enderror" name="password" tabindex="1" autofocus>
-                      <span class="password-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password');"></i></span>
+                      <span class="password-toggle-icon pass-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password');"></i></span>
                       @error('password')
                       <div class="invalid-feedback">
                         {{ $message }}
@@ -63,7 +63,7 @@
                         </div>
                       </div>
                       <input type="password" value="{{ old('password_confirmation') }}" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" tabindex="1" autofocus>
-                      <span class="confirm-password-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password_confirmation');"></i></span>
+                      <span class="confirm-password-toggle-icon pass-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'password_confirmation');"></i></span>
                       @error('password_confirmation')
                       <div class="invalid-feedback">
                         {{ $message }}
