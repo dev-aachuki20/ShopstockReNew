@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-
+use PDF;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Support\Facades\Cache;
 
 class OrdersController extends Controller
 {
@@ -677,5 +680,59 @@ class OrdersController extends Controller
         abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'draft';
         return $dataTable->render('admin.orders.draft', compact('orderType'));
+    }
+
+    public function printPdf($id){
+       // ini_set('max_execution_time', 300);
+       
+        try{
+            if(!is_numeric($id)){
+                $id = decrypt($id);
+            }
+            if (Cache::has('order_invoice_'.$id)){
+                $order = Order::with(['orderPayTransaction' => function ($query) {                    
+                    $query->withTrashed();
+                }])->withTrashed()->findOrFail($id);
+                if(!is_null($order->deleted_at)){
+                    //dd($order);
+                    if (Cache::has('order_invoice_cancel_'.$id)){
+                        return Cache::get('order_invoice_cancel_'.$id);
+                    }else{
+                        $pdfData['title'] = time().'_estimate';
+                        $pdfData['order'] = $order;
+                        
+                        $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');    
+                        $stream = $pdf->stream();
+
+                        Cache::Forever('order_invoice_cancel_'.$id, $stream);
+                        return $stream;
+                    }
+                  
+                }else{
+                    return Cache::get('order_invoice_'.$id); 
+                }
+                
+            }else{         
+                $order = Order::with(['orderPayTransaction' => function ($query) {                    
+                    $query->withTrashed();
+                }])->withTrashed()->findOrFail($id);                    
+                                   
+                $pdfData['title'] = time().'_estimate';
+                $pdfData['order'] = $order;                
+
+                // $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');  
+                           
+                // $stream = $pdf->stream();
+                // Cache::Forever('order_invoice_'.$id,$stream);
+                // return $stream;   
+
+                $pdf= PDF::loadHTML($pdfHtml)->setPaper('a5'); 
+                        $stream = $pdf->stream();
+                        return $stream;
+              
+            }
+        }catch(\Exception $e){
+            return abort(404);
+        }
     }
 }

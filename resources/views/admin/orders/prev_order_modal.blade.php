@@ -72,6 +72,14 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
 @endphp
 
 <div class="panel panel-default">
+
+    <div class="panel-heading order-estimate">
+        
+        {{-- <a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank">
+            <i class="fa fa-print"></i> Print
+        </a> --}}
+    </div>
+
     <div class="panel-body {{ !is_null($order->deleted_at) ? 'cancel-watermark' : '' }} {{ !is_null($isSplit)&& is_null($order->deleted_at) && !is_null($paytdeleted_at) ? 'split-watermark' : '' }}">
         <div class="row">
             <div class="col-xs-12">

@@ -126,6 +126,14 @@ class PaymentTransactionDataTable extends DataTable
         // } else {
         //     $model = $model->orderBy('entry_date', 'asc');
         // }
+        // $this->start_date
+        if($this->startDate !=''){
+            $model->whereDate('created_at','>=',$this->startDate);
+        }
+        if($this->endDate !=''){
+            $model->whereDate('created_at','<=',$this->endDate);
+        }
+
         return $model;
     }
 

@@ -86,6 +86,8 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::post('/add_product_row', [OrdersController::class, 'add_product_row'])->name('add_product_row');
     Route::post('orders/edit-product', [OrdersController::class, 'EditProduct'])->name('orders.editProduct');
 
+    Route::get('orders/print-pdf/{orderid}',[OrdersController::class, 'printPdf'])->name('orders.printPdf');
+
     Route::resource('/transactions', PaymentTransactionsController::class);
     Route::get('transaction/{type}', [PaymentTransactionsController::class, 'typeFilter'])->name('transactions.type');
 

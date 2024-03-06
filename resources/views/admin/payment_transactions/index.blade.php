@@ -9,12 +9,29 @@
 <section class="section roles" style="z-index: unset">
   <div class="section-body">
     <div class="row">
-      <div class="col-12">
+      <div class="col-md-12">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4>
               @lang('quickadmin.transaction.'.$type.'_title')
             </h4>
+          @if($type != 'modified_sales' && $type != 'current_estimate')
+          <div class="col-md-8">
+              <form class="row">
+                <div class="col-md-4 form-group date_main_show">              
+                    <input type="date" class="form-control dateshow" name="start_date" id="start_date" value="{{$_GET['start_date']??''}}" autocomplete="false">
+                </div>
+                <div class="col-md-4 form-group date_main_show">              
+                    <input type="date" class="form-control dateshow" name="end_date" id="end_date"   value="{{$_GET['end_date']??''}}" autocomplete="false">
+                </div>
+                <div class="col-md-2">
+                  <input type="submit" class="btn btn-sm btn-success" value="Submit">
+                </div>
+              </form>
+          </div>
+          @endif
+
+
           </div>
         </div>
         <div class="card-body">
@@ -121,5 +138,6 @@
       });
     });
   });
+
 </script>
 @endsection

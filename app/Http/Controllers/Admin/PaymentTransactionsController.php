@@ -114,6 +114,8 @@ class PaymentTransactionsController extends Controller
 
     public function typeFilter(PaymentTransactionDataTable $dataTable, $type)
     {
-        return $dataTable->with(['type' => $type])->render('admin.payment_transactions.index',compact('type'));
+        $startDate = $_REQUEST['start_date']??'';
+        $endDate = $_REQUEST['end_date']??'';
+        return $dataTable->with(['type' => $type,'startDate'=> $startDate,'endDate'=>$endDate])->render('admin.payment_transactions.index',compact('type'));
     }
 }
