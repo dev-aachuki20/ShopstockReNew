@@ -690,30 +690,30 @@ class OrdersController extends Controller
             if(!is_numeric($id)){
                 $id = decrypt($id);
             }
-            if (Cache::has('order_invoice_'.$id)){
-                $order = Order::with(['orderPayTransaction' => function ($query) {                    
-                    $query->withTrashed();
-                }])->withTrashed()->findOrFail($id);
-                if(!is_null($order->deleted_at)){
-                    //dd($order);
-                    if (Cache::has('order_invoice_cancel_'.$id)){
-                        return Cache::get('order_invoice_cancel_'.$id);
-                    }else{
-                        $pdfData['title'] = time().'_estimate';
-                        $pdfData['order'] = $order;
+            // if (Cache::has('order_invoice_'.$id)){
+            //     $order = Order::with(['orderPayTransaction' => function ($query) {                    
+            //         $query->withTrashed();
+            //     }])->withTrashed()->findOrFail($id);
+            //     if(!is_null($order->deleted_at)){
+            //         //dd($order);
+            //         if (Cache::has('order_invoice_cancel_'.$id)){
+            //             return Cache::get('order_invoice_cancel_'.$id);
+            //         }else{
+            //             $pdfData['title'] = time().'_estimate';
+            //             $pdfData['order'] = $order;
                         
-                        $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');    
-                        $stream = $pdf->stream();
+            //             $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');    
+            //             $stream = $pdf->stream();
 
-                        Cache::Forever('order_invoice_cancel_'.$id, $stream);
-                        return $stream;
-                    }
+            //             Cache::Forever('order_invoice_cancel_'.$id, $stream);
+            //             return $stream;
+            //         }
                   
-                }else{
-                    return Cache::get('order_invoice_'.$id); 
-                }
+            //     }else{
+            //         return Cache::get('order_invoice_'.$id); 
+            //     }
                 
-            }else{         
+            // }else{         
                 $order = Order::with(['orderPayTransaction' => function ($query) {                    
                     $query->withTrashed();
                 }])->withTrashed()->findOrFail($id);                    
@@ -726,9 +726,9 @@ class OrdersController extends Controller
                 $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
                 $mpdf = new Mpdf();
                 $mpdf->WriteHTML($pdfHtml);
-                $mpdf->Output('example.pdf', 'I');
+                $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
               
-            }
+            // }
         }catch(\Exception $e){
             return abort(404);
         }
