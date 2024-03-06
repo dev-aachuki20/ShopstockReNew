@@ -19,8 +19,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use PDF;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+// use Dompdf\Dompdf;
+// use Dompdf\Options;
+use Mpdf\Mpdf;
 use Illuminate\Support\Facades\Cache;
 
 class OrdersController extends Controller
@@ -724,11 +725,19 @@ class OrdersController extends Controller
                            
                 // $stream = $pdf->stream();
                 // Cache::Forever('order_invoice_'.$id,$stream);
-                // return $stream;   
+                // return $stream;  
 
-                $pdf= PDF::loadHTML($pdfHtml)->setPaper('a5'); 
-                        $stream = $pdf->stream();
-                        return $stream;
+
+               // $pdfHtml = "<html><head></head><body><h1>Hello</h1></body></html>" ;
+                // $pdf= PDF::loadHTML($pdfHtml)->setPaper('a5'); 
+                // $stream = $pdf->stream();
+                // return $stream;
+                return view('admin.exports.pdf.order-pdf',compact("pdfData","order"));
+
+                // $pdfHtml = view('admin.exports.pdf.order-pdf', $pdfData)->render();
+                // $mpdf = new Mpdf();
+                // $mpdf->WriteHTML($pdfHtml);
+                // $mpdf->Output('example.pdf', 'I');
               
             }
         }catch(\Exception $e){
