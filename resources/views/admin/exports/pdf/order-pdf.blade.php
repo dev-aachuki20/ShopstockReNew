@@ -159,10 +159,10 @@
         #ItemTable thead th:first-child{
             text-align:center !important;
         }
-        .header{
+        /* .header{
             padding-bottom:0;
             margin-top: -80px;
-        }
+        } */
         .text-align-center{
             text-align:center !important;
         }
@@ -172,20 +172,20 @@
             font-size:16px;
         }
         @page{
-        margin-top: 100px; /* create space for header */
-        margin-bottom: 70px; /* create space for footer */
+        margin-top: 50px; /* create space for header */
+        margin-bottom: 50px; /* create space for footer */
         }
 
-        header{
+        /* header{
         position: fixed; 
         left: 0px;
         right: 0px;
         height: 200px;
-        margin-top: -60px;
+        margin-top: -30px;
         margin-bottom:100px !important;
         padding-bottom: 20px !important;
         z-index: 1000;
-        }
+        } */
 
         footer{
         position: fixed;
@@ -215,40 +215,37 @@
                 <!-- <td style="padding: 40px 0 30px;vertical-align: top;"> -->
                 <td style="vertical-align: top;">
 
-                    <table class="table_head" style="width: 100%;">
+                    <table class="table_head" style="width: 100%;border-spacing: 0;">
                         <tr>
                             <td class="text-center">
-                                    <h2 class="title_hd">Estimate</h2>
+                                <h2 class="title_hd" style="margin-top: 0;">Estimate</h2>
                             </td>
                         </tr>
-                        
-                       <table style="width: 100%; padding-bottom:10px">
-                            <tr>
-                                    <td colspan="2">
-                                          <table style="width: 100%;">
+                        <tr>
+                            <td style="padding-left: 0;padding-right: 0;padding-top: 10px;">
+                                <table style="width: 100%; padding-bottom:10px;border-spacing: 0;">
+                                    <tr>
+                                        <td style="padding-left: 0;padding-right: 0;">
+                                            <table style="width: 100%;border-spacing: 0;">
+                                                <tr><td style="padding-left: 0;padding-right: 0;"><strong>Bill To:</strong></td></tr>
                                                 <tr>
-                                                    <td>
-                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Bill To:</strong></div>
+                                                    <td class="font-italic" style="padding-left: 0;padding-right: 0;">
+                                                        <address>
+                                                            {{ $order->customer->name ??'' }}
+                                                            {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
+                                                            <br>  {{ $order->customer->area->address ?? '' }}
+                                                        </address>
                                                     </td>
-                                                    
-                                                    <td style="width: 150px; float:right;backgound:red; text-align:right" >
-                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Estimate #:</strong> {{ $order->invoice_number }}</div>
-                                                    </td>
-
                                                 </tr>
-
+                                            </table>
+                                        </td>
+                                        <td style="text-align: right;padding-left: 0;padding-right: 0;">
+                                            <table style="width: 100%;border-spacing: 0;">
+                                                <tr><td style="padding-left: 0;padding-right: 0;"><strong>Estimate #:</strong> {{ $order->invoice_number }}</td></tr>
                                                 <tr>
-                                                    <td class="font-italic">
-                                                            <address>
-                                                                {{ $order->customer->name or '' }}
-                                                                {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
-                                                              <br>  {{ $order->customer->area->address ?? '' }}
-                                                            </address>
-                                                    </td>
-
-                                                    <td style="vertical-align: top;">
+                                                    <td style="vertical-align: top;padding-left: 0;padding-right: 0;">
                                                         @php
-                                                       
+                                                        
                                                         $orderType = $order->order_type;
                                                         if($orderType == 'create'){
                                                             $orderType = 'Estimate' ;
@@ -262,15 +259,14 @@
                                                         </address>
                                                     </td>
                                                 </tr>
-                                          </table>
-                                    </td>
-                            </tr>
-                       </table>
-                        
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
                     </table>
                 </td>
-                
-               
             </tr>
         </table>
     </header>
@@ -394,7 +390,7 @@
                     </tr>
                 @endif
                 <tr style="border: 1px solid #000000;">
-                    <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>@lang('quickadmin.order.fields.ground_total')</b></td>
+                    <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>@lang('quickadmin.order.fields.grand_total')</b></td>
                     <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
                 </tr>
             </tfoot>

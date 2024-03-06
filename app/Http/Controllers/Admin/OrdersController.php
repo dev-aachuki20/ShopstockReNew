@@ -718,26 +718,15 @@ class OrdersController extends Controller
                     $query->withTrashed();
                 }])->withTrashed()->findOrFail($id);                    
                                    
-                $pdfData['title'] = time().'_estimate';
+                $pdfData['title'] = $title = time().'_estimate';
                 $pdfData['order'] = $order;                
 
-                // $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');  
-                           
-                // $stream = $pdf->stream();
-                // Cache::Forever('order_invoice_'.$id,$stream);
-                // return $stream;  
+                //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
-
-               // $pdfHtml = "<html><head></head><body><h1>Hello</h1></body></html>" ;
-                // $pdf= PDF::loadHTML($pdfHtml)->setPaper('a5'); 
-                // $stream = $pdf->stream();
-                // return $stream;
-                return view('admin.exports.pdf.order-pdf',compact("pdfData","order"));
-
-                // $pdfHtml = view('admin.exports.pdf.order-pdf', $pdfData)->render();
-                // $mpdf = new Mpdf();
-                // $mpdf->WriteHTML($pdfHtml);
-                // $mpdf->Output('example.pdf', 'I');
+                $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
+                $mpdf = new Mpdf();
+                $mpdf->WriteHTML($pdfHtml);
+                $mpdf->Output('example.pdf', 'I');
               
             }
         }catch(\Exception $e){
