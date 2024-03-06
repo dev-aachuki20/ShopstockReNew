@@ -52,6 +52,18 @@
         transform: translate(-50%, -50%);
         background-repeat: no-repeat;
     }
+    .panel.panel-default{
+        display: inline-block;
+        width: 100%;
+        padding-bottom: 50px;
+    }
+    .panel-body .table tbody tr:not(:last-child) td{
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+    .panel-body .table tr th:last-child,
+    .panel-body .table tr td:last-child{
+        text-align: right !important;
+    }
 
     @media(max-width:400px) {
         .pre-order-content .panel-body.cancel-watermark:after {
@@ -63,7 +75,7 @@
         }
     }
 </style>
-<a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;">
+<a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;padding: 6px 30px;">
 <i class="fa fa-print"></i> Print
 </a>
 @php
@@ -74,12 +86,12 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
 <div class="panel panel-default">
     <div class="panel-body {{ !is_null($order->deleted_at) ? 'cancel-watermark' : '' }} {{ !is_null($isSplit)&& is_null($order->deleted_at) && !is_null($paytdeleted_at) ? 'split-watermark' : '' }}">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-md-12">
                 <div class="invoice-title">
                     <h2>@lang('quickadmin.transaction-management.fields.'.$type)</h2>
                 </div>
-                <div class="row" style="padding-top:30px;">
-                    <div class="col-xs-6">
+                <div class="row" style="padding-top:20px;">
+                    <div class="col-sm-6">
                         <address>
                             <strong>Billed To:</strong><br>
                             {{ $order->customer->name ?? '' }}<br>
@@ -87,7 +99,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                             {{ $order->customer->area->address ?? '' }}
                         </address>
                     </div>
-                    <div class="col-xs-6 text-right">
+                    <div class="col-sm-6 text-sm-right">
                         <address>
                             <strong> @lang('quickadmin.transaction-management.fields.sales') #:</strong> {{ $order->invoice_number }} <br>
                             @php
@@ -109,7 +121,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
 
         <div class="row">
             <div class="col-md-12">
-                <div style="margin-top: 40px;">
+                <div style="margin-top: 20px;">
                     <div class="panel-body">
                         <div class="table-responsive">
                             <table class="table table-condensed">
@@ -129,7 +141,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                     @endphp
                                     @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_at')->get() as $item)
                                     <tr>
-                                        <td class="text-center">{{ ++$sno }}</td>
+                                        <td class="text-left">{{ ++$sno }}</td>
                                         <td>
                                             {{ ucfirst($item->product->name) }}
                                             @if(!is_null($item->is_sub_product))
@@ -265,7 +277,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
     </div>
 </div>
 
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
     <div class="col-md-12"><strong> Created By : {{$order->createdBy->name ?? ""}}</strong></div>
 </div>
 
