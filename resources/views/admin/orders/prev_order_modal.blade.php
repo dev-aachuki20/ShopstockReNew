@@ -88,7 +88,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
         <div class="row">
             <div class="col-md-12">
                 <div class="invoice-title">
-                    <h2>@lang('quickadmin.transaction-management.fields.'.$type)</h2>
+                    <h3>@lang('quickadmin.transaction-management.fields.'.$type)</h3>
                 </div>
                 <div class="row" style="padding-top:20px;">
                     <div class="col-sm-6">
