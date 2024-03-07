@@ -1,6 +1,6 @@
       <div class="col-md-6 form-group">
           {!! Form::label('name', trans('quickadmin.customers.fields.name'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
-          {!! Form::text('name', $customer->name??'', ['class' => 'form-control', 'placeholder' => 'Enter name']) !!}
+          {!! Form::text('name', $customer->name??'', ['class' => 'form-control name_checklist', 'placeholder' => 'Enter name']) !!}
           <div class="error_name text-danger error"></div>
       </div>
 
@@ -26,7 +26,7 @@
       @if(!isset($customer))
       <div class="col-md-6 col-sm-12 col-lg-6 form-group">
           {!! Form::label('opening_blance', trans('quickadmin.customers.fields.opening_blance'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
-          {!! Form::text('opening_blance', $customer->opening_blance ?? '', ['class' => 'form-control only_integer', 'placeholder' => 'Enter opening blance', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
+          {!! Form::text('opening_blance', $customer->opening_blance ?? 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter opening balance', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
           <div class="error_opening_blance text-danger error"></div>
       </div>
       @endif
@@ -69,9 +69,9 @@
 
       <div class="col-md-12">
           @if(isset($customer))
-          <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
+          <input type="button" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
           @else
-          <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+          <input type="button" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
           @endif
       </div>
 
@@ -105,15 +105,51 @@
       @section('customJS')
       <script type="text/javascript">
           $(document).ready(function() {
+            $(document).on('input','.name_checklist',function(){
+                var nameIs = $(this).val();
+                $.ajax({
+                      type: "POST",
+                      url: "{{route('admin.customers.namelist')}}",
+                      data: {name:nameIs},
+                      success: function(data) {
+                          if ($.isEmptyObject(data.error)) {
+                              var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                              var message = data.success;
+                              var title = "Customer";
+                              showToaster(title, alertType, message);
+                              setTimeout(() => {
+                                  window.location.replace("{{route('admin.customers.index')}}");
+                              }, 1500);
+                          } else {
+                              $('.save_btn').prop('disabled', false);
+                              printErrorMsg(data.error);
+                          }
+                      },
+                      error: function(data) {
+                          $('.save_btn').prop('disabled', false);
+                      }
+                  });
+
+            })
+
               //
               $(document).on('change', '#select_all', function() {
                   var isChecked = $(this).prop('checked');
                   $('.selected_product').prop('checked', isChecked);
               });
+              $(document).on('click','.selected_product',function(){
+                    checkboxChecked();                   
+              });
+
+
+
               $(document).on('change', '#is_type', function() {
                   var is_type_selected = $(this).val();
                   if (is_type_selected == "wholesaler") {
                       $('.select_group_list').css('display', 'inline-block');
+                      setTimeout(()=>{
+                        $("#select_all").trigger('click');
+                      },200)
                   } else {
                       $('#select_all').prop('checked', false);
                       $('.selected_product').prop('checked', false);
@@ -121,11 +157,13 @@
                   }
               });
               // 
-
-
               $(document).on('input', '.only_integer', function(evt) {
                   var inputValue = $(this).val();
-                  $(this).val(inputValue.replace(/[^0-9]/g, ''));
+                if(inputValue.length > 10){
+                    $(this).val($(this).val().substring(0, 10));
+                }else{  
+                    $(this).val(inputValue.replace(/[^0-9]/g, ''));
+                }
               });
 
               $.ajaxSetup({
@@ -134,12 +172,13 @@
                   }
               });
 
-              $(document).on('submit', "#customerForm", function(e) {
+            //   $(document).on('submit', "#customerForm", function(e) {
+              $(document).on('click', ".save_btn", function(e) {
 
                   e.preventDefault();
                   $('.error').html('');
-                  var action = $(this).attr('action');
-                  var method = $(this).attr('method');
+                  var action = $("#customerForm").attr('action');
+                  var method = $("#customerForm").attr('method');
                   var formData = new FormData($("#customerForm")[0]);
                   $('.save_btn').prop('disabled', true);
                   formData.append('_method', method);
@@ -183,9 +222,10 @@
                   if (e.key === 'Enter') {
                       if ($('#add_newModal').is(':visible')) {
                           $('.add_unittype_btn').click();
-                      } else {
-                          $('#customerForm').submit();
-                      }
+                      } 
+                    //   else {
+                    //       $('#customerForm').submit();
+                    //   }
                   }
               });
 
@@ -238,5 +278,25 @@
                   $(`.error_new_${key}`).html(value);
               });
           }
+         
+          function checkboxChecked(){
+            var checkValue = "Yes";
+            $(".selected_product").each(function(){
+                if(!$(this).is(":checked")){
+                    checkValue = "No";                       
+                }
+            });
+            if(checkValue == "Yes"){
+                $('#select_all').prop('checked', true);
+            }else{
+                $('#select_all').prop('checked', false);
+            }
+          }
+
+          $(document).ready(function() {
+                setTimeout(()=>{
+                    checkboxChecked();
+                },300);
+        });
       </script>
       @endsection

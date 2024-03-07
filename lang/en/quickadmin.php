@@ -163,7 +163,7 @@ return [
 			'credit_limit'  => 'Credit Limit',
 			'phone_number' 	=> 'Phone Number',
 			'alternate_phone_number' 	=> 'Alternate Phone Number',
-			'opening_blance' => 'Opening Blance',
+			'opening_blance' => 'Opening Balance',
 			'add' 	=> 'Add Party',
 			'edit' => 'Edit Party',
 			'select_address' => 'Select City',

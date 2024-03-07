@@ -3,11 +3,11 @@
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
-<style>
+{{-- <style>
   #select2-parent_id-results{
     margin-top: -34px;
   }
-</style>
+</style> --}}
 @endsection
 @section('main-content')
 
@@ -78,6 +78,9 @@
 
               </div>
             </div>
+            
+          </div>
+          <div class="form-group">
             <label for="naem">Name:</label>
             <input type="hidden" class="group_edit_id">
             <input type="text" class="form-control group_edit_name" id="name" placeholder="Enter name" name="name">
@@ -274,10 +277,24 @@
             data:{parent_id:parent_id},
             success: function(data) {
                 $('.parent_group_list').html(data.html);
-                $('#parent_id').select2();
+                setTimeout(() => {
+                  $('#parent_id').select2({});                  
+                }, 500);
+                // $('#parent_id').select2({}).on('select2:open', function() {
+                //     let a = $(this).data('select2');
+                //     if (!$('.select2-group_add').length) {
+                //         a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+                //     }
+                // });
             }
         });
 }
+
+// $(document).ready(function(){
+//   $(document).on('click','.addNewGroupBtn',function(){
+      
+//   });
+// });
 </script>
 
 @endsection

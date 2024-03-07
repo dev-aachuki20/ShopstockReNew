@@ -76,6 +76,7 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::get('/customer/list', [CustomerController::class, 'customerList'])->name('customer_list');
     Route::get('/customer/view-customer', [CustomerController::class, 'viewCostomer'])->name('customers.view_customer');
     Route::post('/customer/history-filter', [CustomerController::class, 'historyFilter'])->name('customers.historyFilter');
+    Route::post('/customer/name-list', [CustomerController::class, 'getCustomerNameList'])->name('customers.namelist');
 
     Route::get('orders-return', [OrdersController::class, 'returnCreate'])->name('orders.return');
     Route::get('orders/draft-invoice',[OrdersController::class, 'draftInvoice'])->name('orders.draftInvoice');

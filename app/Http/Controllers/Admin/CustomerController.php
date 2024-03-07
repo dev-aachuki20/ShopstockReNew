@@ -64,12 +64,13 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => ['required','string','max:250'], 
-            'phone_number' => ['required','numeric','digits_between:7,15'], 
-            'alternate_phone_number' => ['nullable','numeric','digits_between:7,15'], 
+            'phone_number' => ['required','numeric','digits_between:7,10'], 
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'], 
             'area_id' => ['required','numeric'], 
             'is_type' => ['required','string','max:50'], 
             'opening_blance' => ['required','numeric'],
         ],[
+            'opening_blance.required'=>'The opening balance field is required.',
             'area_id.required' => 'The area address field is required.',
             'is_type.required' => 'The type field is required.',
         ]); 
@@ -174,8 +175,8 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
             'name' => ['required','string','max:250'], 
-            'phone_number' => ['required','numeric','digits_between:7,15'], 
-            'alternate_phone_number' => ['nullable','numeric','digits_between:7,15'], 
+            'phone_number' => ['required','numeric','digits_between:7,10'], 
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'], 
             'area_id' => ['required','numeric'], 
             'is_type' => ['required','string','max:50']
         ]); 
@@ -272,5 +273,9 @@ class CustomerController extends Controller
         }         
         $view = view('admin.customer.payment_history', compact('customer','openingBalance'))->render();       
         return response()->json(array('success' => true,'viewRender' =>$view), 200);
+     }
+
+     public function getCustomerNameList(Request $request){
+            dd($request->all());
      }
 }
