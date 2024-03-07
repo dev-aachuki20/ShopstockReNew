@@ -110,6 +110,9 @@
           $(document).ready(function() {
             $(document).on('input','.name_checklist',function(){
                 var nameIs = $(this).val();
+                    if(nameIs.length < 1){
+                        $('.name_suggestion_list').html('');
+                    }
                 $.ajax({
                       type: "POST",
                       url: "{{route('admin.customers.namelist')}}",
@@ -121,7 +124,7 @@
                         $('.name_suggestion_list').html('');
                       }
                   });
-            })
+            });
 
               //
               $(document).on('change', '#select_all', function() {
