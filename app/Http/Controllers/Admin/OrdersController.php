@@ -690,45 +690,21 @@ class OrdersController extends Controller
             if(!is_numeric($id)){
                 $id = decrypt($id);
             }
-            // if (Cache::has('order_invoice_'.$id)){
-            //     $order = Order::with(['orderPayTransaction' => function ($query) {                    
-            //         $query->withTrashed();
-            //     }])->withTrashed()->findOrFail($id);
-            //     if(!is_null($order->deleted_at)){
-            //         //dd($order);
-            //         if (Cache::has('order_invoice_cancel_'.$id)){
-            //             return Cache::get('order_invoice_cancel_'.$id);
-            //         }else{
-            //             $pdfData['title'] = time().'_estimate';
-            //             $pdfData['order'] = $order;
-                        
-            //             $pdf = PDF::loadView('admin.exports.pdf.order-pdf',$pdfData)->setPaper('a5');    
-            //             $stream = $pdf->stream();
+                    
+            $order = Order::with(['orderPayTransaction' => function ($query) {                    
+                $query->withTrashed();
+            }])->withTrashed()->findOrFail($id);                    
+                                
+            $pdfData['title'] = $title = time().'_estimate';
+            $pdfData['order'] = $order;                
 
-            //             Cache::Forever('order_invoice_cancel_'.$id, $stream);
-            //             return $stream;
-            //         }
-                  
-            //     }else{
-            //         return Cache::get('order_invoice_'.$id); 
-            //     }
-                
-            // }else{         
-                $order = Order::with(['orderPayTransaction' => function ($query) {                    
-                    $query->withTrashed();
-                }])->withTrashed()->findOrFail($id);                    
-                                   
-                $pdfData['title'] = $title = time().'_estimate';
-                $pdfData['order'] = $order;                
+            //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
-                //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
-
-                $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
-                $mpdf = new Mpdf();
-                $mpdf->WriteHTML($pdfHtml);
-                $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
+            $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
+            $mpdf = new Mpdf();
+            $mpdf->WriteHTML($pdfHtml);
+            $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
               
-            // }
         }catch(\Exception $e){
             return abort(404);
         }

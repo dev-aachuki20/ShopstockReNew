@@ -137,6 +137,12 @@
         }
       });
     });
+
+      $(document).on('click',"#select-all",function (e) {
+				var rows = DataaTable.rows({ 'search': 'applied' }).nodes();
+				$('input[type="checkbox"]', rows).prop('checked', this.checked);
+			});
+
   });
 
 </script>

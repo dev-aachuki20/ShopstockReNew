@@ -26,6 +26,10 @@ class PaymentTransactionDataTable extends DataTable
         return datatables()
             ->eloquent($query)
             ->addIndexColumn()
+            // ->editColumn('list_checkbox', function ($row) {
+            //     $listcheckbox = '<input type="checkbox" id="select-checkbox-'.$row->id.'" class="select-checkbox" data-transaction="'.$row->id.'" data-order="'.$row->order_id.'"/>';
+            //     return $listcheckbox;
+            // })
             ->editColumn('entry_date', function ($row) {
                 return date('d-m-Y', strtotime($row->entry_date)) ?? "";
             })
@@ -76,7 +80,7 @@ class PaymentTransactionDataTable extends DataTable
                 }
                 return $action;
             })
-            ->rawColumns(['action']);
+            ->rawColumns(['action','list_checkbox']);
     }
 
     /**
@@ -169,7 +173,8 @@ class PaymentTransactionDataTable extends DataTable
     {
         return [
 
-            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
+             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
+            //Column::make('list_checkbox')->title('<input type="checkbox" id="select-all"  class="select-checkbox" />')->orderable(false)->searchable(false),
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
