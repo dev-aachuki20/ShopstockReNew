@@ -1,7 +1,7 @@
       <div class="col-md-6 form-group ">
           {!! Form::label('name', trans('quickadmin.customers.fields.name'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
         <div class="name_suggestion_main">
-          {!! Form::text('name', $customer->name??'', ['class' => 'form-control name_checklist', 'placeholder' => 'Enter name']) !!}
+          {!! Form::text('name', $customer->name??'', ['class' => 'form-control name_checklist','autocomplete'=>'off','placeholder' => 'Enter name']) !!}
             <div class="name_suggestion_list"></div>
         </div>
           <div class="error_name text-danger error"></div>

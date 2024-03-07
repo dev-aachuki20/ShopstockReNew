@@ -69,8 +69,8 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form id="group_form">
         <div class="modal-body">
+          <form>
           <div class="form-group">
             <div class="parent_group">
               <label>@lang('admin_master.product.group_type')</label>
@@ -86,16 +86,44 @@
             <input type="text" class="form-control group_edit_name" id="name" placeholder="Enter name" name="name">
             <span class="error_name text-danger error"></span>
           </div>
+        </form>
         </div>
         <div class="modal-footer">
           <div class="success_error_message"></div>
-          <button type="submit" class="btn btn-primary save_btn">Save</button>
+          <button type="button" class="btn btn-primary save_btn">Save</button>
         </div>
-        </form>
       </div>
     </div>
   </div>
 <!-- Add Edit Modal -->
+
+
+<!-- Parent Group -->
+<div class="modal fade" id="parentGroupModel" tabindex="-1" role="dialog" aria-labelledby="parentGroupModelTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="parentexampleModalLongTitle">Add</span> Group</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="anme">Name:</label>
+          <input type="text" class="form-control " id="parent_name" placeholder="Enter name" name="name">
+          <span class="error_parent_name text-danger error"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="success_error_message"></div>
+        <button type="button" class="btn btn-primary save_parent">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Parent Group -->
+
 
 @endsection
 
@@ -148,12 +176,12 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
         });
-        $(document).on('keyup', function(e) {
-          if (e.key === 'Enter') {
-            $('#group_form').submit();
-          }
-        });
-          $(document).on('submit', "#group_form", function(e) {
+        // $(document).on('keyup', function(e) {
+        //   if (e.key === 'Enter') {
+        //     $('#group_form').submit();
+        //   }
+        // });
+          $(document).on('click',".save_btn", function(e) {
             e.preventDefault();
             var parent_id = $("#parent_id").val() ?? 0;
             var name = $("#name").val();
@@ -280,21 +308,60 @@
                 setTimeout(() => {
                   $('#parent_id').select2({});                  
                 }, 500);
-                // $('#parent_id').select2({}).on('select2:open', function() {
-                //     let a = $(this).data('select2');
-                //     if (!$('.select2-group_add').length) {
-                //         a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
-                //     }
-                // });
+                $('#parent_id').select2({}).on('select2:open', function() {
+                    let a = $(this).data('select2');
+                    if (!$('.select2-group_add').length) {
+                        a.$results.parents('.select2-results').append('<div class="select2-group_add select_2_add_btn"><button class="btns addNewGroupBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+                    }
+                });
             }
         });
 }
 
-// $(document).ready(function(){
-//   $(document).on('click','.addNewGroupBtn',function(){
-      
-//   });
-// });
+$(document).ready(function(){
+    $(document).on('click','.addNewGroupBtn',function(){
+      $('.save_parent').prop('disabled', false);
+      $("#parentGroupModel").modal('show');
+      $("#parent_id").select2('close');
+      $("#parent_name").val('');
+      $('.error').html('');
+    });
+    $(document).on('click', ".save_parent", function(e) {
+            e.preventDefault();
+            var name = $("#parent_name").val();
+            $('.save_parent').prop('disabled', true);
+            var postType = "POST";
+            var post_url = "{{ route('admin.master.groups.store') }}";
+            $.ajax({
+              type: postType,
+              url: post_url,
+              data: {
+                name: name,
+                add_type: "",
+              },
+              success: function(data) {
+                $('.save_parent').prop('disabled', false);
+                if ($.isEmptyObject(data.error)) {
+                  var newOption = new Option(data.group.name, data.group.id, true, true);
+                  $('#parent_id').append(newOption).trigger('change');
+                   $("#parentGroupModel").modal('hide');
+                    var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+                    var message = data.success;
+                    var title = "Parent Group";
+                    showToaster(title,alertType,message);              
+                } else {
+                  GroupAddprintErrorMsg(data.error);
+                }
+              }
+            });
+          });
+});
+
+function GroupAddprintErrorMsg(msg) {
+      $.each(msg, function(key, value) {
+        $(`.error_parent_name`).html(value);
+      });
+    }
 </script>
 
 @endsection
