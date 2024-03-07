@@ -276,6 +276,15 @@ class CustomerController extends Controller
      }
 
      public function getCustomerNameList(Request $request){
-            dd($request->all());
+            $customerlist =   Customer::withTrashed() ->where('name', 'like', "%{$request->name}%")->get();
+            $html = "";
+            if(count($customerlist) > 0){
+                $html .= "<ul>";
+                foreach($customerlist as $row){
+                    $html .= "<li>".$row->name."</li>";
+                }
+                $html .= "</ul>";
+            }
+            return response()->json(array('success' => true,'viewData' =>$html), 200);
      }
 }

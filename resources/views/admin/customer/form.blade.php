@@ -1,6 +1,9 @@
-      <div class="col-md-6 form-group">
+      <div class="col-md-6 form-group ">
           {!! Form::label('name', trans('quickadmin.customers.fields.name'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
+        <div class="name_suggestion_main">
           {!! Form::text('name', $customer->name??'', ['class' => 'form-control name_checklist', 'placeholder' => 'Enter name']) !!}
+            <div class="name_suggestion_list"></div>
+        </div>
           <div class="error_name text-danger error"></div>
       </div>
 
@@ -112,24 +115,12 @@
                       url: "{{route('admin.customers.namelist')}}",
                       data: {name:nameIs},
                       success: function(data) {
-                          if ($.isEmptyObject(data.error)) {
-                              var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                              var message = data.success;
-                              var title = "Customer";
-                              showToaster(title, alertType, message);
-                              setTimeout(() => {
-                                  window.location.replace("{{route('admin.customers.index')}}");
-                              }, 1500);
-                          } else {
-                              $('.save_btn').prop('disabled', false);
-                              printErrorMsg(data.error);
-                          }
+                        $('.name_suggestion_list').html(data.viewData);
                       },
                       error: function(data) {
-                          $('.save_btn').prop('disabled', false);
+                        $('.name_suggestion_list').html('');
                       }
                   });
-
             })
 
               //
