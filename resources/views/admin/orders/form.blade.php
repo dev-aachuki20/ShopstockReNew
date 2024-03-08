@@ -289,7 +289,7 @@
         <button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft">
             {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
         @endif
-        <button class="btn btn-success btn-lg" type="button" name="submit" value="save">
+        <button class="btn btn-success btn-lg order_form_submit" type="button" name="submit" value="save">
             @if($orderType=='create')
             {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
@@ -306,7 +306,7 @@
 
 
 <!-- Add Edit Modal -->
-<div class="modal fade" id="add_newModal" tabindex="-1" role="dialog" aria-labelledby="add_newModalTitle" aria-hidden="true">
+{{-- <div class="modal fade" id="add_newModal" tabindex="-1" role="dialog" aria-labelledby="add_newModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -328,7 +328,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 <!-- Add Edit Modal -->
 
 <!-- All modals -->
@@ -340,6 +340,7 @@
 $('#productForm').on('keyup keypress', function(e) {
   var keyCode = e.keyCode || e.which;
   if (keyCode === 13) { 
+    $("#add_row").trigger('click');
     e.preventDefault();
     return false;
   }
@@ -1089,17 +1090,8 @@ $('#productForm').on('keyup keypress', function(e) {
             $('input[name=submit]').val($(this).attr('value'));
         });
 
-        // $(document).on('keyup', function(e) {
-        //     if (e.key === 'Enter') {
-        //         if ($('#addGlassProductDetailModal').is(':visible')) {
-        //             $('.glass-item-save').click();
-        //         } else {
-        //             $('#productForm').submit();
-        //         }
-        //     }
-        // });
 
-        $(document).on('submit', '#productForm', function(e) {
+        $(document).on('click', '.order_form_submit', function(e) {
             e.preventDefault();
 
             // var customerCreditAmount = parseFloat($(".customers option:selected").attr('data-credit'));
@@ -1127,9 +1119,9 @@ $('#productForm').on('keyup keypress', function(e) {
                 }
             });
             $.ajax({
-                type: $(this).attr('method'),
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
+                type: $("#productForm").attr('method'),
+                url: $("#productForm").attr('action'),
+                data: $("#productForm").serialize(),
                 dataType: 'json',
                 success: function(response, status, xhr) {
                     // console.log(response);
