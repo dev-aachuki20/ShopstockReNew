@@ -1,3 +1,7 @@
+<style>.modal-header .close {
+    z-index: 0;
+}
+</style>
 <div class="col-md-12">
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
@@ -140,7 +144,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Add <span class="add_new_drop"></span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close model_displaynone">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -514,6 +518,11 @@
         }
     }
     // add new dropdown
+    $(document).ready(function(){
+        $(document).on('click','.model_displaynone',function(){
+           $('#add_newModal').modal('hide');
+        });
+    });
 </script>
 @if($isOrderFrom == "No")
 @endsection
