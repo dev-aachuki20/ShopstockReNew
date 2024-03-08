@@ -138,7 +138,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $groups = Group::where('parent_id', 0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.edit', compact('product_unit', 'groups', 'product'));
+        $isOrderFrom = "No";
+        return view('admin.master.product.edit', compact('product_unit', 'groups', 'product','isOrderFrom'));
     }
 
     /**
