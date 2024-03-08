@@ -10,7 +10,7 @@
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card">
             <div class="card-body">
-            <form action="{{ route('admin.master.products.update',['product'=>$product->id]) }}" method="PUT" id="productForm" name="productForm" enctype="multipart/form-data">
+            <form action="{{ route('admin.master.products.update',['product'=>$product->id]) }}" method="PUT" id="productFormMain" name="productFormMain" enctype="multipart/form-data">
               <div class="row">
                 @include('admin.master.product.form')
               </div>

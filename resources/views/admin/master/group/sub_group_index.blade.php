@@ -60,7 +60,7 @@
   </section>
 
 <!-- Add Edit Modal -->
-  <div class="modal fade" id="groupModal" tabindex="-1" role="dialog" aria-labelledby="groupModalTitle" aria-hidden="true">
+  <div class="modal fade" id="groupModal" role="dialog" aria-labelledby="groupModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">

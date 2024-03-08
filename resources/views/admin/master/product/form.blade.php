@@ -127,9 +127,9 @@
 </div> --}}
 <div class="col-md-12">
     @if(isset($product))
-    <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
+    <input type="button" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
     @else
-    <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
+    <input type="button" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
     @endif
 </div>
 
@@ -160,8 +160,9 @@
 </div>
 <!-- Add Edit Modal -->
 
-
+@if($isOrderFrom == "No")
 @section('customJS')
+@endif
 <script type="text/javascript">
     $(document).ready(function() {
         // $('input.extra_option').change(function() {
@@ -200,18 +201,18 @@
             getSubGroup(ifProductGroupId, ifProductSubGroupId);
         }
         // get sub Group
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Enter') {
-                if ($('#add_newModal').is(':visible')) {
-                    $('#add_new_name').blur();
-                    e.preventDefault();
-                    $(".save_add_new").trigger('click');
-                } else {
-                    $('#productForm').submit();
-                }
-            }
-        });
-        $(document).on('submit', "#productForm", function(e) {
+        // $(document).on('keydown', function(e) {
+        //     if (e.key === 'Enter') {
+        //         if ($('#add_newModal').is(':visible')) {
+        //             $('#add_new_name').blur();
+        //             e.preventDefault();
+        //             $(".save_add_new").trigger('click');
+        //         } else {
+        //             $('#productFormMain').submit();
+        //         }
+        //     }
+        // });
+        $(document).on('click', ".save_btn", function(e) {
             e.preventDefault();
             if (e.keyCode == 13) {
                 return false;
@@ -226,12 +227,11 @@
             } else {
                 $('.error_min_sale_price').html('');
             }
-            var action = $(this).attr('action');
-            var method = $(this).attr('method');
-            var formData = new FormData($("#productForm")[0]);
+            var action = $("#productFormMain").attr('action');
+            var method = $("#productFormMain").attr('method');
+            var formData = new FormData($("#productFormMain")[0]);
             $('.save_btn').prop('disabled', true);
             formData.append('_method', method);
-
             $.ajax({
                 type: "POST",
                 url: action,
@@ -244,9 +244,15 @@
                         var message = data.success;
                         var title = "Group";
                         showToaster(title, alertType, message);
+                        @if($isOrderFrom == "Yes")
+                            $('#AddnewProductModal').modal('hide');
+                            var newOption = new Option(data.product.name, data.product.id, true, true);
+                            $('.products').append(newOption).trigger('change');
+                        @else
                         setTimeout(() => {
                             window.location.replace("{{route('admin.master.products.index')}}");
                         }, 1500);
+                        @endif
                     } else {
                         $('.save_btn').prop('disabled', false);
                         printErrorMsg(data.error);
@@ -377,6 +383,13 @@
             e.preventDefault();
             var name = $("#add_new_name").val();
             var parent_id = parseInt($("#groupList").val());
+            if(!(parent_id > 0)){
+                var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                var message = "Please select Group first";
+                var title = "Sub Group";
+                showToaster(title, alertType, message);
+                return false;
+            }
             if (parent_id > 0) {
                 $('.save_add_new').prop('disabled', true);
                 $.ajax({
@@ -384,7 +397,8 @@
                     url: "{{ route('admin.master.groups.store') }}",
                     data: {
                         name: name,
-                        parent_id: parent_id
+                        parent_id: parent_id,
+                        add_type:"Add Sub"
                     },
                     success: function(data) {
                         $('.save_add_new').prop('disabled', false);
@@ -501,4 +515,6 @@
     }
     // add new dropdown
 </script>
+@if($isOrderFrom == "No")
 @endsection
+@endif

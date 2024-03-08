@@ -56,7 +56,7 @@
     <div class="form-group">
         <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
         <div class="input-group">
-            <select class="form-control select2 products">
+            <select class="form-control select2 products" id="product_list">
                 <option value="">{{trans('admin_master.g_please_select')}}</option>
                 @foreach($products as $productData)
                 <option value="{{$productData->id}}" data-name="{{$productData->name ?? ''}}" data-type="{{$productData->calculation_type}}" data-isSubProduct="{{$productData->is_sub_product}}">{{$productData->name ?? ''}}</option>
@@ -289,7 +289,7 @@
         <button class="btn btn-info btn-lg w-150" type="submit" name="submit" value="draft">
             {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
         @endif
-        <button class="btn btn-success btn-lg" type="submit" name="submit" value="save">
+        <button class="btn btn-success btn-lg" type="button" name="submit" value="save">
             @if($orderType=='create')
             {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
@@ -302,13 +302,7 @@
 </div>
 {{-- end table html --}}
 
-{{-- <div class="col-md-12">
-    @if(isset($product))
-        <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_update')">
-    @else
-        <input type="submit" class="btn btn-primary save_btn" value="@lang('admin_master.g_submit')">
-    @endif
-</div> --}}
+
 
 
 <!-- Add Edit Modal -->
@@ -343,6 +337,13 @@
 @section('customJS')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript">
+$('#productForm').on('keyup keypress', function(e) {
+  var keyCode = e.keyCode || e.which;
+  if (keyCode === 13) { 
+    e.preventDefault();
+    return false;
+  }
+});
     var productDetail = {
         // 'customer':'',
         'product': '',
@@ -1088,15 +1089,15 @@
             $('input[name=submit]').val($(this).attr('value'));
         });
 
-        $(document).on('keyup', function(e) {
-            if (e.key === 'Enter') {
-                if ($('#addGlassProductDetailModal').is(':visible')) {
-                    $('.glass-item-save').click();
-                } else {
-                    $('#productForm').submit();
-                }
-            }
-        });
+        // $(document).on('keyup', function(e) {
+        //     if (e.key === 'Enter') {
+        //         if ($('#addGlassProductDetailModal').is(':visible')) {
+        //             $('.glass-item-save').click();
+        //         } else {
+        //             $('#productForm').submit();
+        //         }
+        //     }
+        // });
 
         $(document).on('submit', '#productForm', function(e) {
             e.preventDefault();
@@ -1590,5 +1591,26 @@
             }
         });
     }
+
+    $(document).ready(function(){
+        $("#product_list").select2({}).on('select2:open', function() {
+            let a = $(this).data('select2');
+            if (!$('.select2-product_add').length) {
+                a.$results.parents('.select2-results').append('<div class="select2-product_add select_2_add_btn"><button class="btns add_new_product get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
+            }
+        });
+        $(document).on('click','.add_new_product',function(){
+            $("#product_list").select2('close');
+            $.ajax({
+            type: "GET",
+            url: "{{ route('admin.get_product_add_form')}}",
+            data: {},
+            success: function(data) {
+                $('#AddnewProductModal').modal('show');
+                $(".view_model_form").html(data.html);
+            }
+            });
+        });
+    });
 </script>
 @endsection

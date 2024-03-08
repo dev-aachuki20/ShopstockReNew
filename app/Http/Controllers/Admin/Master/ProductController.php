@@ -39,12 +39,20 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $product_unit = ProductUnit::all()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $groups = Group::where('parent_id', 0)->get()->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
-        return view('admin.master.product.create', compact('groups', 'product_unit'));
+        $isOrderFrom = "No";
+        if($request->ajax()){
+            $isOrderFrom = "Yes";
+            $html = view('admin.master.product.form', compact('groups', 'product_unit','isOrderFrom'))->render();
+            return response()->json(['html' => $html]);
+        }else{
+            return view('admin.master.product.create', compact('groups', 'product_unit','isOrderFrom'));
+        }
+        
     }
 
     /**
@@ -104,7 +112,7 @@ class ProductController extends Controller
         }
         $product =  Product::create($data);
         addToLog($request, 'Product', 'Create', $product);
-        return response()->json(['success' => 'Product Created successfully.']);
+        return response()->json(['success' => 'Product Created successfully.', 'product' => $product]);
     }
 
     /**

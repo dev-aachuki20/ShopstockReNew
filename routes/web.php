@@ -72,6 +72,9 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
         //Route::resource('/split', SplitsController::class);
         Route::resource('/role_ip', RoleIpController::class);
     });
+
+    Route::get('/get_product_add_form', [ProductController::class, 'create'])->name('get_product_add_form');
+
     Route::resource('/customers', CustomerController::class);
     Route::get('/customer/list', [CustomerController::class, 'customerList'])->name('customer_list');
     Route::get('/customer/view-customer', [CustomerController::class, 'viewCostomer'])->name('customers.view_customer');
