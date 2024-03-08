@@ -340,7 +340,9 @@
 $('#productForm').on('keyup keypress', function(e) {
   var keyCode = e.keyCode || e.which;
   if (keyCode === 13) { 
-    $("#add_row").trigger('click');
+    if(!$('.select2').hasClass('select2-container--open')){
+        $("#add_row").trigger('click');
+    }
     e.preventDefault();
     return false;
   }
