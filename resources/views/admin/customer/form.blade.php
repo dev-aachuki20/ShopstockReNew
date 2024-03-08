@@ -112,6 +112,7 @@
                 var nameIs = $(this).val();
                     if(nameIs.length < 1){
                         $('.name_suggestion_list').html('');
+                        return false;
                     }
                 $.ajax({
                       type: "POST",
