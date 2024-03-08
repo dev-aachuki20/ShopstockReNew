@@ -152,8 +152,9 @@ aside,
     padding-right: 15px;
 }
 #addGlassProductDetailModal .modal-body .deleteGlassRow {
-    background-color: #db5102 !important;
+    background-color: #ce2222 !important;
     color: #fff;
+    padding: 3px 25px !important;
 }
 .sub_product_div .form-control {
     transition: inherit;
@@ -295,6 +296,130 @@ aside,
     display: block;
 }
 
+/*08-03-2024*/
+.swal2-container .swal2-title{
+    padding: 14px 10px;
+    background-color: #062142;
+    font-size: 20px;
+    color: #fff;
+    font-weight: 500;
+    border-radius: 5px 5px 0 0;
+}
+.swal2-container .swal2-input-label{
+    display: block;
+    text-align: left;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: 100%;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: capitalize;
+    color: #062142;
+}
+.swal2-container .swal2-textarea{
+    margin-top: 10px;
+    border: 1px solid #d9d9d9;
+}
+.swal2-container .swal2-textarea:focus{
+    box-shadow: none;
+    border-color: #d9d9d9;
+}
+.swal2-container .swal2-actions{
+    width: 100%;
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    padding-right: 2rem;
+}
+.swal2-container .swal2-actions>button{
+    min-width: 100px;
+    text-align: center;
+}
+.swal2-container .swal2-actions .swal2-confirm,
+#addGlassProductDetailModal .modal-footer .glass-item-save{
+    background-color: #db5102;
+    border-color: transparent !important;
+    color: #fff;
+}
+
+#addGlassProductDetailModal .modal-header{
+    padding: 15px;
+    background-color: #062142;
+}
+#addGlassProductDetailModal .modal-header .modal-title{
+    font-size: 20px;
+    color: #fff;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+#addGlassProductDetailModal .modal-header .close{
+    background-color: #384657;
+    padding: 0 !important;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    -webkit-flex: 0 0 36px;
+}
+#addGlassProductDetailModal .modal-header .close>span{
+    font-size: 26px;
+    color: #fff;
+    transform: translateY(-2px);
+    -webkit-transform: translateY(-2px);
+}
+#addGlassProductDetailModal .addGlassRow{
+    line-height: 22px;
+    padding: 6px 10px !important;
+}
+#addGlassProductDetailModal .addGlassRow:hover,
+#addGlassProductDetailModal .addGlassRow:focus{
+    background-color: #23a574 !important;
+    border-color: #23a574 !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+}
+#addGlassProductDetailModal .addGlassRow i{
+    font-size: 14px;
+}
+#addGlassProductDetailModal .glass-product-item .form-group>label{
+    margin-bottom: 7px;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: capitalize;
+}
+#addGlassProductDetailModal .glass-product-item .form-group>input{
+    line-height: 22px;
+    height: auto;
+}
+#addGlassProductDetailModal .glass-product-item>.row+.row{
+    position: relative;
+}
+#addGlassProductDetailModal .glass-product-item>.row+.row:before{
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: -15px;
+    width: calc(100% - 30px);
+    height: 1px;
+    background-color: #ebebeb;
+}
+#addGlassProductDetailModal .glass-product-item>.row:last-child .form-group{
+    margin-bottom: 0;
+}
+#addGlassProductDetailModal .modal-footer .btn-secondary{
+    border-radius: 0.25em;
+    background: initial;
+    background-color: #6e7881;
+    color: #fff;
+    border: none;
+}
+#addGlassProductDetailModal .modal-footer .glass-item-save:hover,
+#addGlassProductDetailModal .modal-footer .glass-item-save:focus{
+    background-color: #db5102 !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+}
+#addGlassProductDetailModal .modal-footer .btn-secondary:hover,
+#addGlassProductDetailModal .modal-footer .btn-secondary:focus{
+    background-color: #6e7881 !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {
