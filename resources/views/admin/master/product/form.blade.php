@@ -521,6 +521,11 @@
     $(document).ready(function(){
         $(document).on('click','.model_displaynone',function(){
            $('#add_newModal').modal('hide');
+           if($("#AddnewProductModal").hasClass('show')){
+                setTimeout(()=>{
+                    $('body').addClass('modal-open');
+                },300)
+           }
         });
     });
 </script>
