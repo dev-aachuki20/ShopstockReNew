@@ -287,6 +287,8 @@ aside,
     margin: 0;
     opacity: 0;
     visibility: hidden;
+    max-height: 200px;
+    overflow-y: auto;
 }
 .name_suggestion_main input:focus + .name_suggestion_list ul{
     opacity: 1;
@@ -294,6 +296,10 @@ aside,
 }
 .name_suggestion_main .name_suggestion_list ul li{
     display: block;
+}
+
+.modal{
+    height: calc(100% - 100px);
 }
 
 /*08-03-2024*/
