@@ -364,6 +364,7 @@ if (!function_exists('getNewInvoiceNumber')) {
 if (!function_exists('removeTrailingZeros')) {
     function removeTrailingZeros($number): string
     {
+        $number = floatval($number);
         $number = number_format($number, 2);
         $number_string = strval($number);
 

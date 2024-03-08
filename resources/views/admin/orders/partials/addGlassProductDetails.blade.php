@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="col-xs-1 col-lg-3 col-md-1  col-sm-1 mt-10" style="margin-top: 27px;">
+    <div class="col-xs-1 col-lg-3 col-md-1  col-sm-1 mt-10" style="margin-top: 25px;">
         <div class="form-group">
             <button type="button" class="deleteGlassRow pull-right btn btn-danger">
                 <i class="fa fa-minus"></i>

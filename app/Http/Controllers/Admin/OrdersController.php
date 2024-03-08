@@ -12,6 +12,7 @@ use App\Http\Requests\Order\UpdateOrdersRequest;
 use App\Models\PaymentTransaction;
 use App\Models\Product;
 use App\Models\OrderProduct;
+use App\Models\CustomerGroup;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -219,8 +220,11 @@ class OrdersController extends Controller
             $rowData['retailer_price']   = ($customer->is_type == 'retailer') ? $product->product->retailer_price : 0.00;
             $rowData['wholesaler_price'] = ($customer->is_type == 'wholesaler') ? $product->product->wholesaler_price : 0.00;
             $WSP = 0.00;
+
+
+            $customerGroup = CustomerGroup::where('customer_id',$request->customer_id)->get()->pluck('group_id')->toArray();
             if (isset($product)) {
-                if ($customer->is_type == 'wholesaler' && $customer->group && $customer->group->group_id == $product->product->group_id) {
+                if ($customer->is_type == 'wholesaler' && $customer->group && in_array($product->group_id, $customerGroup)) {
                     $WSP = $product->product->wholesaler_price ?? 0.00;
                     $priceName = 'WSP';
                 } else if ($customer->is_type == 'retailer' || $customer->is_type == 'wholesaler') {
@@ -490,8 +494,13 @@ class OrdersController extends Controller
             /* if (isset($last_order_price) && $last_order_price != 0) {
                 $price = $last_order_price;
             } else */
+            
+
+
+
+            $customerGroup = CustomerGroup::where('customer_id',$request->customer_id)->get()->pluck('group_id')->toArray();
             if (isset($product)) {
-                if ($customer->is_type == 'wholesaler' && $customer->group && $customer->group->group_id == $product->group_id) {
+                if ($customer->is_type == 'wholesaler' && $customer->group && in_array($product->group_id, $customerGroup)) {
                     $price = $product->wholesaler_price ?? 0.00;
                     $priceName = 'WSP';
                 } else if ($customer->is_type == 'retailer' || $customer->is_type == 'wholesaler') {
