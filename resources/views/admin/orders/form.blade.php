@@ -75,7 +75,7 @@
             {{-- <label>Product Price:<span class="purchase-price"> 777</span></label> --}}
             <label>MSP:<span class="min-sale-price"> 555</span></label>
             <label><span class="price-name">WSP</span>:<span class="whole-sale-price"> 333</span></label>
-            <label><a href="javascript:void(0)" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price price_per_fee"> 555</span></a></label>
+            <label><a href="javascript:void(0)" class="price_per_fee" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a></label>
         </p>
     </div>
 </div>
