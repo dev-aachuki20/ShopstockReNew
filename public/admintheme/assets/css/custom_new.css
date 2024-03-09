@@ -430,6 +430,12 @@ aside,
 .delete_row_block{
     margin-top: 25px;
 }
+.price_per_fee{
+    cursor: default;
+}
+.price_per_fee:hover{
+    text-decoration: none;
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {
