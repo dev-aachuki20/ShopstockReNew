@@ -427,6 +427,10 @@ aside,
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
 }
 
+.delete_row_block{
+    margin-top: 25px;
+}
+
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     .product-detail {
         flex: 0 0 100%;
@@ -460,5 +464,18 @@ aside,
     #products_table .row > div:nth-child(3) {
         flex: 0 0 14%;
         max-width: 14%;
+    }
+}
+
+@media screen and (max-width: 575px){
+    #addGlassProductDetailModal .glass-product-item>.row .form-group,
+    #addGlassProductDetailModal .glass-product-item>.row:last-child .form-group{
+        margin-bottom: 10px;
+    }
+    .delete_row_block {
+        margin-top: 5px;
+    }
+    #addGlassProductDetailModal .glass-product-item>.row+.row{
+        margin-top: 36px;
     }
 }
