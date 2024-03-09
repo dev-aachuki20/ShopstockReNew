@@ -469,7 +469,10 @@
         });
 
         @if(isset($product))
-        calculationProcess('{{$product->calculation_type}}', 'edit');
+            calculationProcess('{{$product->calculation_type}}', 'edit');
+            setTimeout(()=>{
+                $('#extra_option_hint').val("{{$product->extra_option_hint??''}}");
+            },300);
         @endif
 
     });
