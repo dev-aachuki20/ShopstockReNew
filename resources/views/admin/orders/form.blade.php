@@ -1160,6 +1160,11 @@ $('#productForm').on('keyup keypress', function(e) {
                 error: function(response) {
                     // console.log(response);
                     var errorArray = response.responseJSON.errors;
+                        var alertType = "{{ trans('quickadmin.alert-type.error') }}";
+                        var message = response?.responseJSON?.message;
+                        var title = "Error";
+                        showToaster(title, alertType, message);
+
                     $.each(errorArray, function(index, item) {
                         // console.log(index, item);
                         $('.error_' + index).html(item);
@@ -1217,7 +1222,7 @@ $('#productForm').on('keyup keypress', function(e) {
         });
 
         //Start to edit product row
-        $(document).on('click', '.editRow', function(e) {
+        $(document).on('click','.editRow', function(e) {
             e.preventDefault();
 
             var customer_id = $(".customers option:selected").val();

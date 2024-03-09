@@ -251,6 +251,9 @@
                         @if($isOrderFrom == "Yes")
                             $('#AddnewProductModal').modal('hide');
                             var newOption = new Option(data.product.name, data.product.id, true, true);
+                            newOption.setAttribute('data-name', data?.product?.name);
+                            newOption.setAttribute('data-type', data?.product?.calculation_type);
+                            newOption.setAttribute('data-isSubProduct', data?.product?.is_sub_product);
                             $('.products').append(newOption).trigger('change');
                         @else
                         setTimeout(() => {
