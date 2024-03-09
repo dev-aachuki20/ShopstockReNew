@@ -370,7 +370,7 @@
                                 }
                             }
                             if(!is_null($item->quantity)){
-                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->unit_type).' ';
+                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
                             }
                         @endphp
 
