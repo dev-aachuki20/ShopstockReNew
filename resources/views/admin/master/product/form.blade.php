@@ -94,7 +94,7 @@
         <label class="form-check-label height position-relative">
         <input class="form-check-input extra_option height" name="is_height" type="checkbox" id="is_height" value="1" {{(($product->is_height??'') == 1)?'checked':''}} readonly>@lang('admin_master.g_height')</label>
 
-        <label class="form-check-label pl-5 width position-relative">
+        <label class="form-check-label ml-5 width position-relative">
         <input class="form-check-input extra_option width" name="is_width" type="checkbox" id="is_width" value="1" {{(($product->is_width??'') == 1)?'checked':''}} readonly>@lang('admin_master.g_width')</label>
 
         {{--<label class="form-check-label pl-5" for="is_length">
