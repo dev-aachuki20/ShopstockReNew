@@ -26,7 +26,7 @@
             </tr>
             @if($customer->is_type =="wholesaler")
             <tr>
-                <th>Grops</th>
+                <th>Groups</th>
                 <td >
                     @foreach($customerGroup as $row)
                             {{$row->group->name??''}}@if (!$loop->last),@endif

@@ -70,7 +70,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form>
+          {{-- <form> --}}
           <div class="form-group">
             <div class="parent_group">
               <label>@lang('admin_master.product.group_type')</label>
@@ -86,7 +86,7 @@
             <input type="text" class="form-control group_edit_name" id="name" placeholder="Enter name" name="name">
             <span class="error_name text-danger error"></span>
           </div>
-        </form>
+        {{-- </form> --}}
         </div>
         <div class="modal-footer">
           <div class="success_error_message"></div>
