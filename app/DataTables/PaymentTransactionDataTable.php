@@ -58,10 +58,21 @@ class PaymentTransactionDataTable extends DataTable
 
                 // }
                 // if (Gate::check('product_edit')) {
+                $typeAction = $this->type;
+                $today = now()->format('Y-m-d');
+                $date_created = $row->created_at->format('Y-m-d');
+
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                 if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
                     if (Gate::check('estimate_edit') && $this->type != 'cancelled') {
-                        $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                       // sales me only edit and delete show only when order is created at today
+                        if($typeAction == "sales"){
+                            if($today == $date_created){
+                                 $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                            }
+                        }else{
+                            $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                        }
                     }
                     if (Gate::check('estimate_access')) {
                         $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
@@ -76,7 +87,13 @@ class PaymentTransactionDataTable extends DataTable
                 }
                 $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                 if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
-                    $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                    if($typeAction == "sales"){
+                        if($today == $date_created){
+                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                        }
+                    }else{
+                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                    }
                 }
                 return $action;
             })

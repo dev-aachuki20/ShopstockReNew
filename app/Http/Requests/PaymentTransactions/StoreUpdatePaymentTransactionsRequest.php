@@ -25,7 +25,7 @@ class StoreUpdatePaymentTransactionsRequest extends FormRequest
         return [
             'customer_id'   => 'required|exists:customers,id',
             'payment_way'   => 'required|in:by_cash,by_check,by_account',
-            'extra_details' => 'required_unless:payment_way,by_cash',
+           // 'extra_details' => 'required_unless:payment_way,by_cash',
             'amount'        => 'required|regex:/^\d+(\.\d{1,4})?$/',
             'entry_date'    => 'required',
         ];
@@ -39,7 +39,7 @@ class StoreUpdatePaymentTransactionsRequest extends FormRequest
     public function message()
     {
         return [
-            'extra_details.required_unless'  => 'The check/account number field is required, if payment mode is in by check or by account.',
+            //'extra_details.required_unless'  => 'The check/account number field is required, if payment mode is in by check or by account.',
         ];
     }
 

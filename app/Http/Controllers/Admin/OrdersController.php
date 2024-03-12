@@ -137,10 +137,12 @@ class OrdersController extends Controller
                 ]);
             }
         }
+       $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
         if ($order->order_type == 'return') {
             return response()->json([
                 'success' => true,
                 'message'     => 'Successfully created!',
+                'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
                 // 'printPdfUrl' => route('admin.orders.printPdf', encrypt($order->id)),
                 'redirectUrl' => route('admin.orders.return'),
             ], 200);
@@ -149,6 +151,7 @@ class OrdersController extends Controller
         return response()->json([
             'success' => true,
             'message'     => 'Successfully created!',
+            'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
             // 'printPdfUrl' => route('admin.orders.printPdf',encrypt($order->id)),
             'redirectUrl' => route('admin.orders.create'),
         ], 200);

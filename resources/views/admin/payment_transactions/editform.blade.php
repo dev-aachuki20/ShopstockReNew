@@ -108,11 +108,11 @@
         $("select.payment_mode").change(function(e){
             var payment_mode = $(".payment_mode option:selected").val();
             if (payment_mode !='' && payment_mode != 'by_cash') {
-                $("#extra_details").prop('required',true);
+               // $("#extra_details").prop('required',true);
                 $('.extra_detail_row').show('slow');
             }else{
                 $("#extra_details").val('');
-                $("#extra_details").prop('required',false);
+                //$("#extra_details").prop('required',false);
                 $('.extra_detail_row').hide('slow');
             }
         });

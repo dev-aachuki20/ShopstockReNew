@@ -284,12 +284,12 @@
     </div>
     <div class="text-right order_create order_create_btnarea">
         <input type="hidden" name="submit" value="">
-        @if($orderType=='create')<button class="btn btn-info btn-lg w-150 order_form_submit" type="button" name="submit" value="draft" disabled="">Save as Draft</button>@endif
+        @if($orderType=='create')<button class="btn btn-info btn-lg w-150 order_form_submit save_as_draft_btn" data-checktype_is="save_as_draft_btn"; type="button" name="submit" value="draft" disabled="">Save as Draft</button>@endif
         @if($orderType=='edit')
-        <button class="btn btn-info btn-lg w-150 order_form_submit" type="button" name="submit" value="draft">
+        <button class="btn btn-info btn-lg w-150 order_form_submit save_draft_btn" data-checktype_is="save_draft_btn"; type="button" name="submit" value="draft">
             {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
         @endif
-        <button class="btn btn-success btn-lg order_form_submit" type="button" name="submit" value="save">
+        <button class="btn btn-success btn-lg order_form_submit save_estimate_btn" data-checktype_is="save_estimate_btn"; type="button" name="submit" value="save">
             @if($orderType=='create')
             {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
@@ -440,12 +440,17 @@ $('#productForm').on('keyup keypress', function(e) {
                     },
                     success: function(response) {
                         productCost['response'] = response;
-
                         if (response.status) {
                             $('.product-detail').html(response.data);
-
                             var products_table = $('#products_table');
-
+                            setTimeout(() => {
+                                if($("#glassProductBtn").hasClass('glassProductBtn')){
+                                    console.log('yes');
+                                    $("#product_quantity").attr("readonly",true);
+                                }else{
+                                    $("#product_quantity").attr("readonly",false);
+                                }
+                            }, 300);
                             var minPrePrice = 0;
                             if (response.rowData.last_order_price != 0) {
                                 minPrePrice = response.rowData.last_order_price;
@@ -1112,7 +1117,8 @@ $('#productForm').on('keyup keypress', function(e) {
 
         $(document).on('click', '.order_form_submit', function(e) {
             e.preventDefault();
-
+            $(this).prop('disabled', true);
+            var getTypeSave = $(this).data('checktype_is');
             // var customerCreditAmount = parseFloat($(".customers option:selected").attr('data-credit'));
             // var customerDebitAmount  = parseFloat($(".customers option:selected").attr('data-debit'));
             // var customerCreditLimit  = parseFloat($(".customers option:selected").attr('data-limit'));
@@ -1144,9 +1150,10 @@ $('#productForm').on('keyup keypress', function(e) {
                 dataType: 'json',
                 success: function(response, status, xhr) {
                     // console.log(response);
+                    $(`.${getTypeSave}`).prop('disabled', false);
                     if (response.success) {
                         Swal.fire(
-                            'Success!',
+                            response.invoiceNumber,
                             response.message,
                             'success'
                         ).then(function() {
@@ -1159,6 +1166,7 @@ $('#productForm').on('keyup keypress', function(e) {
                 },
                 error: function(response) {
                     // console.log(response);
+                    $(`.${getTypeSave}`).prop('disabled', false);
                     var errorArray = response.responseJSON.errors;
                         var alertType = "{{ trans('quickadmin.alert-type.error') }}";
                         var message = response?.responseJSON?.message;
@@ -1178,7 +1186,7 @@ $('#productForm').on('keyup keypress', function(e) {
         });
 
         $(document).on('input', '#product_quantity,.update_price,.price', function(e) {
-
+                console.log('yes yes yes');
             if ($(this).hasClass('price')) {
                 var priceVal = $(this).val();
 
@@ -1616,13 +1624,19 @@ $('#productForm').on('keyup keypress', function(e) {
             }
         });
         $(document).on('click','.add_new_product',function(){
+            $(".view_model_form").html('');
+            var jsAlredyUseOrder = "";
+            if($('#order_create_time_js').hasClass('js_alredy_added')){
+                jsAlredyUseOrder = "Yes";
+            }
             $("#product_list").select2('close');
             $.ajax({
             type: "GET",
             url: "{{ route('admin.get_product_add_form')}}",
-            data: {},
+            data: {jsAlredyUseOrder:jsAlredyUseOrder},
             success: function(data) {
                 $('#AddnewProductModal').modal('show');
+                $("#order_create_time_js").addClass('js_alredy_added');
                 $(".view_model_form").html(data.html);
             }
             });

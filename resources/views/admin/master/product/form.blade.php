@@ -191,13 +191,15 @@
         });
 
         // get sub Group
-        $(document).on('change', '#groupList', function() {
-            var group_list_id = $(this).val();
-            if (group_list_id > 0) {
-                $('#sub_group_list').prop('disabled', true);
-                getSubGroup(group_list_id);
-            }
-        });
+        @if(($jsAlredyUseOrder ??"") == "")
+            $(document).on('change', '#groupList', function() {
+                var group_list_id = $(this).val();
+                if (group_list_id > 0) {
+                    $('#sub_group_list').prop('disabled', true);
+                    getSubGroup(group_list_id);
+                }
+            });
+        @endif
         var ifProductGroupId = "{{$product->group_id??''}}";
         var ifProductSubGroupId = "{{$product->sub_group_id??''}}";
         if (ifProductGroupId && ifProductSubGroupId) {
@@ -216,6 +218,7 @@
         //         }
         //     }
         // });
+        @if(($jsAlredyUseOrder ??"") == "")
         $(document).on('click', ".save_btn", function(e) {
             e.preventDefault();
             if (e.keyCode == 13) {
@@ -270,6 +273,7 @@
                 }
             });
         });
+        @endif
     })
 
     function printErrorMsg(msg) {
@@ -335,6 +339,8 @@
             a.$results.parents('.select2-results').append('<div class="select2-unit_type_add select_2_add_btn"><button class="btns addNewUnitTypeBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
         }
     });
+
+@if(($jsAlredyUseOrder ??"") == "")
     $(document).ready(function() {
         $(document).on('click', ".addNewgroupBtn", function() {
             $("#add_new_name").val('');
@@ -347,7 +353,8 @@
             $(".save_add_new").removeClass('add_sub_group_btn');
             $(".save_add_new").addClass('add_group_btn');
         });
-        $(document).on('click', '.add_group_btn', function(e) {
+        
+        $(document).on('click','.add_group_btn', function(e) {
             e.preventDefault();
             var name = $("#add_new_name").val();
             $('.save_add_new').prop('disabled', true);
@@ -534,6 +541,7 @@
            }
         });
     });
+    @endif
 </script>
 @if($isOrderFrom == "No")
 @endsection

@@ -47,7 +47,8 @@ class ProductController extends Controller
         $isOrderFrom = "No";
         if($request->ajax()){
             $isOrderFrom = "Yes";
-            $html = view('admin.master.product.form', compact('groups', 'product_unit','isOrderFrom'))->render();
+            $jsAlredyUseOrder = $request->jsAlredyUseOrder;
+            $html = view('admin.master.product.form', compact('groups', 'product_unit','isOrderFrom','jsAlredyUseOrder'))->render();
             return response()->json(['html' => $html]);
         }else{
             return view('admin.master.product.create', compact('groups', 'product_unit','isOrderFrom'));

@@ -114,6 +114,9 @@ class PaymentTransactionsController extends Controller
 
     public function typeFilter(PaymentTransactionDataTable $dataTable, $type)
     {
+        if($type == "current_estimate"){
+            return redirect()->route('admin.transactions.type',['sales']);
+        }
         $startDate = $_REQUEST['start_date']??'';
         $endDate = $_REQUEST['end_date']??'';
         return $dataTable->with(['type' => $type,'startDate'=> $startDate,'endDate'=>$endDate])->render('admin.payment_transactions.index',compact('type'));

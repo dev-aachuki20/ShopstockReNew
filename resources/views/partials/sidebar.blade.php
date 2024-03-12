@@ -72,11 +72,11 @@
         </a>
         <ul class="dropdown-menu">
             @can('estimate_access')
-            <li class="{{ Request::is('admin/transaction/current_estimate') ? 'active' : '' }}">
+            {{-- <li class="{{ Request::is('admin/transaction/current_estimate') ? 'active' : '' }}">
                 <a href="{{ route('admin.transactions.type',['current_estimate']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.current_estimate')</span>
                 </a>
-            </li>
+            </li> --}}
             <li class="{{ Request::is('admin/transaction/sales') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.transactions.type',['sales']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.sales')</span>

@@ -22,9 +22,7 @@
                       <div class="card">
                         <div class="card-body">
                         <form action="{{ route('admin.master.products.store') }}"  id="productFormMain" method="POST"  name="productForm" enctype="multipart/form-data">
-                            <div class="row view_model_form">
-
-                            </div>
+                            <div class="row view_model_form" id="order_create_time_js"></div>
                         </form>
                     </div>
                   </div>
