@@ -2,6 +2,11 @@
 @section('title')@lang('quickadmin.transaction-management.fields.new_case_reciept') @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
+<style>
+  .select2-results {
+  padding-top: 0px !important;
+}
+</style>
 @endsection
 @section('main-content')
 <section class="section">

@@ -1,55 +1,47 @@
 <div class="panel panel-default col-md-12">
-    <div class="panel-body col-md-12">
+    <div class="panel-body row col-md-12">
 
-        <div class="row">
-            <div class="col-md-6 form-group">
+            <div class="col-md-4 form-group">
                 {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
                 {!! Form::select('customer_id', $customers, $transaction->customer_id??'', ['class' => 'form-control select2', 'required' => '']) !!}
                 <div class="error_customer_id text-danger error"></div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
+            <div class="col-md-4 form-group">
                 {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
                 {!! Form::hidden('payment_type','debit') !!}
                 {!! Form::select('payment_way', $paymentWays, $transaction->payment_way??'', ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
                 <div class="error_payment_way text-danger error"></div>
             </div>
-        </div>
 
 
-        <div class="row extra_detail_row" style="display: {{ (($transaction->payment_way??'') != '' && ($transaction->payment_way??'') !='by_cash') ?'block':'none' }}">
-            <div class="col-md-6 form-group">
-                {!! Form::label('extra_details', trans('quickadmin.transaction.fields.check_account').'*', ['class' => 'extra_detail_label control-label']) !!}
+        <div class="col-md-4 extra_detail_row" style="display: {{ (($transaction->payment_way??'') != '' && ($transaction->payment_way??'') !='by_cash') ?'block':'none' }}">
+            <div class=" form-group">
+                {!! Form::label('extra_details', trans('quickadmin.transaction.fields.check_account'), ['class' => 'extra_detail_label control-label']) !!}
                 {!! Form::text('extra_details', $transaction->extra_details??'', ['id' => 'extra_details','class' => 'form-control', 'placeholder' => '']) !!}
                 <div class="error_extra_details text-danger error"></div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
-                {!! Form::label('remark', trans('quickadmin.transaction.fields.remark'), ['class' => 'control-label']) !!}
-                {!! Form::text('remark', $transaction->remark??'', ['class' => 'form-control', 'placeholder' => '']) !!}
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('remark', trans('quickadmin.transaction.fields.remark'), ['class' => 'control-label']) !!}
+            {!! Form::text('remark', $transaction->remark??'', ['class' => 'form-control', 'placeholder' => '']) !!}
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
-                {!! Form::label('amount', trans('quickadmin.transaction.fields.amount').'*', ['class' => 'control-label']) !!}
-                <input type="number" value="{{ $transaction->amount??''}}" class="form-control" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min="0" step=".01" autocomplete="off" name="amount" id="amount">
-                <div class="error_amount text-danger error"></div>
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('amount', trans('quickadmin.transaction.fields.amount').'*', ['class' => 'control-label']) !!}
+            <input type="number" value="{{ $transaction->amount??''}}" class="form-control" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min="0" step=".01" autocomplete="off" name="amount" id="amount">
+            <div class="error_amount text-danger error"></div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group date_main_show">
-                {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}
-                <input type="date" class="form-control" name="entry_date" value="{{ $transaction->entry_date??"" }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
-                <div class="error_entry_date text-danger error"></div>
-            </div>
+        <div class="col-md-4 form-group date_main_show">
+            {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}
+            <input type="date" class="form-control" name="entry_date" value="{{ $transaction->entry_date??"" }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+            <div class="error_entry_date text-danger error"></div>
         </div>
-        {!! Form::submit(trans('quickadmin.qa_save'), ['class' => 'btn btn-lg btn-success cashReceiptSubmitBtn']) !!}
+        <div class="col-md-12">
+            {!! Form::submit(trans('quickadmin.qa_save'), ['class' => 'btn btn-lg btn-success cashReceiptSubmitBtn']) !!}
+        </div>
     </div>
 </div>
 

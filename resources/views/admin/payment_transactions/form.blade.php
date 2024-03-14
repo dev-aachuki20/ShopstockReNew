@@ -1,40 +1,54 @@
+
 <div class="panel panel-default col-md-12">
-    <div class="panel-body col-md-12">
-        <div class="row">
-            <div class="col-md-6 form-group formValidate">
-                {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
-                <select class="form-control select2" name="customer_id" id="customer_id" required>
-                    <option value="">{{ trans('quickadmin.qa_please_select_customer') }}</option>
-                    @if($customers->count() > 0)
-                    @foreach($customers as $id=>$value)
-                    <option value="{{ $value->id }}" data-credit="{{ getTotalCredit($value->id) }}" data-debit="{{ getTotalDebit($value->id) }}" data-limit="{{$value->credit_limit}}" {{ old('customer_id') == $value->id ? 'selected' : ''}}>{{ $value->name }}</option>
-                    @endforeach
-                    @endif
-                </select>
-                @if($errors->has('customer_id'))
-                <p class="help-block red text-danger">
-                    {{ $errors->first('customer_id') }}
-                </p>
+    <div class="panel-body row">        
+        <div class="col-md-4 form-group formValidate">
+            {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
+            <select class="form-control select2" name="customer_id" id="customer_id" required>
+                <option value="">{{ trans('quickadmin.qa_please_select_customer') }}</option>
+                @if($customers->count() > 0)
+                @foreach($customers as $id=>$value)
+                <option value="{{ $value->id }}" data-credit="{{ getTotalCredit($value->id) }}" data-debit="{{ getTotalDebit($value->id) }}" data-limit="{{$value->credit_limit}}" {{ old('customer_id') == $value->id ? 'selected' : ''}}>{{ $value->name }}</option>
+                @endforeach
                 @endif
+            </select>
+            @if($errors->has('customer_id'))
+            <p class="help-block red text-danger">
+                {{ $errors->first('customer_id') }}
+            </p>
+            @endif
+        </div>
+
+        <div class="col-md-4 remain_balance_main">
+            <div class="form-group">
+                <label for="remain_balance" class="control-label">{{ trans("quickadmin.transaction.fields.remain_balance")."*"}}</label>
+                <input type="number" value="" class="form-control" autocomplete="off" id="remain_balance" disabled>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
-                {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
-                {!! Form::hidden('payment_type','debit') !!}
-                {!! Form::select('payment_way', $paymentWays, old('payment_way'), ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
-                @if($errors->has('payment_way'))
-                <p class="help-block red text-danger">
-                    {{ $errors->first('payment_way') }}
-                </p>
-                @endif
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('remark', trans('quickadmin.transaction.fields.remark'), ['class' => 'control-label']) !!}
+            {!! Form::text('remark', old('remark'), ['class' => 'form-control', 'placeholder' => '']) !!}
+            @if($errors->has('remark'))
+            <p class="help-block red text-danger">
+                {{ $errors->first('remark') }}
+            </p>
+            @endif
+        </div>
+
+        <div class="col-md-4 form-group">
+            {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
+            {!! Form::hidden('payment_type','debit') !!}
+            {!! Form::select('payment_way', $paymentWays, old('payment_way'), ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
+            @if($errors->has('payment_way'))
+            <p class="help-block red text-danger">
+                {{ $errors->first('payment_way') }}
+            </p>
+            @endif
         </div>
 
 
-        <div class="row extra_detail_row" style="display: {{ (old('payment_way') != '' && old('payment_way') !='by_case') ?'block':'none' }}">
-            <div class="col-md-6 form-group">
+        <div class="col-md-4 extra_detail_row" style="display: {{ (old('payment_way') != '' && old('payment_way') !='by_case') ?'block':'none' }}">
+            <div class=" form-group">
                 {!! Form::label('extra_details', trans('quickadmin.transaction.fields.check_account').'*', ['class' => 'extra_detail_label control-label']) !!}
                 {!! Form::text('extra_details', old('extra_details'), ['id' => 'extra_details','class' => 'form-control', 'placeholder' => '']) !!}
                 @if($errors->has('extra_details'))
@@ -45,33 +59,19 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
-                {!! Form::label('remark', trans('quickadmin.transaction.fields.remark'), ['class' => 'control-label']) !!}
-                {!! Form::text('remark', old('remark'), ['class' => 'form-control', 'placeholder' => '']) !!}
-                @if($errors->has('remark'))
-                <p class="help-block red text-danger">
-                    {{ $errors->first('remark') }}
-                </p>
-                @endif
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('amount', trans('quickadmin.transaction.fields.amount').'*', ['class' => 'control-label']) !!}
+            <input type="number" value="{{ old('amount') }}" class="form-control" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min="0" step=".01" autocomplete="off" name="amount" id="amount">
+
+            @if($errors->has('amount'))
+            <p class="help-block red text-danger">
+                {{ $errors->first('amount') }}
+            </p>
+            @endif
         </div>
 
-        <div class="row">
-            <div class="col-md-6 form-group">
-                {!! Form::label('amount', trans('quickadmin.transaction.fields.amount').'*', ['class' => 'control-label']) !!}
-                <input type="number" value="{{ old('amount') }}" class="form-control" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Period','NumpadDecimal'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min="0" step=".01" autocomplete="off" name="amount" id="amount">
-
-                @if($errors->has('amount'))
-                <p class="help-block red text-danger">
-                    {{ $errors->first('amount') }}
-                </p>
-                @endif
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 form-group date_main_show">
+        <div class="col-md-4">
+            <div class="form-group date_main_show">
                 {!! Form::label('entry_date', trans('quickadmin.transaction.fields.entry-date').'*', ['class' => 'control-label']) !!}
                 <input type="date" class="form-control dateshow" name="entry_date" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
                 @if($errors->has('entry_date'))
@@ -81,7 +81,9 @@
                 @endif
             </div>
         </div>
-        {!! Form::submit(trans('quickadmin.qa_save'), ['class' => 'btn btn-lg btn-success cashReceiptSubmitBtn']) !!}
+        <div class="col-md-12">
+            {!! Form::submit(trans('quickadmin.qa_save'), ['class' => 'btn btn-lg btn-success cashReceiptSubmitBtn']) !!}
+        </div>
     </div>
 </div>
 @section('customJS')
@@ -171,7 +173,8 @@
     $('#customer_id').change(function() {
         let $this = $(this);
         let customerId = $this.val();
-        $('#remain_balance').parent().parent().remove();
+        //$('#remain_balance').parent().parent().remove();
+        $("#remain_balance").val('');
         $('#customer_id-error').remove();
         if (customerId != '') {
             let findOption = $this.find('option').filter('[value=' + customerId + ']');
@@ -180,14 +183,15 @@
             remainingBalance = debit - credit;
             remainingBalance = Math.abs(remainingBalance);
 
-            var addRemainingElement = '<div class="row">' +
-                '<div class="col-md-6 mb-5 form-group">' +
-                '<label for="remain_balance" class="control-label">{{ trans("quickadmin.transaction.fields.remain_balance")."*"}}</label>' +
-                '<input type="number" value="' + remainingBalance + '" class="form-control" autocomplete="off" id="remain_balance" disabled>' +
-                '</div>' +
-                '</div>';
+            $("#remain_balance").val(remainingBalance);
+            // var addRemainingElement = '<div class="col-md-4">' +
+            //     '<div class="form-group">' +
+            //     '<label for="remain_balance" class="control-label">{{ trans("quickadmin.transaction.fields.remain_balance")."*"}}</label>' +
+            //     '<input type="number" value="' + remainingBalance + '" class="form-control" autocomplete="off" id="remain_balance" disabled>' +
+            //     '</div>' +
+            //     '</div>';
 
-            $(addRemainingElement).insertAfter($this.parent().parent());
+            // $(addRemainingElement).insertAfter($this.parent().parent());
         }
     });
 
