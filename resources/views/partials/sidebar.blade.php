@@ -38,7 +38,7 @@
 
     <li class="dropdown {{ ((Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice')) || Request::is('admin/transactions/create') || Request::is('admin/orders-return')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
-            <x-side-bar-svg-icon icon="user" />
+            <x-side-bar-svg-icon icon="backup" />
             <span>@lang('quickadmin.order-management2.title')</span>
         </a>
         <ul class="dropdown-menu">
@@ -67,7 +67,7 @@
     </li>
     <li class="dropdown {{ (Request::is('admin/transaction/current_estimate') || Request::is('admin/transaction/sales') || Request::is('admin/transaction/modified_sales') || Request::is('admin/transaction/sales_return') || Request::is('admin/transaction/cash_reciept') || Request::is('admin/orders/draft-invoice') || Request::is('admin/transaction/cancelled')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
-            <x-side-bar-svg-icon icon="user" />
+            <x-side-bar-svg-icon icon="invoice" />
             <span>@lang('quickadmin.transaction-management.title')</span>
         </a>
         <ul class="dropdown-menu">
@@ -145,12 +145,20 @@
     </li>
 
 
+    @if (Gate::check('product_access'))
+    <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') || Request::is('admin/master/product-recycle*') || Request::is('admin/master/product-price*' || Request::is('admin/master/product-group/*')) ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.master.products.index') }}">
+            <x-side-bar-svg-icon icon="device" />
+            @lang('admin_master.product.seo_title_product_master')
+        </a>
+    </li>
+    @endif
 
 
 
-    <li class="dropdown {{ Request::is('admin/master*') ? 'active' : '' }}">
+    <li class="dropdown {{ (Request::is('admin/master*') && !(Request::is('admin/master/products*')) && !(Request::is('admin/master/product-recycle*')) && !(Request::is('admin/master/product-price*')) && !(Request::is('admin/master/product-group/*')))  ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
-            <x-side-bar-svg-icon icon="user" />
+            <x-side-bar-svg-icon icon="customer" />
             <span>@lang('quickadmin.master-management.title')</span>
         </a>
         <ul class="dropdown-menu">
@@ -181,13 +189,7 @@
         </a>
     </li>
     @endif
-    @if (Gate::check('product_access'))
-    <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.master.products.index') }}">
-            @lang('admin_master.product.seo_title_product_master')
-        </a>
-    </li>
-    @endif
+   
 
 
     @if (Gate::check('area_access'))

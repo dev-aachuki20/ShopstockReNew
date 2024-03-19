@@ -444,8 +444,8 @@ $('#productForm').on('keyup keypress', function(e) {
                             $('.product-detail').html(response.data);
                             var products_table = $('#products_table');
                             setTimeout(() => {
-                                if($("#glassProductBtn").hasClass('glassProductBtn')){
-                                    console.log('yes');
+                                var calulate_type = $("#glassProductBtn").data('calculation_type');
+                                if($("#glassProductBtn").hasClass('glassProductBtn') && calulate_type == 4){
                                     $("#product_quantity").attr("readonly",true);
                                 }else{
                                     $("#product_quantity").attr("readonly",false);
@@ -1186,8 +1186,7 @@ $('#productForm').on('keyup keypress', function(e) {
         });
 
         $(document).on('input', '#product_quantity,.update_price,.price', function(e) {
-                console.log('yes yes yes');
-            if ($(this).hasClass('price')) {
+             if ($(this).hasClass('price')) {
                 var priceVal = $(this).val();
 
 

@@ -171,7 +171,7 @@
             @if(isset($product) && in_array($product->calculation_type,config('constant.product_category_id')))--}}
 
             @if(isset($product) && ((isset($product->calculation_type) && in_array($product->calculation_type,config('constant.product_category_id'))) || (isset($product->product->calculation_type) && in_array($product->product->calculation_type,config('constant.product_category_id')))))
-            <button title="Fill Product Details" type="button" id='glassProductBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="glassProductBtn pull-right btn btn-primary"><i class="fa fa-plus"></i> Details</button>
+            <button title="Fill Product Details" type="button" id='glassProductBtn'  data-product-exists="{{$orderProductId}}" data-calculation_type="{{$product->calculation_type??''}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="glassProductBtn pull-right btn btn-primary"><i class="fa fa-plus"></i> Details</button>
             @endif
             <button title="Add Description" type="button" id='addDesBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addDes pull-right btn btn-primary"><i class="fa fa-commenting"></i></button>
             <button title="Add Product" type="button" id='add_row' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addRow pull-right btn btn-success"><i class="fa fa-plus"></i></button>
