@@ -15,10 +15,8 @@
             </div>
             <div class="card-body">
             <form action="{{ route('admin.orders.update',$order->id) }}"  id="productForm" method="PUT"  name="productForm" enctype="multipart/form-data">
-              <div class="row">
-              @csrf
+                @csrf
                 @include('admin.orders.form')
-              </div>
             </form>
             </div>
           </div>

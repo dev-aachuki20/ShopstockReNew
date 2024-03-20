@@ -149,10 +149,11 @@
     <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') || Request::is('admin/master/product-recycle*') || Request::is('admin/master/product-price*' || Request::is('admin/master/product-group/*')) ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.master.products.index') }}">
             <x-side-bar-svg-icon icon="device" />
-            @lang('admin_master.product.seo_title_product_master')
+            <span>@lang('admin_master.product.seo_title_product_master')</span>
         </a>
     </li>
     @endif
+
 
 
 

@@ -14,10 +14,8 @@
             </div>
             <div class="card-body">
             <form action="{{ route('admin.orders.store') }}"  id="productForm" method="POST"  name="productForm" enctype="multipart/form-data">
-              <div class="row">
-              @csrf
+                @csrf
                 @include('admin.orders.form')
-              </div>
             </form>
             </div>
           </div>

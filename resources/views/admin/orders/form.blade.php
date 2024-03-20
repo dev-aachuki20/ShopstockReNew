@@ -1,47 +1,45 @@
-<div class="col-md-3">
-    <div class="form-group">
-        <label>@lang('admin_master.new_estimate.customer_name') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            {!! Form::hidden('order_type', $orderType) !!}
-            {!! Form::hidden('type', optional(request())->route('type')) !!}
-            {!! Form::hidden('deleted_opids') !!}
-            {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@lang('admin_master.new_estimate.customer_name') <span class="text-danger">*</span></label>
+            <div class="input-group">
+                {!! Form::hidden('order_type', $orderType) !!}
+                {!! Form::hidden('type', optional(request())->route('type')) !!}
+                {!! Form::hidden('deleted_opids') !!}
+                {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
+            </div>
+            <div class="error_customer_id text-danger error"></div>
         </div>
-        <div class="error_customer_id text-danger error"></div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@lang('admin_master.new_estimate.customer_number') <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="text" class="form-control" name="customer_number" value="" id="customer_number" autocomplete="true" readonly>
+            </div>
+            <div class="error_customer_number text-danger error"></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@lang('admin_master.new_estimate.supply_place') <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="text" class="form-control" name="customer_place" value="" id="customer_place" autocomplete="true" readonly>
+                <input type="hidden" name="area_id" class="area_id" id="area_id">
+            </div>
+            <div class="error_customer_place text-danger error"></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@lang('admin_master.new_estimate.date') <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <input type="date" class="form-control" name="invoice_date" value="{{ (isset($order) && $order) ? $order->invoice_date : date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
+            </div>
+            <div class="error_date text-danger error"></div>
+        </div>
     </div>
 </div>
-
-<div class="col-md-3">
-    <div class="form-group">
-        <label>@lang('admin_master.new_estimate.customer_number') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <input type="text" class="form-control" name="customer_number" value="" id="customer_number" autocomplete="true" readonly>
-        </div>
-        <div class="error_customer_number text-danger error"></div>
-    </div>
-</div>
-
-<div class="col-md-3">
-    <div class="form-group">
-        <label>@lang('admin_master.new_estimate.supply_place') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <input type="text" class="form-control" name="customer_place" value="" id="customer_place" autocomplete="true" readonly>
-            <input type="hidden" name="area_id" class="area_id" id="area_id">
-        </div>
-        <div class="error_customer_place text-danger error"></div>
-    </div>
-</div>
-
-<div class="col-md-2">
-    <div class="form-group">
-        <label>@lang('admin_master.new_estimate.date') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <input type="date" class="form-control" name="invoice_date" value="{{ (isset($order) && $order) ? $order->invoice_date : date('Y-m-d') }}" max="{{ date('Y-m-d') }}" id="date" autocomplete="true" placeholder="@lang('admin_master.product.product_name_enter')">
-        </div>
-        <div class="error_date text-danger error"></div>
-    </div>
-</div>
-
 {{-- <div class="col-md-2">
     <div class="form-group">
         <label>@lang('admin_master.new_estimate.estimate_number') <span class="text-danger">*</span></label>
@@ -51,39 +49,38 @@
 <div class="error_estimate_number text-danger error"></div>
 </div>
 </div> --}}
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <select class="form-control select2 products" id="product_list">
+                    <option value="">{{trans('admin_master.g_please_select')}}</option>
+                    @foreach($products as $productData)
+                    <option value="{{$productData->id}}" data-name="{{$productData->name ?? ''}}" data-type="{{$productData->calculation_type}}" data-isSubProduct="{{$productData->is_sub_product}}">{{$productData->name ?? ''}}</option>
+                    @endforeach
+                </select>
+                {{--{!! Form::select('product_id', $products , $product->calculation_type??'', ['class' => 'form-control select2 products', 'id'=>'productList']) !!}--}}
+            </div>
+            <div class="error_product_id text-danger error"></div>
+            {{-- <p id="get_estimate_price">
+                <p class="d-none">
+                    <a href="#pre" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a>
+                </p>
+            </p> --}}
 
-<div class="col-md-12 col-lg-12 col-xl-3">
-    <div class="form-group">
-        <label>@lang('admin_master.product.product_name') <span class="text-danger">*</span></label>
-        <div class="input-group">
-            <select class="form-control select2 products" id="product_list">
-                <option value="">{{trans('admin_master.g_please_select')}}</option>
-                @foreach($products as $productData)
-                <option value="{{$productData->id}}" data-name="{{$productData->name ?? ''}}" data-type="{{$productData->calculation_type}}" data-isSubProduct="{{$productData->is_sub_product}}">{{$productData->name ?? ''}}</option>
-                @endforeach
-            </select>
-            {{--{!! Form::select('product_id', $products , $product->calculation_type??'', ['class' => 'form-control select2 products', 'id'=>'productList']) !!}--}}
-        </div>
-        <div class="error_product_id text-danger error"></div>
-        {{-- <p id="get_estimate_price">
-            <p class="d-none">
-                <a href="#pre" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a>
+            <p class="product_information-block" style="display:none">
+                {{-- <label>Product Price:<span class="purchase-price"> 777</span></label> --}}
+                <label>MSP:<span class="min-sale-price"> 555</span></label>
+                <label><span class="price-name">WSP</span>:<span class="whole-sale-price"> 333</span></label>
+                <label><a href="javascript:void(0)" class="price_per_fee" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a></label>
             </p>
-        </p> --}}
-
-        <p class="product_information-block" style="display:none">
-            {{-- <label>Product Price:<span class="purchase-price"> 777</span></label> --}}
-            <label>MSP:<span class="min-sale-price"> 555</span></label>
-            <label><span class="price-name">WSP</span>:<span class="whole-sale-price"> 333</span></label>
-            <label><a href="javascript:void(0)" class="price_per_fee" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a></label>
-        </p>
+        </div>
+    </div>
+    <div class="form-group product-detail col-md-9">
+        @include('admin.orders.product_detail')
     </div>
 </div>
-
-<div class="form-group product-detail col-md-12 col-lg-12 col-xl-9">
-    @include('admin.orders.product_detail')
-</div>
-
 {{--<div class="col-md-1">
     <div class="form-group">
         <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>

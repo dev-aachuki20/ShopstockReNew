@@ -1,7 +1,9 @@
 <div class="product-table-design" id="products_table">
     <div class="row">
+        @php $isSubProductCheck = "No"; @endphp
         @if((isset($product->is_sub_product) && $product->is_sub_product == 1) || (isset($product->product->is_sub_product) && $product->product->is_sub_product == 1))
-        <div class="col-lg-2 col-md-12 pr-0 sub_product_div">
+        @php $isSubProductCheck = "Yes"; @endphp
+        <div class="col-lg-3 sub_product_div">
             <div class="form-group">
                 <label for="sub_product">@lang('admin_master.product.sub_product')</label>
                 @if((is_array($orders) && count($orders)>0) || ($orders->count() > 0))
@@ -21,7 +23,26 @@
         </div>
         @endif
 
-        <div class="col-lg-1 col-md-12 pr-0">
+        <div class="col-lg-3">
+            <div class="quantity-content">
+                <div class="form-group">
+                    <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="product_unit" value="{{ (isset($product) && $product->product_unit) ? $product->product_unit->name : ((isset($product) && $product->product && $product->product->product_unit) ? $product->product->product_unit->name : '') }}" id="product_unit" autocomplete="true" readonly>
+                    </div>
+                    <div class="error_product_unit text-danger error"></div>
+                </div>
+                <div class="form-group">
+                    <label>@lang('admin_master.new_estimate.quantity') <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="product_quantity" value="{{ isset($product) ? $product->quantity : 0 }}" min="0" max="999999" id="product_quantity" autocomplete="false">
+                    </div>
+                    <span id="quantity_error" class="text-danger  d-none" role="alert" style="font-size:12px;"></span>
+                </div>
+            </div>
+        </div>
+
+        {{-- <div class="col-lg-1 col-md-12 pr-0">
             <div class="form-group">
                 <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -39,7 +60,7 @@
                 </div>
                 <span id="quantity_error" class="text-danger  d-none" role="alert" style="font-size:12px;"></span>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Start Price -->
         @php
@@ -76,7 +97,7 @@
         }
         @endphp
 
-        <div class="col-xs-2 {{ $productAtr != 0 ? 'col-lg-4' : 'col-lg-2'}} col-md-12 col-sm-12 pr-xl-0">
+        <div class="{{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-2'}} ">
             <div class="quantity-content">
                 {{--@if(isset($editRow) && $editRow)
                 <input type="hidden" name="extra_option_hint" class="extra_option_hint" value="{{$product->product->extra_option_hint ?? '' }}">
@@ -153,7 +174,7 @@
         </div>
 
         <!-- Start Sub Total -->
-        <div class="col-xs-1 col-lg-2 col-md-12 col-sm-12">
+        <div class="col-lg-2">
             <div class="form-group">
                 <label for="customer">@lang('quickadmin.order.fields.sub_total')</label>
                 <div class="input-group">
@@ -166,7 +187,8 @@
         </div>
         <!-- End Sub Total -->
 
-        <div class="col-xs-12 {{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-3'}} col-md-12 col-sm-12 form-group add-product mt-10">
+        {{-- <div class="{{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-5'}} form-group add-product mt-10"> --}}
+        <div class="{{ ($isSubProductCheck == "Yes")? 'col-lg-2' : 'col-lg-5'}} form-group add-product mt-10">
             {{-- @if(isset($product) && (in_array($product->product_category_id,config('constant.product_category_id')) || in_array($product->product->product_category_id,config('constant.product_category_id')))) 
             @if(isset($product) && in_array($product->calculation_type,config('constant.product_category_id')))--}}
 
