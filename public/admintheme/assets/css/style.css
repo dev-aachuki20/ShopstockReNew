@@ -8,7 +8,10 @@
     url("https://db.onlinewebfonts.com/t/be9b9dc6273bfa79a55f2f381d16b42a.svg#Roadgeek 2005 Series C")format("svg");
 } */
 
-@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800;900&display=swap");
+/*@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800;900&display=swap");*/
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 @font-face {
     font-family: "Mangal";
@@ -7550,8 +7553,8 @@ ul.treeview-menu {
     padding-left: 10px;
 }
 .main-content {
-    padding-left: 285px;
-    padding-right: 15px;
+    padding-left: 295px;
+    padding-right: 25px;
     padding-top: 90px;
     width: 100%;
     position: relative;
@@ -13619,7 +13622,7 @@ table.dataTable.dtr-inline.collapsed
 /* New theme mode  */
 body {
     background-color: #fbfdff;
-    font-family: "Jost", sans-serif !important;
+    font-family: 'Roboto', sans-serif !important;
 }
 .purple-sidebar .main-sidebar .sidebar-brand {
     /*    background-color: #000;*/
