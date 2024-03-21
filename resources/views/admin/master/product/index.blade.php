@@ -101,7 +101,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click','.view_detail',function(){
-      $("#body").prepend('<div class="loader"></div>');
+      $("#body").prepend('<div class="loader" id="loader_div"></div>');
       $("#view_model_Modal").modal('show');
       $('.show_html').html('');
       var _id = $(this).data('id');
@@ -114,7 +114,11 @@ $(document).ready(function(){
               url: post_url,
               data: {id: _id},
               success: function(data) {
+                  $("#loader_div").remove();
                   $('.show_html').html(data.html);
+              },
+              error: function () {
+                $("#loader_div").remove();
               }
             });
          }

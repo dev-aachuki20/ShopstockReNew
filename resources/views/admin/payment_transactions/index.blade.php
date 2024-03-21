@@ -81,6 +81,7 @@
     });
 
     $(document).on('click', '.view_detail', function() {
+      $("#body").prepend('<div class="loader" id="loader_div"></div>');
       $("#view_model_Modal").modal('show');
       $('.show_html').html('');
       var url = $(this).data('url');
@@ -92,7 +93,11 @@
             type : '{{$type}}'
           },
           success: function(data) {
+            $("#loader_div").remove();
             $('.show_html').html(data.html);
+          },
+          error: function () {
+            $("#loader_div").remove();
           }
         });
       }
