@@ -253,7 +253,7 @@
                 </tr>
                 @endif
                 <tr>
-                    <th colspan="4" class="grand total text-right">GRAND TOTAL</th>
+                    <th colspan="4" class="grand total text-right">Grand Total</th>
                     <td colspan="2" class="grand total">
                         <input type="hidden" name="total_amount" class="grandTotalHidden">
                         <span class="form-control grand_total" id="grandTotalSpan">0</span>

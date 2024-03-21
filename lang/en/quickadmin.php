@@ -388,7 +388,7 @@ return [
 			'total_price'	=> 'Total Price',
 			'thaila'	    => 'Thaila',
 			'round_off'	    => 'Round Off',
-			'grand_total'	=> 'GRAND TOTAL',
+			'grand_total'	=> 'Grand Total',
 			'invoice_date'  => 'Invoice Date',
 			'invoice_number' => 'Invoice Number',
 			'address'		=> 'City',
