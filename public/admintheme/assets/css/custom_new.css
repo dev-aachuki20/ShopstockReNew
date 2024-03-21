@@ -463,10 +463,60 @@ body,
 }
 .section-body .card .card-header{
     border-bottom: none;
+    padding-top: 15px;
 }
 .section-body .card .card-header h3{
     font-size: 22px;
 }
+.section-body .card .card-body form .form-group>label,
+.order_products_table-design .table th{
+    color: #3b4863;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    text-transform: inherit;
+}
+.section-body .card .card-body form .form-group .select2-container .select2-selection--single,
+.section-body .card .card-body form .form-group .select2-container--default .select2-selection--single .select2-selection__rendered,
+.section-body .card .card-body form .form-group .select2-container--default .select2-selection--single .select2-selection__arrow{
+    min-height: 34px;
+}
+.section-body .card .card-body form .form-group .select2-container--default .select2-selection--single .select2-selection__rendered{
+    line-height: 34px;
+    font-size: 15px;
+}
+.section-body .card .card-body form .form-group .input-group input,
+.section-body .card .card-body form .form-group .quantity-content input,
+.sub_product_div select{
+    height: 34px !important;
+}
+.add-product.form-group{
+    text-align: right;
+}
+.add-product.form-group #addDesBtn,
+.add-product.form-group #glassProductBtn{
+    float: none;
+    margin-left: 0;
+    margin-right: 6px;
+}
+.add-product.form-group button{
+    padding: 7px 10px !important;
+    min-height: auto;
+    height: auto;
+    line-height: 18px;
+}
+.add-product.form-group button,
+.add-product.form-group button i,
+.sub_product_div select{
+    font-size: 15px !important;
+}
+.order_products_table-design .table th{
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: inherit !important;
+}
+
 .main-sidebar .sidebar-brand a{
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
@@ -483,27 +533,73 @@ body,
     width: 16px !important;
 }
 
+
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
-    .product-detail {
+    /*.product-detail {
         flex: 0 0 100%;
         max-width: 100%;
-    }
-    .add-product button {
+    }*/
+    /*.add-product button {
         padding: 6px 20px !important;
-    }
-    #products_table .row > div:first-child {
+    }*/
+    /*#products_table .row > div:first-child {
         flex: 0 0 100%;
         max-width: 100%;
         padding-right: 15px !important;
-    }
-    #products_table .row > div:nth-child(2),
+    }*/
+    /*#products_table .row > div:nth-child(2),
     #products_table .row > div:nth-child(3) {
         flex: 0 0 10%;
         max-width: 10%;
+    }*/
+    .product-detail .product-table-design .quantity-column{
+        flex: 0 0 30%;
+        max-width: 30%;
+    }
+    .product-detail .product-table-design .sub_product_div ~ .quantity-column{
+        flex: 0 0 28%;
+        max-width: 28%;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .product-detail .product-table-design .price-column{
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+    .product-detail .product-table-design .sub_product_div ~ .price-column{
+        flex: 0 0 15%;
+        max-width: 15%;
+        padding-right: 0;
+    }
+    .product-detail .product-table-design .add-product{
+        flex: 0 0 33.33%;
+        max-width: 33.33%;
+    }
+    .product-detail .product-table-design .sub_product_div ~ .add-product{
+        flex: 0 0 15%;
+        max-width: 15%;
+        padding-left: 0;
     }
 }
 
 @media screen and (min-width: 992px) and (max-width: 1199px) {
+    .product-detail .product-table-design .sub_product_div,
+    .product-detail .product-table-design .quantity-column,
+    .product-detail .product-table-design .price-column,
+    .product-detail .product-table-design .amount-column,
+    .product-detail .product-table-design .add-product{
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .product-detail .product-table-design .sub_product_div ~ .price-column,
+    .product-detail .product-table-design .sub_product_div ~ .amount-column,
+    .product-detail .product-table-design .sub_product_div ~ .add-product{
+        flex: 0 0 33.33%;
+        max-width: 33.33%;
+    }
+}
+
+/*@media screen and (min-width: 992px) and (max-width: 1199px) {
     .add-product button {
         padding: 6px 8px !important;
     }
@@ -517,7 +613,7 @@ body,
         flex: 0 0 14%;
         max-width: 14%;
     }
-}
+}*/
 
 @media screen and (max-width: 575px){
     #addGlassProductDetailModal .glass-product-item>.row .form-group,

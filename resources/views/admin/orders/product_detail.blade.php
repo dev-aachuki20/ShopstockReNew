@@ -23,7 +23,7 @@
         </div>
         @endif
 
-        <div class="col-lg-3">
+        <div class="col-lg-3 quantity-column">
             <div class="quantity-content">
                 <div class="form-group">
                     <label>@lang('admin_master.product.unit_type') <span class="text-danger">*</span></label>
@@ -97,7 +97,7 @@
         }
         @endphp
 
-        <div class="{{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-2'}} ">
+        <div class="price-column {{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-2'}} ">
             <div class="quantity-content">
                 {{--@if(isset($editRow) && $editRow)
                 <input type="hidden" name="extra_option_hint" class="extra_option_hint" value="{{$product->product->extra_option_hint ?? '' }}">
@@ -174,7 +174,7 @@
         </div>
 
         <!-- Start Sub Total -->
-        <div class="col-lg-2">
+        <div class="col-lg-2 amount-column">
             <div class="form-group">
                 <label for="customer">@lang('quickadmin.order.fields.sub_total')</label>
                 <div class="input-group">
