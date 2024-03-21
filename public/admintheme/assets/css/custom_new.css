@@ -453,8 +453,8 @@ aside,
     background: #ebebeb;
 }
 body,
-.theme-white .navbar-bg{
-    background-color: #f1f5f9;
+.navbar-bg{
+    background-color: #f1f5f9 !important;
 }
 .section-body .card{
     border: 1px solid #ddd;
@@ -558,13 +558,48 @@ table.dataTable tbody>tr:nth-child(even){
 .dropdownBtnTable tbody tr td:last-child{
     display: table-cell;
 }
-.card .card-header h4{
+.card .card-header h4,
+.modal-header h5,
+.table:not(.table-sm) thead th,
+.section-body .card .card-header h3,
+#group_form .form-group label,
+.table tfoot th{
     text-transform: capitalize;
 }
 .loader {
     background-color: rgba(255, 255, 255, 0.8);
 }
-
+.product_page_buttons>.row{
+    gap: 8px;
+}
+.product_page_buttons .btn-column{
+    display: flex;
+    display: -webkit-flex;
+    gap: 5px;
+    padding: 8px;
+    background-color: #f1f5f9;
+    border-radius: 5px;
+}
+.product_page_buttons .btn-column .btn{
+    border-radius: 50% !important;
+    width: 45px;
+    height: 45px;
+}
+.product_page_buttons .btn-column .btn svg{
+    height: 22px;
+    width: auto;
+}
+.product_page_buttons .btn-column:nth-child(2) .in-btn-column>.btn{
+    background-color: #062142 !important;
+}
+.section-body .card .card-header h3{
+    font-size: 18px;
+    line-height: 28px;
+    padding-right: 10px;
+    margin-bottom: 0;
+    font-weight: 600;
+    color: #062142;
+}
 
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
@@ -658,5 +693,38 @@ table.dataTable tbody>tr:nth-child(even){
     }
     #addGlassProductDetailModal .glass-product-item>.row+.row{
         margin-top: 36px;
+    }
+    .product_page_buttons .btn-column .btn{
+        width: 35px;
+        height: 35px;
+    }
+    .product_page_buttons .btn-column .btn svg{
+        height: 20px;
+        width: auto;
+    }
+    .main-navbar .navbar-nav.navbar-right{
+        padding-right: 30px;
+    }
+    .main-navbar .navbar-nav.navbar-right li:first-child a{
+        margin-left: 0;
+    }
+    .main-navbar .navbar-nav.navbar-right li:not(.dropdown)>a{
+        padding: 6px;
+        font-size: 13px;
+        margin-left: 5px;
+    }
+    .main-navbar>.form-inline,
+    .main-navbar>.form-inline>.navbar-nav{
+        margin-right: 0 !important;
+    }
+    .main-navbar>.form-inline>.navbar-nav .nav-link{
+        padding-right: 10px !important;
+    }
+}
+
+@media screen and (max-width: 320px){
+    .main-navbar .navbar-nav.navbar-right li:not(.dropdown)>a{
+        font-size: 12px;
+        padding: 4px;
     }
 }

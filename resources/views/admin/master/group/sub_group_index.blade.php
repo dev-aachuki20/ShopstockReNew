@@ -27,23 +27,27 @@
                   <h4>@lang('quickadmin.group_master.sub_recycle')</h4>
                   @else               
                   <h4>@lang('quickadmin.group_master.sub_title')</h4> 
-                    <div class="col-auto  mt-md-0 mt-3 ml-auto">
-                      <div class="row align-items-center">                          
-                          <div class="col-auto px-1">
+                    <div class="col-auto  mt-md-0 mt-3 ml-auto product_page_buttons">
+                      <div class="row align-items-center">   
+                        <div class="btn-column">
+                          <div class="in-btn-column">
                             @can('group_create')
-                              <button type="button" class="addnew-btn add_sub_group sm_btn circlebtn" title="@lang('messages.add_sub_group')" ><x-svg-icon icon="add-device" /></button>
+                              <button type="button" class="addnew-btn add_sub_group sm_btn btn circlebtn" title="@lang('messages.add_sub_group')" ><x-svg-icon icon="add-device" /></button>
                             @endcan
                           </div>
-                          <div class="col-auto pl-1">
-                              @can('group_export')
+                          <div class="in-btn-column">
+                            @can('group_export')
                               <a href="{{ route('admin.master.sub.group.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
-                              @endcan
+                            @endcan
                           </div>
-                          <div class="col-auto pl-1">
-                              @can('group_undo')
+                        </div>
+                        <div class="btn-column">
+                          <div class="in-btn-column">
+                            @can('group_undo')
                               <a href="{{ route('admin.master.sub.group.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
-                              @endcan
+                            @endcan
                           </div>
+                        </div>
                       </div>
                   </div>
                 @endif
