@@ -18,11 +18,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
+                    <div class="card-header">
+                        <h4> @lang('quickadmin.user-management.title')</h4>
+                      </div> 
                     <div class="card-body">
                         <div class="row align-items-center pb-3 mb-3 cart_filter_box">
-                            <div class="col">
-                                <h4>@lang('quickadmin.user-management.title')</h4>
-                            </div>
                             <div class="col-auto  mt-md-0 mt-3 ml-auto">
                                 @if ($type != 'deleted')
                                 <div class="row align-items-center">

@@ -273,8 +273,8 @@ return [
 		'title' => 'Products',
 		'fields' => [
 			'name' 				=> 'Product Name',
-			'calculation_unit' 		=> 'Calculation Type / Unit Type',
-			'group_sub_group' 		=> 'Group / Sub Group',
+			'calculation_unit' 		=> 'Calculation <br>/ Unit',
+			'group_sub_group' 		=> 'Group <br>/ Sub Group',
 			'print_name' 		=> 'Print Name',
 			'product_type' 		=> 'Product Type',
 			'group_type' 		=> 'Group Type',

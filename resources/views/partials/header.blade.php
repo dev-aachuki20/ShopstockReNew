@@ -7,6 +7,12 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
+          <li>
+            <a href="{{ route('admin.orders.create') }}">@lang('quickadmin.order-management2.fields.add')</a>
+          </li>
+          <li>
+            <a href="{{ route('admin.transactions.create') }}">@lang('quickadmin.transaction-management.fields.new_case_reciept')</a>
+          </li>
             <li>
                 <div class="text-center mx-2">
                     <div class="bg-danger alertMessage d-none my-1 text-center text-light py-2 px-3" id="internetlostMessage">

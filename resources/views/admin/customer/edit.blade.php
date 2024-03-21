@@ -9,6 +9,9 @@
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card">
+            <div class="card-header">
+              <h3>Party Edit</h3>
+            </div>
             <div class="card-body">
             <form action="{{ route('admin.customers.update',['customer'=>$customer->id]) }}"  id="customerForm" method="PUT"  name="productForm" enctype="multipart/form-data">
               <div class="row">

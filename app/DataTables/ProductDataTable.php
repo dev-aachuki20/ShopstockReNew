@@ -68,7 +68,7 @@ class ProductDataTable extends DataTable
                 }else{ 
                     if (Gate::check('product_access')) {
                         $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-                       $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-id="'.encrypt($row->id).'" >'.$editIcon.'</a>';
+                       $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-id="'.encrypt($row->id).'" data-product_name="'.$row->name.'" >'.$editIcon.'</a>';
                    }
                     if (Gate::check('product_edit')) {
                         $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();

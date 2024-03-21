@@ -21,38 +21,37 @@
                     <h4>@lang('admin_master.product.product_recycle_master')</h4>
                   @else               
                   <h4>@lang('admin_master.product.seo_title_product_master')</h4>                 
-                      <div class="col-auto  mt-md-0 mt-3 ml-auto">
-                    <div class="row align-items-center">
-                        <div class="col-auto px-1">
-                            @can('product_create')                              
-                              <a href="{{route('admin.master.products.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add-device" /></a>
-                              @endcan
-                        </div>
-                        <div class="col-auto pl-1">
-                            @can('product_export')
-                            <a href="{{ route('admin.master.product.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
-                            @endcan
-                        </div>
-                        <div class="col-auto pl-1">
-                            @can('product_undo')
-                            <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  ><x-svg-icon icon="rejoin-btn" /></a>
-                            @endcan
-                        </div>
-                        @can('product_edit')
-                          <div class="col-auto pl-1">
-                              <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
+                    <div class="col-auto  mt-md-0 mt-3 ml-auto">
+                      <div class="row align-items-center">
+                          <div class="col-auto px-1">
+                              @can('product_create')                              
+                                <a href="{{route('admin.master.products.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add-device" /></a>
+                                @endcan
                           </div>
-                        @endcan
+                          <div class="col-auto pl-1">
+                              @can('product_export')
+                              <a href="{{ route('admin.master.product.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
+                              @endcan
+                          </div>
+                          <div class="col-auto pl-1">
+                              @can('product_undo')
+                              <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  ><x-svg-icon icon="rejoin-btn" /></a>
+                              @endcan
+                          </div>
+                          @can('product_edit')
+                            <div class="col-auto pl-1">
+                                <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
+                            </div>
+                          @endcan
 
-                        <div class="col-auto px-1">
-                          @can('product_edit')                              
-                            <a href="{{route('admin.master.update-product-group')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.update_product_group')"><x-svg-icon icon="add-order" /></a>
-                            @endcan
-                      </div>
-
+                          <div class="col-auto px-1">
+                              @can('product_edit')                              
+                                <a href="{{route('admin.master.update-product-group')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.update_product_group')"><x-svg-icon icon="add-order" /></a>
+                              @endcan
+                          </div>
+                        </div>
                     </div>
                   @endif
-                </div>
 
 
                 </div>
@@ -102,9 +101,11 @@ $(document).ready(function(){
     });
 
     $(document).on('click','.view_detail',function(){
+      $("#body").prepend('<div class="loader"></div>');
       $("#view_model_Modal").modal('show');
       $('.show_html').html('');
       var _id = $(this).data('id');
+      $("#exampleModalLongTitle").html($(this).data('product_name'));
       if(_id){
         var post_url = "{{ route('admin.master.products.show',['product'=> ':viewId']) }}";
         post_url = post_url.replace(':viewId', _id);

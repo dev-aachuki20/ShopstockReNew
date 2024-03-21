@@ -11,6 +11,9 @@
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card">
+            <div class="card-header">
+              <h4>Product Create</h4>
+            </div> 
             <div class="card-body">
             <form action="{{ route('admin.master.products.store') }}"  id="productFormMain" method="POST"  name="productFormMain" enctype="multipart/form-data">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />

@@ -33,12 +33,13 @@
 
 
           </div>
-        </div>
+       
         <div class="card-body">
           <div class="table-responsive fixed_Search">
             {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>

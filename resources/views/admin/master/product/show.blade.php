@@ -2,10 +2,10 @@
 <div class="row">
     <div class="col-md-12">
         <table class="table table-bordered table-striped">
-            <tr>
+            {{-- <tr>
                 <th>@lang('admin_master.product.product_name')</th>
                 <td field-key='user name'>{{ $product->name ?? '' }}</td>
-            </tr>
+            </tr> --}}
 
             <tr>
                 <th>@lang('admin_master.product.group_type_name')</th>
