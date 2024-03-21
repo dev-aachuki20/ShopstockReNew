@@ -21,34 +21,39 @@
                     <h4>@lang('admin_master.product.product_recycle_master')</h4>
                   @else               
                   <h4>@lang('admin_master.product.seo_title_product_master')</h4>                 
-                    <div class="col-auto  mt-md-0 mt-3 ml-auto">
+                    <div class="col-auto  mt-md-0 mt-3 ml-auto product_page_buttons">
                       <div class="row align-items-center">
-                          <div class="col-auto px-1">
+                        <div class="btn-column">
+                          <div class="in-btn-column">
                               @can('product_create')                              
                                 <a href="{{route('admin.master.products.create')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.add')"><x-svg-icon icon="add-device" /></a>
-                                @endcan
+                              @endcan
                           </div>
-                          <div class="col-auto pl-1">
-                              @can('product_export')
+                          <div class="in-btn-column">
+                            @can('product_export')
                               <a href="{{ route('admin.master.product.export')}}" class="excelbtn btn h-10 col circlebtn" title="@lang('messages.excel')"  id="excel-button"><x-svg-icon icon="excel" /></a>
-                              @endcan
+                            @endcan
                           </div>
-                          <div class="col-auto pl-1">
-                              @can('product_undo')
+                        </div>
+                        <div class="btn-column">
+                          <div class="in-btn-column">
+                            @can('product_undo')
                               <a href="{{ route('admin.master.product.recycle')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('messages.undo')"  ><x-svg-icon icon="rejoin-btn" /></a>
-                              @endcan
+                            @endcan
                           </div>
-                          @can('product_edit')
-                            <div class="col-auto pl-1">
-                                <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
-                            </div>
+                        </div>
+                        <div class="btn-column">
+                          <div class="in-btn-column">
+                            @can('product_edit')
+                              <a href="{{ route('admin.master.update-prices')}}" class="recycleicon btn h-10 col circlebtn" title="@lang('admin_master.product.update_product_price')"  ><x-svg-icon icon="add-order" /></a>                          
+                            @endcan
+                          </div>
+                          <div class="in-btn-column">
+                            @can('product_edit')                              
+                            <a href="{{route('admin.master.update-product-group')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.update_product_group')"><x-svg-icon icon="add-order" /></a>
                           @endcan
-
-                          <div class="col-auto px-1">
-                              @can('product_edit')                              
-                                <a href="{{route('admin.master.update-product-group')}}" class="addnew-btn add_group sm_btn circlebtn btn" title="@lang('messages.update_product_group')"><x-svg-icon icon="add-order" /></a>
-                              @endcan
                           </div>
+                        </div>
                         </div>
                     </div>
                   @endif
