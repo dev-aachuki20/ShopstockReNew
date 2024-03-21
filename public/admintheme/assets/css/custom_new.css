@@ -532,6 +532,39 @@ body,
 .main-sidebar .sidebar-menu li a svg{
     width: 16px !important;
 }
+.main-navbar .navbar-nav.navbar-right li:not(.dropdown)>a {
+    background-color: #fff;
+    color: #062142;
+    padding: 8px 10px;
+    display: inline-block;
+    line-height: 18px;
+    margin-left: 10px;
+    border-radius: 5px;
+}
+.main-navbar .navbar-nav.navbar-right li:first-child>a{
+    background-color: #db5102;
+    color: #fff;
+}
+.main-navbar .navbar-nav.navbar-right li:not(.dropdown)>a{
+    text-decoration: none;
+}
+table.dataTable thead>tr>th{
+    text-transform: capitalize !important;
+    background-color: #eff3f8 !important;
+}
+table.dataTable tbody>tr:nth-child(even){
+    background-color: #eff3f8;
+}
+.dropdownBtnTable tbody tr td:last-child{
+    display: table-cell;
+}
+.card .card-header h4{
+    text-transform: capitalize;
+}
+.loader {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
 
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
