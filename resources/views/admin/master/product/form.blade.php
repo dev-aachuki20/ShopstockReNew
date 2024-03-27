@@ -523,8 +523,10 @@
             $('.height, .width, .extra_option_hint').show();
             $('.sub_product').hide();
             $('.extra_options span.text-danger').removeClass('d-none');
+            type == 'add' && $('#unit_type').val('11').trigger('change');
             type == 'add' && $('#extra_option_hint').val('Ft');
             $('#is_height, #is_width').prop("checked", true);
+            $('#unit_type').attr("readonly", true);
         } else {
             $('.extra_options').hide();
             $('.unit_type span.text-danger').removeClass('d-none');
