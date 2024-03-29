@@ -128,6 +128,8 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                 <thead>
                                     <tr>
                                         <th>@lang('quickadmin.order.fields.sno')</th>
+                                        <th>@lang('quickadmin.order.fields.created_at')</th>
+                                        <th>@lang('quickadmin.order.fields.created_by')</th>
                                         <th>@lang('quickadmin.order.fields.product_name')</th>
                                         <th>@lang('quickadmin.order.fields.quantity')</th>
                                         <th>@lang('quickadmin.order.fields.price')</th>
@@ -142,6 +144,12 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                     @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_at')->get() as $item)
                                     <tr>
                                         <td class="text-left">{{ ++$sno }}</td>
+                                        <td>
+                                            {{ $order->created_at->format('d-m-Y') }}<br>
+                                            {{ $order->created_at->format('h:i:s A') }}
+                                        </td>
+
+                                        <td>{{ $order->createdBy->name }}</td>
                                         <td>
                                             {{ ucfirst($item->product->name) }}
                                             @if(!is_null($item->is_sub_product))

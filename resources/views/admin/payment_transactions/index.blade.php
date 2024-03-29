@@ -15,13 +15,13 @@
             <h4>
               @lang('quickadmin.transaction.'.$type.'_title')
             </h4>
-          @if($type != 'modified_sales' && $type != 'current_estimate')
+          @if($type != 'modified_sales' && $type != 'current_estimate' && $type!='sales_return' && $type!='cancelled')
           <div class="col-md-8">
               <form class="row">
-                <div class="col-md-4 form-group date_main_show">              
+                <div class="col-md-4 form-group date_main_show">
                     <input type="date" class="form-control dateshow" name="start_date" id="start_date" value="{{$_GET['start_date']??''}}" autocomplete="false">
                 </div>
-                <div class="col-md-4 form-group date_main_show">              
+                <div class="col-md-4 form-group date_main_show">
                     <input type="date" class="form-control dateshow" name="end_date" id="end_date"   value="{{$_GET['end_date']??''}}" autocomplete="false">
                 </div>
                 <div class="col-md-2">
@@ -33,7 +33,7 @@
 
 
           </div>
-       
+
         <div class="card-body">
           <div class="table-responsive fixed_Search">
             {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}

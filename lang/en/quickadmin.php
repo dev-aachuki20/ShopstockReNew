@@ -400,6 +400,7 @@ return [
 			'sno' => 'SNo.',
 			'number_of_item' => 'Number of item',
 			'created_at' => 'Created At',
+            'created_by' => 'Created By',
 			'deleted_at' => 'Deleted At',
 			'deleted_by' => 'Deleted By',
 			'add' 	=> 'Add New',
