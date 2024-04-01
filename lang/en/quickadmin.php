@@ -355,7 +355,7 @@ return [
 		'view-title-cash_reciept'  => 'View cash reciept',
 		'view-title-draft'  => 'View Draft',
 		'view-title-current_estimate'  => 'View Current Estimate',
-		'view-title-modified_sales'  => 'View Modified Estimate',
+		'view-title-modified_sales'  => 'View Modified Estimate History',
 		'view-title-cancelled'  => 'View Cancelled Estimate',
 		'invoice'  => 'Invoice',
 		'recycle'  => 'Recycle',

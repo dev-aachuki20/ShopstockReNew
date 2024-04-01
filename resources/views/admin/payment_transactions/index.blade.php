@@ -103,6 +103,26 @@
       }
     });
 
+    $(document).on('click', '.view_history_detail', function() {
+      $("#body").prepend('<div class="loader" id="loader_div"></div>');
+      $("#view_model_Modal").modal('show');
+      $('.show_html').html('');
+      var url = $(this).data('url');
+      if (url) {
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data) {
+            $("#loader_div").remove();
+            $('.show_html').html(data.html);
+          },
+          error: function () {
+            $("#loader_div").remove();
+          }
+        });
+      }
+    });
+
     $(document).on('click', '.delete_transaction', function(e) {
       e.preventDefault();
       var id = $(this).data('id');

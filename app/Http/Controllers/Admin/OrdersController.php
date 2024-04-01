@@ -13,6 +13,7 @@ use App\Models\PaymentTransaction;
 use App\Models\Product;
 use App\Models\OrderProduct;
 use App\Models\CustomerGroup;
+use App\Models\OrderEditHistory;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -163,13 +164,24 @@ class OrdersController extends Controller
     public function show(Request $request, string $id)
     {
         abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if ($request->ajax()) { 
+        if ($request->ajax()) {
             $id = decrypt($id);
             $order = Order::withTrashed()->find($id);
             $type = $request->type;
             $html = View::make('admin.orders.prev_order_modal', compact('order', 'type'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
+    }
+
+    public function showHistory($type=null,string $id)
+    {
+        abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id = decrypt($id);
+        $order= Order::findorfail($id);
+        $allOrderHistory = OrderEditHistory::where('order_id', $id)->get();
+        //dd($allOrderHistory);
+        $html = View::make('admin.orders.prev_order_history_modal', compact('allOrderHistory','order','type'))->render();
+        return response()->json(['success' => true, 'html' => $html]);
     }
 
     /**
@@ -179,7 +191,7 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $orderType = 'edit';
-        $id = decrypt($id); 
+        $id = decrypt($id);
         $order = Order::findOrFail($id);
         $customers = Customer::select('id', 'name', 'is_type', 'credit_limit')->orderBy('name', 'asc')->pluck('name', 'id')->prepend(trans('admin_master.g_please_select'), '');
         $products = Product::select('id', 'name', 'price', 'group_id', 'calculation_type', 'is_sub_product')->orderBy('name', 'asc')->get();
@@ -254,6 +266,67 @@ class OrdersController extends Controller
         }
     }
 
+
+    protected function recordOrderHistory($order, $updatedData,$action_type= null)
+    {
+        if(!$action_type){
+            foreach ($updatedData['products'] as $product) {
+                $historyData = [
+                    'order_id' => $order->id,
+                    'product_id' => $product['product_id'],
+                    'quantity' => $product['quantity']?? null,
+                    'price' => (float)str_replace(',', '', $product['price']) ?? null,
+                    'height' => $product['height'] ?? null,
+                    'width' => $product['width'] ?? null,
+                    'description'  => (isset($product['description']) && !empty($product['description'])) ?  $product['description'] : null,
+                    'other_details'  => isset($product['other_details']) ? json_encode(json_decode($product['other_details'], true)) : null,
+                    'is_sub_product'  => (isset($product['is_sub_product_value']) && !empty($product['is_sub_product_value'])) ?  $product['is_sub_product_value'] : null,
+                    'total_price' => round((float)str_replace(',', '', $product['total_price'])) ?? 0.00,
+                    'order_data' => json_encode([
+                        'customer_id' => $updatedData['customer_id'],
+                        'area_id' => $updatedData['area_id'],
+                        'invoice_date' => $updatedData['invoice_date'],
+                        'total_amount'   => round($order->total_amount),
+                    ]),
+                ];
+
+                if (isset($product['opid'])) {
+                    $historyData['update_status'] = 'update';
+                    $historyData['order_product_id'] = $product['opid'];
+                }
+                else {
+                    $historyData['update_status'] = 'add';
+                }
+                OrderEditHistory::create($historyData);
+            }
+        }else
+        {
+            foreach ($updatedData as $orderProduct) {
+                $historyData = [
+                    'order_id' => $order->id,
+                    'product_id' => $orderProduct->product_id,
+                    'quantity' => $orderProduct->quantity,
+                    'price' => (float)str_replace(',', '', $orderProduct['price']) ?? null,
+                    'height' => $orderProduct['height'] ?? null,
+                    'width' => $orderProduct['width'] ?? null,
+                    'description'  => (isset($orderProduct['description']) && !empty($orderProduct['description'])) ?  $orderProduct['description'] : null,
+                    'other_details'  => isset($orderProduct['other_details']) ? json_encode(json_decode($orderProduct['other_details'], true)) : null,
+                    'is_sub_product'  => (isset($orderProduct['is_sub_product_value']) && !empty($orderProduct['is_sub_product_value'])) ?  $orderProduct['is_sub_product_value'] : null,
+                    'total_price' => round((float)str_replace(',', '', $orderProduct['total_price'])) ?? 0.00,
+                    'order_data' => json_encode([
+                        'customer_id' => $order->customer_id,
+                        'area_id' => $order->area_id,
+                        'invoice_date' => $order->invoice_date,
+                        'total_amount'   => round($order->total_amount),
+                    ]),
+                    'update_status' => 'delete',
+                    'order_product_id' => $orderProduct->id,
+                ];
+                OrderEditHistory::create($historyData);
+            }
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -263,8 +336,11 @@ class OrdersController extends Controller
         $type = $request->type; //sales
         $isDraft = $request->submit == 'draft' ? true : false;
         $checkDraftStatus = $isDraft == true ? 0 : 1;
-
         $order = $checkProductOrder = Order::findOrFail($id);
+        if (!$isDraft) {
+            $this->recordOrderHistory($order, $request->all());  //Check History
+        }
+
         $beforIs_draft = $order['is_draft'];
         $inputs = array(
             'invoice_date'   => $request->invoice_date,
@@ -275,7 +351,7 @@ class OrdersController extends Controller
             'created_by'     => Auth::user()->id,
             'is_draft'       => $isDraft ? 1 : 0,
             'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
-        ); 
+        );
         if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $checkDraftStatus) {
             $inputs['updated_by'] = Auth::user()->id;
             $order->update($inputs);
@@ -339,6 +415,7 @@ class OrdersController extends Controller
 
         if (count($delproids) > 0) {
             $orderProductsToDelete = OrderProduct::whereIn('id', $delproids)->get();
+            $this->recordOrderHistory($order, $orderProductsToDelete, 'delete'); // Check History
             foreach ($orderProductsToDelete as $orderProduct) {
                 $orderProduct->delete();
             }
@@ -382,6 +459,8 @@ class OrdersController extends Controller
             }
         }
 
+
+
         if ($type == 'draft') {
             return response()->json([
                 'success' => true,
@@ -389,6 +468,7 @@ class OrdersController extends Controller
                 'redirectUrl' => route('admin.orders.draftInvoice'),
             ]);
         }
+
 
         return response()->json([
             'success' => true,
@@ -497,7 +577,7 @@ class OrdersController extends Controller
             /* if (isset($last_order_price) && $last_order_price != 0) {
                 $price = $last_order_price;
             } else */
-            
+
 
 
 
@@ -697,18 +777,18 @@ class OrdersController extends Controller
 
     public function printPdf($id){
        // ini_set('max_execution_time', 300);
-       
+
         try{
             if(!is_numeric($id)){
                 $id = decrypt($id);
             }
-                    
-            $order = Order::with(['orderPayTransaction' => function ($query) {                    
+
+            $order = Order::with(['orderPayTransaction' => function ($query) {
                 $query->withTrashed();
-            }])->withTrashed()->findOrFail($id);                    
-                                
+            }])->withTrashed()->findOrFail($id);
+
             $pdfData['title'] = $title = time().'_estimate';
-            $pdfData['order'] = $order;                
+            $pdfData['order'] = $order;
 
             //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
@@ -716,7 +796,7 @@ class OrdersController extends Controller
             $mpdf = new Mpdf();
             $mpdf->WriteHTML($pdfHtml);
             $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
-              
+
         }catch(\Exception $e){
             return abort(404);
         }

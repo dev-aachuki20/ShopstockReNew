@@ -84,7 +84,9 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::get('orders-return', [OrdersController::class, 'returnCreate'])->name('orders.return');
     Route::get('orders/draft-invoice',[OrdersController::class, 'draftInvoice'])->name('orders.draftInvoice');
     Route::get('orders/{type?}/{id}/edit', [OrdersController::class, 'edit'])->name('orders.edit');
+    Route::get('orders/{type?}/{id}', [OrdersController::class, 'showHistory'])->name('orders.history.show');
     Route::resource('/orders', OrdersController::class)->except('edit');
+
     Route::get('/get_customer_detail', [OrdersController::class, 'get_customer_detail'])->name('customer_detail');
     Route::post('/get_product_detail', [OrdersController::class, 'get_product_detail'])->name('get_product_detail');
     Route::post('/add_product_row', [OrdersController::class, 'add_product_row'])->name('add_product_row');

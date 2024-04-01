@@ -63,7 +63,7 @@ class PaymentTransactionDataTable extends DataTable
                 $date_created = $row->created_at->format('Y-m-d');
 
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
+                if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
                     if (Gate::check('estimate_edit') && $this->type != 'cancelled') {
                        // sales me only edit and delete show only when order is created at today
                         if($typeAction == "sales"){
@@ -85,16 +85,25 @@ class PaymentTransactionDataTable extends DataTable
                         $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
                     }
                 }
-                $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
-                if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
-                    if($typeAction == "sales"){
-                        if($today == $date_created){
-                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
-                        }
-                    }else{
-                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                else if ($typeAction == 'modified_sales'){
+                    if (Gate::check('estimate_access')) {
+                        $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" >' . $viewIcon . '</a>';
                     }
                 }
+
+                if($typeAction != 'modified_sales'){
+                    $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
+                    if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
+                        if($typeAction == "sales"){
+                            if($today == $date_created){
+                                $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                            }
+                        }else{
+                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                        }
+                    }
+                }
+
                 return $action;
             })
             ->rawColumns(['action','list_checkbox']);
@@ -117,11 +126,12 @@ class PaymentTransactionDataTable extends DataTable
                 break;
 
             case 'modified_sales':
-                $model = $model->with('order')->where('payment_way', 'order_create')->whereHas('order', function ($query) {
-                    $query->whereHas('orderProduct', function ($subquery) {
-                        $subquery->whereDate('updated_at', Carbon::today());
-                    });
-                });
+                // $model = $model->with('order')->where('payment_way', 'order_create')->whereHas('order', function ($query) {
+                //     $query->whereHas('orderProduct', function ($subquery) {
+                //         $subquery->whereDate('updated_at', Carbon::today());
+                //     });
+                // });
+                $model = $model->where('payment_way', 'order_create');
                 break;
 
             case 'cash_reciept':
@@ -138,7 +148,7 @@ class PaymentTransactionDataTable extends DataTable
                 break;
 
             default:
-                // Handle unknown type here  
+                // Handle unknown type here
                 return abort(404);
                 break;
         }

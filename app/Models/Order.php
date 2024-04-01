@@ -55,4 +55,9 @@ class Order extends Model
     {
         return $this->hasMany(PaymentTransaction::class, 'order_id');
     }
+
+    public function history()
+    {
+        return $this->hasMany(OrderEditHistory::class);
+    }
 }
