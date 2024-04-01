@@ -48,6 +48,7 @@ class PaymentTransactionsController extends Controller
 
         $payment = PaymentTransaction::create($inputs);
         addToLog($request,'Cash receipt','Create', $payment);
+        $this->recordCashReceiptHistory($payment, $request->all());
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
 
