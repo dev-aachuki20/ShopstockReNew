@@ -450,9 +450,14 @@ class ProductController extends Controller
                     return $html;
                 })
                 ->editColumn('unit_type', function ($row) {
+                    $unittype = "readonly";
+                    if($row->calculation_type == '1'){
+                        $unittype = "";
+                    }
+
                     $allUnit = ProductUnit::get();
                     $html = "";
-                    $html .= '<select class="product_unit select2" id="product_unit_' . $row->id . '" data-porduct_id="' . $row->id . '">';
+                    $html .= '<select class="product_unit select2" '.$unittype .' id="product_unit_' . $row->id . '" data-porduct_id="' . $row->id . '">';
                     $html .= '<option value="">' . trans('admin_master.g_please_select') . '</option>';
                     foreach ($allUnit  as $unit) {
                         $selected = "";
