@@ -133,7 +133,12 @@ class PaymentTransactionDataTable extends DataTable
                 //         $subquery->whereDate('updated_at', Carbon::today());
                 //     });
                 // });
-                $model = $model->where('payment_way', 'order_create');
+                // $model = $model->where('payment_way', 'order_create');
+                $model = $model->with('order')->where('payment_way', 'order_create')->whereHas('order', function ($query) {
+                    $query->whereHas('orderProduct', function ($subquery) {
+                        $subquery->whereColumn('updated_at','!=','created_at');
+                    });
+                });
                 break;
 
             case 'cash_reciept':
