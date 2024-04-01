@@ -82,7 +82,9 @@ class PaymentTransactionDataTable extends DataTable
                         $action .= '<a href="' . route("admin.transactions.edit", encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
                     }
                     if (Gate::check('transaction_access')) {
-                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' (' . date('d-m-Y', strtotime($row->entry_date)) . ')" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                        $historyIcon = view('components.svg-icon', ['icon' => 'staff-rejoin'])->render();
+                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' (' . date('d-m-Y', strtotime($row->entry_date)) . ')" class="btn btn-icon btn-info m-1 view_history_detail" >' . $historyIcon . '</a>';
                     }
                 }
                 else if ($typeAction == 'modified_sales'){

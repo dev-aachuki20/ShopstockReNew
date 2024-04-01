@@ -36,7 +36,7 @@
 
         <div class="card-body">
           <div class="table-responsive fixed_Search">
-            {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}
+            {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable cash-reciept-trans', 'style' => 'width:100%;'])}}
           </div>
         </div>
       </div>
@@ -52,7 +52,12 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
+        @if ($type='cash_reciept')
+            <h5 class="modal-title head-title" id="exampleModalLongTitle"></h5>
+        @else
         <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
+        @endif
+
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -85,6 +90,7 @@
       $("#view_model_Modal").modal('show');
       $('.show_html').html('');
       var url = $(this).data('url');
+      var head_title = $(this).attr('data-customerName');
       if (url) {
         $.ajax({
           type: "GET",
@@ -95,6 +101,7 @@
           success: function(data) {
             $("#loader_div").remove();
             $('.show_html').html(data.html);
+            $("#view_model_Modal .head-title").html(head_title);
           },
           error: function () {
             $("#loader_div").remove();
@@ -108,6 +115,8 @@
       $("#view_model_Modal").modal('show');
       $('.show_html').html('');
       var url = $(this).data('url');
+      var head_title = $(this).attr('data-customerName');
+      console.log(head_title);
       if (url) {
         $.ajax({
           type: "GET",
@@ -115,6 +124,8 @@
           success: function(data) {
             $("#loader_div").remove();
             $('.show_html').html(data.html);
+            $("#view_model_Modal .head-title").html(head_title);
+
           },
           error: function () {
             $("#loader_div").remove();

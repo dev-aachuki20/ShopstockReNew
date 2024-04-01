@@ -8,6 +8,7 @@ use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
 use App\Http\Requests\PaymentTransactions\StoreUpdatePaymentTransactionsRequest;
 use App\Models\PaymentTransaction;
+use App\Models\PaymentTransactionHistory;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -44,9 +45,9 @@ class PaymentTransactionsController extends Controller
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
         $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt');
-               
+
         $payment = PaymentTransaction::create($inputs);
-        addToLog($request,'Cash receipt','Create', $payment); 
+        addToLog($request,'Cash receipt','Create', $payment);
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
 
@@ -56,12 +57,22 @@ class PaymentTransactionsController extends Controller
     public function show(Request $request,string $id)
     {
         abort_if(Gate::denies('transaction_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        if ($request->ajax()) { 
+        if ($request->ajax()) {
             $id = decrypt($id);
             $transaction = PaymentTransaction::withTrashed()->find($id);
             $html = View::make('admin.payment_transactions.show', compact('transaction'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
+    }
+
+    public function showHistory($type=null,string $id)
+    {
+        abort_if(Gate::denies('transaction_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $id = decrypt($id);
+        $alltransaction = PaymentTransactionHistory::where('payment_transaction_id',$id)->get();
+        $cash_receipt = PaymentTransaction::with('customer')->select('customer_id','voucher_number','entry_date')->where('id',$id)->first();
+        $html = View::make('admin.payment_transactions.show_history', compact('alltransaction','cash_receipt'))->render();
+        return response()->json(['success' => true, 'html' => $html]);
     }
 
     /**
@@ -85,12 +96,21 @@ class PaymentTransactionsController extends Controller
     {
         abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $transaction = PaymentTransaction::findOrFail($id);
-        $oldvalue = $transaction->getOriginal();  
+        $oldvalue = $transaction->getOriginal();
         $request['updated_by'] = Auth::id();
         $transaction->update($request->all());
         $newValue = $transaction->refresh();
         addToLog($request,'Cash receipt','Edit', $newValue ,$oldvalue);
+        // Record history
+        $this->recordCashReceiptHistory($transaction, $request->all());
         return response()->json(['success' => 'Update successfully.']);
+    }
+
+    protected function recordCashReceiptHistory($transaction, $cash_receipt)
+    {
+        $cash_receipt['payment_transaction_id'] = $transaction->id;
+        $cash_receipt['voucher_number'] = $transaction->voucher_number;
+        PaymentTransactionHistory::create($cash_receipt);
     }
 
     /**

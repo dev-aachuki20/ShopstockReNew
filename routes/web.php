@@ -96,6 +96,8 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
 
     Route::resource('/transactions', PaymentTransactionsController::class);
     Route::get('transaction/{type}', [PaymentTransactionsController::class, 'typeFilter'])->name('transactions.type');
+    Route::get('transactions/{type?}/{id}', [PaymentTransactionsController::class, 'showHistory'])->name('transactions.history.show');
+
 
     Route::post('checkInvoiceNumber', [OrdersController::class, 'checkInvoiceNumber'])->name('orders.checkInvoiceNumber');
     Route::post('/add-glass-product-view', [OrdersController::class, 'addGlassProductView'])->name('addGlassProductView');

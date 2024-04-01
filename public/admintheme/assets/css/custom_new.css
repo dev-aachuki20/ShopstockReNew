@@ -558,6 +558,10 @@ table.dataTable tbody>tr:nth-child(even){
 .dropdownBtnTable tbody tr td:last-child{
     display: table-cell;
 }
+.cash-reciept-trans tbody tr td:last-child{
+    display: flex;
+    display: -webkit-flex;
+}
 .card .card-header h4,
 .modal-header h5,
 .table:not(.table-sm) thead th,
