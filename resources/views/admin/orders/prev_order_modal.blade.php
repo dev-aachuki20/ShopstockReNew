@@ -75,7 +75,7 @@
         }
     }
 </style>
-<a href="{{ route('admin.orders.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;padding: 6px 30px;">
+<a href="{{ route('admin.order.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;padding: 6px 30px;">
 <i class="fa fa-print"></i> Print
 </a>
 @php

@@ -777,7 +777,6 @@ class OrdersController extends Controller
 
     public function printPdf($id){
        // ini_set('max_execution_time', 300);
-
         try{
             if(!is_numeric($id)){
                 $id = decrypt($id);
