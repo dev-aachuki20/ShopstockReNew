@@ -52,7 +52,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        @if ($type='cash_reciept')
+        @if ($type=='cash_reciept')
             <h5 class="modal-title head-title" id="exampleModalLongTitle"></h5>
         @else
         <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
