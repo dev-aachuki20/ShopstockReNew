@@ -60,6 +60,7 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $isDraft = $request->submit == 'draft' ? true : false;
+
         $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
         if (!$checkOrder) {
             $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
@@ -79,6 +80,7 @@ class OrdersController extends Controller
             );
             $order = Order::create($inputs);
             addToLog($request, 'Order', 'Create', $order);
+
         } else {
             $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
             $totalAmount = round((float)str_replace(',', '', $request->total_amount));
@@ -90,6 +92,10 @@ class OrdersController extends Controller
                 'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
             ]);
             $order = $checkOrder;
+        }
+
+        if (!$isDraft) {
+            $this->recordOrderHistory($order, $request->all());  //Check History
         }
 
         // dd($inputs,$order);
