@@ -145,8 +145,8 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                     <tr>
                                         <td class="text-left">{{ ++$sno }}</td>
                                         <td>
-                                            {{ $order->created_at->format('d-m-Y') }}<br>
-                                            {{ $order->created_at->format('h:i:s A') }}
+                                            {{ $item->created_at->format('d-m-Y') }}<br>
+                                            {{ $item->created_at->format('h:i:s A') }}
                                         </td>
 
                                         <td>{{ $order->createdBy->name }}</td>
