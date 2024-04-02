@@ -92,7 +92,7 @@ class PaymentTransactionDataTable extends DataTable
                     if (Gate::check('transaction_access')) {
                         $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
 
-                        if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->exists()){
+                        if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->count() > 1){
                             $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
                         }
                     }

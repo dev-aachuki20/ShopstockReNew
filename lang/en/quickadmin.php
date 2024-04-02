@@ -622,7 +622,7 @@ return [
 	'qa_view' => 'View',
     'qa_history' => 'History',
 	'qa_download' => 'Download',
-	'qa_update' => 'Update',
+	'qa_update' => 'Edit',
 	'qa_list' => 'List',
 	'qa_cancel' => 'Cancel',
 	'qa_no_entries_in_table' => 'No entries in table',
