@@ -30,8 +30,6 @@
               </form>
           </div>
           @endif
-
-
           </div>
 
         <div class="card-body">
@@ -48,11 +46,11 @@
 
 
 <!-- view Modal -->
-<div class="modal fade" id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
+<div class="modal fade " id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        @if ($type=='cash_reciept')
+        @if ($type=='cash_reciept' || $type=='sales')
             <h5 class="modal-title head-title" id="exampleModalLongTitle"></h5>
         @else
         <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
@@ -116,7 +114,7 @@
       $('.show_html').html('');
       var url = $(this).data('url');
       var head_title = $(this).attr('data-customerName');
-      console.log(head_title);
+      //console.log(head_title);
       if (url) {
         $.ajax({
           type: "GET",
@@ -125,7 +123,7 @@
             $("#loader_div").remove();
             $('.show_html').html(data.html);
             $("#view_model_Modal .head-title").html(head_title);
-
+            DataaTable.ajax.reload();
           },
           error: function () {
             $("#loader_div").remove();

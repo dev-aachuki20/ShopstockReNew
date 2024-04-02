@@ -45,6 +45,10 @@ class OrderEditHistory extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
@@ -56,6 +60,7 @@ class OrderEditHistory extends Model
         static::creating(function(OrderEditHistory $model) {
             $model->created_by = auth()->user()->id;
             $model->order_update_time = now();
+            $model->updated_by = auth()->user()->id;
         });
 
         static::deleting(function (OrderEditHistory $model) {

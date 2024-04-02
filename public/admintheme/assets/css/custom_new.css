@@ -562,6 +562,18 @@ table.dataTable tbody>tr:nth-child(even){
     display: flex;
     display: -webkit-flex;
 }
+.cash-reciept-trans tbody tr.estimates-trans-active{
+    background-color: #062142 !important;
+}
+.cash-reciept-trans tbody tr.estimates-trans-active td{
+    color: #fff;
+}
+.cash-reciept-trans tbody tr.estimates-trans-active td:last-child svg path{
+    fill: #fff;
+}
+.cash-reciept-trans tbody tr.estimates-trans-active td:last-child a:hover svg path{
+    fill: #db5102 !important;
+}
 .card .card-header h4,
 .modal-header h5,
 .table:not(.table-sm) thead th,
@@ -605,6 +617,37 @@ table.dataTable tbody>tr:nth-child(even){
     color: #062142;
 }
 
+.estimates_trans_view .panel-body table thead>tr>th{
+    text-transform: capitalize !important;
+    background-color: #eff3f8 !important;
+}
+.estimates_trans_view .panel-body table tbody tr.odd{
+    background: #fbfdff;
+    color: #232324;
+}
+.estimates_trans_view .panel-body table tbody>tr:nth-child(even){
+    background-color: #eff3f8;
+}
+.modal .estimates_trans_view .panel-body table tbody>tr td,
+.estimates_trans_view .panel-body table thead>tr>th{
+    border-bottom: none !important;
+}
+.estimates_trans_view .panel-body table tbody>tr td:not(:last-child),
+.estimates_trans_view .panel-body table thead>tr>th:not(:last-child){
+    border-right: 1px solid #ddd !important;
+}
+.estimates_trans_view .panel-body table tbody>tr:last-child td{
+    border-right: none !important;
+    border-left: none !important;
+}
+.estimates_trans_view .panel-body .row address{
+    margin-bottom: 0;
+}
+.estimates_trans_view>.panel-body:not(:last-child){
+    border-bottom: 1px solid #ddd !important;
+    padding-bottom: 12px;
+    margin-bottom: 5px;
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {

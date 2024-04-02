@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payment_transactions', function (Blueprint $table) {
-            $table->bigIncrements('id');                      
+            $table->bigIncrements('id');
             $table->integer('customer_id')->unsigned()->index();
             $table->enum('payment_type', array('credit', 'debit'))->default('credit');
             $table->enum('payment_way', array('order_create', 'order_return', 'by_split','by_cash', 'by_check', 'by_account'))->default('order_create');
@@ -22,8 +22,9 @@ return new class extends Migration
             $table->string('remark')->nullable();
             $table->decimal('amount', 15, 2);
             $table->date('entry_date')->nullable();
+            $table->tinyInteger('is_modified')->default(0)->comment('1=> modified, 0=>not_modified');
             $table->integer('created_by')->unsigned()->default(0);
-            $table->integer('updated_by')->default(0)->unsigned();  
+            $table->integer('updated_by')->default(0)->unsigned();
             $table->integer('deleted_by')->unsigned()->default(null)->nullable();
             $table->tinyInteger('is_split')->default(0);
             $table->timestamps();

@@ -10,13 +10,6 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
-    // public static function boot(){
-    //     parent::boot();
-    //     self::creating(function ($model) {
-    // 		$model->invoice_number = getNewInvoiceNumber($model->id);
-    //     });
-    // }
-
     protected $fillable = [
         'customer_id',
         'shipping_amount',
@@ -31,10 +24,30 @@ class Order extends Model
         'invoice_date',
         'due_date',
         'is_add_shipping',
-        'sold_by'
+        'sold_by',
+        'is_modified',
+        'deleted_by'
     ];
 
     protected $hidden = [];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function(Order $model) {
+            $model->created_by = auth()->user()->id;
+        });
+
+        static::deleting(function(Order $model) {
+            $model->deleted_by = auth()->user()->id;
+            $model->save();
+        });
+
+        static::updating(function(Order $model) {
+            $model->updated_by = auth()->user()->id;
+           // $model->is_modified = 1;
+        });
+    }
 
     public function customer()
     {
@@ -60,4 +73,5 @@ class Order extends Model
     {
         return $this->hasMany(OrderEditHistory::class);
     }
+
 }

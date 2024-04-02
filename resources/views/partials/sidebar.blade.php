@@ -89,11 +89,11 @@
                     <span>@lang('quickadmin.transaction-management.fields.sales')</span>
                 </a>
             </li>
-            <li class="{{ Request::is('admin/transaction/modified_sales') ? 'active' : '' }}">
+            {{-- <li class="{{ Request::is('admin/transaction/modified_sales') ? 'active' : '' }}">
                 <a href="{{ route('admin.transactions.type',['modified_sales']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.modified_sales')</span>
                 </a>
-            </li>
+            </li> --}}
             <li class="{{ Request::is('admin/transaction/sales_return') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.transactions.type',['sales_return']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.sales_return')</span>
@@ -185,7 +185,7 @@
         </a>
     </li>
     @endif
-   
+
 
 
     @if (Gate::check('area_access'))

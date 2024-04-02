@@ -3,7 +3,7 @@
 
             <div class="col-md-4 form-group">
                 {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
-                {!! Form::select('customer_id', $customers, $transaction->customer_id??'', ['class' => 'form-control select2', 'required' => '']) !!}
+                {!! Form::select('customer_id', $customers, $transaction->customer_id??'', ['class' => 'form-control select2', 'required' => '' , 'readonly'=>'readonly']) !!}
                 <div class="error_customer_id text-danger error"></div>
             </div>
 

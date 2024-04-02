@@ -77,7 +77,7 @@
 </style>
 
 
-<div class="panel panel-default">
+<div class="panel panel-default estimates_trans_view">
     @foreach($allOrderHistory->groupBy('order_update_time') as $orderUpdateTime => $orderHistoryGroup)
     <div class="panel-body">
         <div class="row">
@@ -85,18 +85,11 @@
                 <div class="row" style="padding-top:20px;">
                     <div class="col-sm-6">
                         <address>
-                           @if ($loop->iteration == 1)
-                            <strong>Billed To:</strong><br>
-                            {{ $order->customer->name ?? '' }}<br>
-                            {{ $order->customer->area->address ?? '' }}
-                           @endif
+                            <strong>By :</strong> {{ $orderHistoryGroup->first()->updatedBy->name ?? '' }}<br>
                         </address>
                     </div>
                     <div class="col-sm-6 text-sm-right">
                         <address>
-                            @if ($loop->iteration == 1)
-                            <strong> @lang('quickadmin.transaction-management.fields.sales') #:</strong> {{ $order->invoice_number }} <br>
-                            @endif
                             <strong> @lang('quickadmin.date'):</strong> {{ date('d-m-Y h:i:s A', strtotime($orderUpdateTime)) }} <br>
                         </address>
                     </div>
@@ -106,7 +99,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                <div style="margin-top: 20px;">
+                <div style="margin-top: 10px;">
                     <div class="panel-body">
                         <div class="table-responsive">
                             <table class="table table-condensed">

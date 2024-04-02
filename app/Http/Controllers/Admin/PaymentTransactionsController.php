@@ -72,6 +72,8 @@ class PaymentTransactionsController extends Controller
         $id = decrypt($id);
         $alltransaction = PaymentTransactionHistory::where('payment_transaction_id',$id)->get();
         $cash_receipt = PaymentTransaction::with('customer')->select('customer_id','voucher_number','entry_date')->where('id',$id)->first();
+        PaymentTransaction::where('id', $id)->update(['is_modified' => 0]);
+
         $html = View::make('admin.payment_transactions.show_history', compact('alltransaction','cash_receipt'))->render();
         return response()->json(['success' => true, 'html' => $html]);
     }
@@ -98,7 +100,7 @@ class PaymentTransactionsController extends Controller
         abort_if(Gate::denies('transaction_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $transaction = PaymentTransaction::findOrFail($id);
         $oldvalue = $transaction->getOriginal();
-        $request['updated_by'] = Auth::id();
+        $request['is_modified'] = 1;
         $transaction->update($request->all());
         $newValue = $transaction->refresh();
         addToLog($request,'Cash receipt','Edit', $newValue ,$oldvalue);

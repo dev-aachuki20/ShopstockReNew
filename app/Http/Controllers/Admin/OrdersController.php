@@ -58,10 +58,11 @@ class OrdersController extends Controller
      */
     public function store(StoreOrdersRequest $request)
     {
-        abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+         abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $isDraft = $request->submit == 'draft' ? true : false;
 
         $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
+
         if (!$checkOrder) {
             $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
             $inputs = array(
@@ -94,10 +95,6 @@ class OrdersController extends Controller
             $order = $checkOrder;
         }
 
-        if (!$isDraft) {
-            $this->recordOrderHistory($order, $request->all());  //Check History
-        }
-
         // dd($inputs,$order);
 
         $orderProducts = $request->get('products');
@@ -119,7 +116,8 @@ class OrdersController extends Controller
             $allOrderProducts[] = $createOrderProduct;
         }
         if (count($allOrderProducts) > 0) {
-            $order->orderProduct()->createMany($allOrderProducts);
+            $createdProducts = $order->orderProduct()->createMany($allOrderProducts);
+            $createdProductIds = $createdProducts->pluck('id')->toArray();
         }
 
         if (!$isDraft) {
@@ -143,6 +141,12 @@ class OrdersController extends Controller
                     'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
                 ]);
             }
+        }
+        //dd($order);
+        if (!$isDraft && count($allOrderProducts) > 0) {
+            $requestData =  $request->all();
+            $requestData['products'] = orderProduct::where('order_id',$order->id)->get()->toArray();
+            $this->recordOrderHistory($order, $requestData,null,$createdProductIds);  //Check History
         }
        $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
         if ($order->order_type == 'return') {
@@ -184,8 +188,8 @@ class OrdersController extends Controller
         abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id = decrypt($id);
         $order= Order::findorfail($id);
+        $order->update(['is_modified' => 0]);
         $allOrderHistory = OrderEditHistory::where('order_id', $id)->get();
-        //dd($allOrderHistory);
         $html = View::make('admin.orders.prev_order_history_modal', compact('allOrderHistory','order','type'))->render();
         return response()->json(['success' => true, 'html' => $html]);
     }
@@ -273,7 +277,7 @@ class OrdersController extends Controller
     }
 
 
-    protected function recordOrderHistory($order, $updatedData,$action_type= null)
+    protected function recordOrderHistory($order, $updatedData,$action_type= null, $produt_add_or_update=null)
     {
         if(!$action_type){
             foreach ($updatedData['products'] as $product) {
@@ -299,8 +303,15 @@ class OrdersController extends Controller
                 if (isset($product['opid'])) {
                     $historyData['update_status'] = 'update';
                     $historyData['order_product_id'] = $product['opid'];
-                }
-                else {
+                }elseif($produt_add_or_update != null){
+                       $order_product_id = $product['id'];
+                        if(in_array($order_product_id, $produt_add_or_update)){
+                            $historyData['update_status'] = 'add';
+                        }else{
+                            $historyData['update_status'] = 'update';
+                            $historyData['order_product_id'] = $product['id'];
+                        }
+                }else {
                     $historyData['update_status'] = 'add';
                 }
                 OrderEditHistory::create($historyData);
@@ -465,12 +476,14 @@ class OrdersController extends Controller
             }
         }
 
-
+        $order->update(['is_modified' => 1]);
+        $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
 
         if ($type == 'draft') {
             return response()->json([
                 'success' => true,
                 'message'     => 'Successfully Updated!',
+                'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
                 'redirectUrl' => route('admin.orders.draftInvoice'),
             ]);
         }
@@ -479,6 +492,7 @@ class OrdersController extends Controller
         return response()->json([
             'success' => true,
             'message'     => 'Successfully Updated!',
+            'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
             'redirectUrl' => route('admin.transactions.type', $type),
         ]);
     }

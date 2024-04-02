@@ -19,12 +19,30 @@ class PaymentTransactionHistory extends Model
         parent::boot();
         static::creating(function(PaymentTransactionHistory $model) {
             $model->created_by = auth()->user()->id;
+            $model->updated_by = auth()->user()->id;
         });
 
         static::deleting(function(PaymentTransactionHistory $model) {
             $model->deleted_by = auth()->user()->id;
             $model->save();
         });
+
+        static::updating(function(PaymentTransactionHistory $model) {
+            $model->updated_by = auth()->user()->id;
+        });
+    }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
     public function setEntryDateAttribute($input){

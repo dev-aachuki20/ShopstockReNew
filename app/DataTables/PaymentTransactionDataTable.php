@@ -2,7 +2,9 @@
 
 namespace App\DataTables;
 
+use App\Models\OrderEditHistory;
 use App\Models\PaymentTransaction;
+use App\Models\PaymentTransactionHistory;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -55,7 +57,7 @@ class PaymentTransactionDataTable extends DataTable
                 $action = '';
                 // if (Gate::check('product_access')) {
                 $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-
+                $historyIcon = view('components.svg-icon', ['icon' => 'staff-rejoin'])->render();
                 // }
                 // if (Gate::check('product_edit')) {
                 $typeAction = $this->type;
@@ -68,28 +70,36 @@ class PaymentTransactionDataTable extends DataTable
                        // sales me only edit and delete show only when order is created at today
                         if($typeAction == "sales"){
                             if($today == $date_created){
-                                 $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                                 $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'">' . $editIcon . '</a>';
                             }
                         }else{
-                            $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                            $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
                         }
                     }
                     if (Gate::check('estimate_access')) {
-                        $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
+                        $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
+
+                        if ($typeAction == 'sales'){
+                            if(OrderEditHistory::where('order_id', $row->order_id)->where('update_status', '!=', 'add')->exists()){
+                                $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                            }
+                        }
                     }
                 } else if ($this->type == 'cash_reciept') {
                     if (Gate::check('transaction_edit')) {
-                        $action .= '<a href="' . route("admin.transactions.edit", encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
+                        $action .= '<a href="' . route("admin.transactions.edit", encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
                     }
                     if (Gate::check('transaction_access')) {
-                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' (' . date('d-m-Y', strtotime($row->entry_date)) . ')" class="btn btn-icon btn-info m-1 view_detail" >' . $viewIcon . '</a>';
-                        $historyIcon = view('components.svg-icon', ['icon' => 'staff-rejoin'])->render();
-                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' (' . date('d-m-Y', strtotime($row->entry_date)) . ')" class="btn btn-icon btn-info m-1 view_history_detail" >' . $historyIcon . '</a>';
+                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
+
+                        if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->exists()){
+                            $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                        }
                     }
                 }
                 else if ($typeAction == 'modified_sales'){
                     if (Gate::check('estimate_access')) {
-                        $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" >' . $viewIcon . '</a>';
+                        $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $viewIcon . '</a>';
                     }
                 }
 
@@ -98,15 +108,30 @@ class PaymentTransactionDataTable extends DataTable
                     if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
                         if($typeAction == "sales"){
                             if($today == $date_created){
-                                $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                                $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '" title="'.trans('quickadmin.qa_delete').'" >  ' . $deleteIcon . '</a>';
                             }
                         }else{
-                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '">  ' . $deleteIcon . '</a>';
+                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '" title="'.trans('quickadmin.qa_delete').'" >  ' . $deleteIcon . '</a>';
                         }
                     }
                 }
 
                 return $action;
+            })
+            ->setRowClass(function ($row) {
+
+                $typeAction = $this->type;
+                if($typeAction=='sales')
+                {
+                    return $row->order->is_modified ? 'estimates-trans-active' : '';
+                }
+                elseif($typeAction=='cash_reciept'){
+                        return $row->is_modified ? 'estimates-trans-active' : '';
+                }
+                else{
+                    return '';
+                }
+
             })
             ->rawColumns(['action','list_checkbox']);
     }

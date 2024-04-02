@@ -336,7 +336,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $(document).on('input', '#product_quantity', function(evt) {
-        var inputValue = $(this).val(); 
+        var inputValue = $(this).val();
         var intValue = parseInt(inputValue);
         if (intValue > 999999) {
             $(this).val($(this).val().substring(0, 6));
@@ -346,16 +346,16 @@ $(document).ready(function(){
 
 $('#productForm').on('keyup keypress', function(e) {
   var keyCode = e.keyCode || e.which;
-  if (keyCode === 13) { 
+  if (keyCode === 13) {
     if(!$(event.target).hasClass('select2-selection') && !$('.modal').hasClass('show')) {
         if($(event.target).hasClass('addDes')){
             $(".addDes").trigger('click');
         }else if($(event.target).hasClass('glassProductBtn')){
-            $(".glassProductBtn").trigger('click');        
+            $(".glassProductBtn").trigger('click');
         }else{
             $("#add_row").trigger('click');
-        }        
-    }   
+        }
+    }
     e.preventDefault();
     return false;
   }
@@ -388,7 +388,7 @@ $('#productForm').on('keyup keypress', function(e) {
         $(document).on('change', '#customerList', function() {
             var customer_id = $(this).val();
             $('#products_table').html(productDetailHtml);
-            $('#product_list').val(null).trigger('change');          
+            $('#product_list').val(null).trigger('change');
             handleCustomerData(customer_id);
         });
 
@@ -651,7 +651,7 @@ $('#productForm').on('keyup keypress', function(e) {
 
         // calulate total amount based on quantity and price.
         // $(document).on('keyup','#product_quantity, .price',function() {
-        //     var product_quantity 	= $('#product_quantity').val(); 
+        //     var product_quantity 	= $('#product_quantity').val();
         //     var product_price       = $("#product_price").val();
         //     var total = product_quantity * product_price;
         //     $("#product_amount").val(total.toFixed(2));
@@ -698,7 +698,7 @@ $('#productForm').on('keyup keypress', function(e) {
             // var total_price   = parseFloat(products_table.find('.sub_total').text()).toFixed(0);
             var total_price = products_table.find('.price').val().toLowerCase() == 'n' ? 0 : parseFloat(products_table.find('#product_amount').val()).toFixed(2);
             var extra_option_hint = products_table.find('.extra_option_hint').val();
-        
+
             icon = products_table.find('#addNewSubProduct i');
             var is_sub_product_value = '';
             if (icon.hasClass("fa-plus")) {
@@ -798,7 +798,7 @@ $('#productForm').on('keyup keypress', function(e) {
                                         markup += "<p style='margin-top:0px; margin-bottom:0px;'>(" + productObject.description + ")</p>";
                                     }
 
-                                    //8 ft x 4 ft - 1 pc 
+                                    //8 ft x 4 ft - 1 pc
                                     markup += "</td>";
                                     if (height != undefined && height != 0) {
                                         matrialElement += "<input type='hidden' name='products[" + row_count + "][height]' value='" + parseFloat(height).toFixed(2) + "' required/>  " + parseFloat(height).toFixed(2).replace(/\.0+$/, '') + extra_option_hint;
@@ -1146,17 +1146,16 @@ $('#productForm').on('keyup keypress', function(e) {
                 data: $("#productForm").serialize(),
                 dataType: 'json',
                 success: function(response, status, xhr) {
-                    // console.log(response);
+                    console.log(response);
                     $(`.${getTypeSave}`).prop('disabled', false);
+
                     if (response.success) {
                         Swal.fire(
                             response.invoiceNumber,
                             response.message,
                             'success'
                         ).then(function() {
-
                             // window.open(response.printPdfUrl, '_blank')
-
                             window.location.replace(response.redirectUrl);
                         });
                     }
@@ -1294,7 +1293,7 @@ $('#productForm').on('keyup keypress', function(e) {
                             }
 
                             // products_table.find('.price').val(response.rowData.price);
-                            // products_table.find('.sub_total').text(response.rowData.sub_total);						
+                            // products_table.find('.sub_total').text(response.rowData.sub_total);
                             // Start to store value in object
                             productObject.description = response.rowData.product_description;
 
@@ -1307,7 +1306,7 @@ $('#productForm').on('keyup keypress', function(e) {
                             $('.whole-sale-price').text(response.rowData.WSP);
                             $('.price-name').text(response.rowData.priceName);
 
-                            // End to store value in object						
+                            // End to store value in object
 
                             $('.purchase-price').text(response.rowData.purchase_price);
                             $('.min-sale-price').text(response.rowData.min_sale_price);
@@ -1471,7 +1470,7 @@ $('#productForm').on('keyup keypress', function(e) {
         }
     }
 
-    //Render glass product item 
+    //Render glass product item
     function addGlassProductViewRender(customer_id, product_id, renderType = 'html', otherDetails = null) {
         $.ajaxSetup({
             headers: {

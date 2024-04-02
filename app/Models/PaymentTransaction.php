@@ -11,20 +11,23 @@ class PaymentTransaction extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['customer_id', 'payment_type', 'payment_way', 'voucher_number', 'order_id', 'extra_details', 'remark', 'amount',  'entry_date', 'created_by','updated_by','deleted_by','is_split'];
+    protected $fillable = ['customer_id', 'payment_type', 'payment_way', 'voucher_number', 'order_id', 'extra_details', 'remark', 'amount',  'entry_date', 'created_by','updated_by','deleted_by','is_split','is_modified'];
 
-    protected static function boot() 
+    protected static function boot()
     {
         parent::boot();
         static::creating(function(PaymentTransaction $model) {
             $model->created_by = auth()->user()->id;
-        });    
+        });
 
         static::deleting(function(PaymentTransaction $model) {
             $model->deleted_by = auth()->user()->id;
             $model->save();
-        }); 
-        
+        });
+
+        static::updating(function(PaymentTransaction $model) {
+            $model->updated_by = auth()->user()->id;
+        });
     }
 
     /**
@@ -79,11 +82,11 @@ class PaymentTransaction extends Model
             $this->attributes['payment_type'] = null;
         }
     }
-    
+
     // public function order(){
     //     return $this->belongsTo(Order::class, 'order_id');
     // }
-    
+
     public function user(){
         return $this->belongsTo(User::class, 'created_by');
     }
@@ -91,11 +94,11 @@ class PaymentTransaction extends Model
     public function deletedByUser(){
         return $this->belongsTo(User::class, 'deleted_by');
     }
-    
+
     public function customer(){
         return $this->belongsTo(Customer::class, 'customer_id');
     }
-    
+
     public function order(){
         return $this->belongsTo(Order::class, 'order_id');
     }
