@@ -137,12 +137,13 @@ class OrdersController extends Controller
                 PaymentTransaction::create($transaction);
                 addToLog($request, 'Estimate', 'Create', $transaction);
             } else {
+                // 'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
                 $checkPaymentTransaction->update([
-                    'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
+                    'amount'        => round((float)str_replace(',', '', $order->total_amount))
                 ]);
             }
         }
-        //dd($order);
+
         if (!$isDraft && count($allOrderProducts) > 0) {
             $requestData =  $request->all();
             $requestData['products'] = orderProduct::where('order_id',$order->id)->get()->toArray();

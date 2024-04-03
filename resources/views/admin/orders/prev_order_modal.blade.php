@@ -156,7 +156,7 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                             ({{ $item->is_sub_product ?? '' }})
                                             @endif
 
-                                            @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && !is_null($item->other_details))
+                                            @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && !is_null($item->other_details) && ($item->other_details != 'false') )
                                             {!! glassProductMeasurement($item->other_details,'new_line') !!}
                                             @endif
 
