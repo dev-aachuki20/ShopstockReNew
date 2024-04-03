@@ -13,13 +13,13 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.customer-management.fields.alter_list')</h4>                 
+                  <h4>@lang('quickadmin.customer-management.fields.alter_list')</h4>
                 </div>
                 <div class="col-md-12">
-                    <h3>{{$customer->name}}</h3>
+                    <h3>{{ucwords($customer->name)}}</h3>
                     <p class="clientInformation">
                       <small title="Customer category">
-                        <i class="fa fa-user-md" aria-hidden="true"></i> 
+                        <i class="fa fa-user-md" aria-hidden="true"></i>
                         {{$customer->is_type ?? ''}}
                       </small>
                         <small title="Customer phone number"><i class="fa fa-phone" aria-hidden="true"></i> {{$customer->phone_number}}</small>
@@ -27,7 +27,7 @@
                         <small title="Customer address"><i class="fa fa-map-marker" aria-hidden="true"></i> {{ $customer->area->address ?? '' }}</small>
                   </p>
                 </div>
-             
+
                 <div class="col-md-12">
                   <!-- Start Filter Section -->
                      <div class="panel panel-default mt-5">
@@ -55,12 +55,12 @@
                               <button id="submitFilter" class="btn btn-sm btn-success mr-5">Submit</button>
                            </div>
                           </div>
-                              
+
                        </div>
                      </div>
                    <!--End Filter Section -->
                </div>
-               
+
                <div class="col-md-12">
                   <!-- Start payement history  -->
                     <div class="panel panel-default mt-0">
@@ -73,14 +73,14 @@
                   </div>
                 <!-- End Payment History -->
                </div>
-             
+
               </div>
             </div>
            </div>
         </div>
   </section>
 
- 
+
 
 @endsection
 
