@@ -4,7 +4,7 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <th>@lang('quickadmin.customers.fields.name')</th>
-                <td >{{ $customer->name ?? '' }}</td>
+                <td >{{ $customer->name ? ucwords($customer->name) : '' }}</td>
             </tr>
             <tr>
                 <th>@lang('quickadmin.customers.fields.phone_number')</th>
@@ -17,7 +17,7 @@
 
 
             <tr>
-                <th>@lang('quickadmin.customers.fields.area_address')</th> 
+                <th>@lang('quickadmin.customers.fields.area_address')</th>
                 <td >{{ $customer->area->address ?? '' }}</td>
             </tr>
             <tr>
