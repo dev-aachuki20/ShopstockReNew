@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
 use Auth;
+use Illuminate\Support\Facades\DB;
+
 class CustomerController extends Controller
 {
     /**
@@ -38,9 +40,75 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customer = Customer::findOrFail($request->id);
         $openingBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-        return view('admin.customer.view_list_customer',compact('customer','openingBalance'));
+
+        $currentDate = Carbon::now();
+        $startDate = $currentDate->copy()->subMonths(12)->startOfMonth();
+        $endDate = $currentDate->endOfMonth();
+
+        $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(created_at, '%Y-%m') as month, 'sales' as type")
+        ->where('customer_id', $request->id)
+        ->where('payment_way', 'order_create')
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'), 'type')->get();
+
+
+        $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(created_at, '%Y-%m') as month, 'cashreceipt' as type")
+        ->where('customer_id', $request->id)
+        ->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])
+        ->whereNotNull('voucher_number')
+        ->where('remark', '!=', 'Opening balance')
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'), 'type')->get();
+       // $data = $estimateData->union($cashReceiptData)->get();
+
+        $monthlyData = [];
+        $currentMonth = $startDate->copy();
+        while ($currentMonth <= $endDate) {
+            $monthKey = $currentMonth->format('Y-m');
+            $monthlyData[$monthKey]['month'] = $monthKey;
+            $monthlyData[$monthKey]['sales'] = 0;
+            $monthlyData[$monthKey]['cashreceipt'] = 0;
+            foreach($estimateData as $esrow){
+                if ($esrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['sales'] = $esrow['total_amount'];
+                    break;
+                }
+            }
+            foreach($cashReceiptData as $cashrow){
+                if ($cashrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['cashreceipt'] = $cashrow['total_amount'];
+                    break;
+                }
+            }
+            $currentMonth->addMonth();
+        }
+        // Sort the monthly data by month
+        ksort($monthlyData);
+        return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData'));
     }
 
+    public function viewCustomerDetail(Customer $customer,string $month)
+    {
+        $customer = Customer::findOrFail($customer->id);
+        //$openingBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+
+        $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")
+        ->where('customer_id', $customer->id)
+        ->where('payment_way', 'order_create')
+        ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$month]);
+
+        $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")
+        ->where('customer_id', $customer->id)
+        ->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])
+        ->whereNotNull('voucher_number')
+        ->where('remark', '!=', 'Opening balance')
+        ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$month]);
+        $alldata = collect($estimateData->get())->merge($cashReceiptData->get());
+        $alldata= $alldata->sortBy('entry_date');
+        //dd($alldata);
+        $html = view('admin.customer.view_customer_detail_modal', compact('customer','alldata','month'))->render();
+        return response()->json(['success' => true, 'htmlView' => $html]);
+    }
 
 
     /**
@@ -63,17 +131,17 @@ class CustomerController extends Controller
       //  dd($request->all());
         abort_if(Gate::denies('customer_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'name' => ['required','string','max:250'], 
-            'phone_number' => ['required','numeric','digits_between:7,10'], 
-            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'], 
-            'area_id' => ['required','numeric'], 
-            'is_type' => ['required','string','max:50'], 
+            'name' => ['required','string','max:250'],
+            'phone_number' => ['required','numeric','digits_between:7,10'],
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'],
+            'area_id' => ['required','numeric'],
+            'is_type' => ['required','string','max:50'],
             'opening_blance' => ['required','numeric'],
         ],[
             'opening_blance.required'=>'The opening balance field is required.',
             'area_id.required' => 'The area address field is required.',
             'is_type.required' => 'The type field is required.',
-        ]); 
+        ]);
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -103,7 +171,7 @@ class CustomerController extends Controller
             'phone_number' => $request->phone_number,
             'alternate_phone_number' => $request->alternate_phone_number,
             'area_id' => $request->area_id,
-            'is_type' => $request->is_type,            
+            'is_type' => $request->is_type,
             'credit_limit' => $request->credit_limit ?? 0,
             'created_by'=> Auth::id()
         ];
@@ -174,12 +242,12 @@ class CustomerController extends Controller
     {
         abort_if(Gate::denies('customer_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $validator = Validator::make($request->all(), [
-            'name' => ['required','string','max:250'], 
-            'phone_number' => ['required','numeric','digits_between:7,10'], 
-            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'], 
-            'area_id' => ['required','numeric'], 
+            'name' => ['required','string','max:250'],
+            'phone_number' => ['required','numeric','digits_between:7,10'],
+            'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'],
+            'area_id' => ['required','numeric'],
             'is_type' => ['required','string','max:50']
-        ]); 
+        ]);
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()->toArray()
@@ -205,14 +273,14 @@ class CustomerController extends Controller
         // for validate
 
         $customer = Customer::findOrFail($id);
-        $oldvalue = $customer->getOriginal(); 
-        $customer->name = $request->name; 
-        $customer->phone_number = $request->phone_number; 
-        $customer->alternate_phone_number = $request->alternate_phone_number; 
-        $customer->area_id = $request->area_id; 
-        $customer->is_type = $request->is_type; 
-        $customer->credit_limit = $request->credit_limit ?? 0; 
-        $customer->updated_by = Auth::id(); 
+        $oldvalue = $customer->getOriginal();
+        $customer->name = $request->name;
+        $customer->phone_number = $request->phone_number;
+        $customer->alternate_phone_number = $request->alternate_phone_number;
+        $customer->area_id = $request->area_id;
+        $customer->is_type = $request->is_type;
+        $customer->credit_limit = $request->credit_limit ?? 0;
+        $customer->updated_by = Auth::id();
         $customer->save();
         $newValue = $customer->refresh();
 
@@ -231,7 +299,7 @@ class CustomerController extends Controller
         }
         // group add
 
-        addToLog($request,'Customer','Edit', $newValue ,$oldvalue); 
+        addToLog($request,'Customer','Edit', $newValue ,$oldvalue);
         return response()->json(['success' => 'Update successfully.']);
     }
 
@@ -243,35 +311,35 @@ class CustomerController extends Controller
         // dd('remove from client');
         abort_if(Gate::denies('customer_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $record = Customer::find(decrypt($id));
-        $oldvalue = $record->getOriginal(); 
+        $oldvalue = $record->getOriginal();
         $record->updated_by = Auth::id();
         $record->save();
         $newValue = $record->refresh();
-        addToLog($request,'Customer','Delete', $newValue ,$oldvalue); 
+        addToLog($request,'Customer','Delete', $newValue ,$oldvalue);
         $record->delete();
         return response()->json(['success' => 'Delete successfully.']);
     }
 
 
-    public function historyFilter(Request $request){        
+    public function historyFilter(Request $request){
         $customerId = $request->customer;
         $openingBalance = 0;
         $openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
         if(is_null($request->from_date) && is_null($request->to_date)){
              $customer = Customer::findOrFail($customerId);
-        }else{            
+        }else{
              $startDate = Carbon::parse($request->from_date)->format('Y-m-d');
              $endDate  = Carbon::parse($request->to_date)->format('Y-m-d');
- 
+
              $previousDebitBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','debit')->sum('amount');
              $previousCreditBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','credit')->sum('amount');
              $openingBalance = $openingBalance + ((float)$previousCreditBalance - (float)$previousDebitBalance);
- 
+
              $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
                      $query->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
              }])->where('id',$customerId)->first();
-        }         
-        $view = view('admin.customer.payment_history', compact('customer','openingBalance'))->render();       
+        }
+        $view = view('admin.customer.payment_history', compact('customer','openingBalance'))->render();
         return response()->json(array('success' => true,'viewRender' =>$view), 200);
      }
 

@@ -648,6 +648,35 @@ table.dataTable tbody>tr:nth-child(even){
     padding-bottom: 12px;
     margin-bottom: 5px;
 }
+.party-list-managementTable{
+    padding-bottom: 10px;
+}
+.party-list-managementTable thead th:not(:first-child,:last-child){
+    width: 140px;
+}
+.party-list-managementTable thead th:nth-last-of-type(2){
+    width: 170px;
+}
+.party-list-managementTable thead th:last-child{
+    width: 80px;
+    text-align: center;
+}
+.party-list-managementTable tbody tr td:last-child{
+    text-align: center;
+}
+.party-list-managementTable tbody tr td:last-child button{
+    background-color: transparent;
+    border: none;
+}
+.party-list-managementTable tfoot{
+    background: #062142;
+}
+.party-list-managementTable tfoot th{
+    color: #fff;
+}
+.party-list-managementTable tfoot th{
+    border-color: #30445c !important;
+}
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {
