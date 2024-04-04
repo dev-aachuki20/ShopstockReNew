@@ -281,12 +281,12 @@
     </div>
     <div class="text-right order_create order_create_btnarea">
         <input type="hidden" name="submit" value="">
-        @if($orderType=='create')<button class="btn btn-info btn-lg w-150 order_form_submit save_as_draft_btn" data-checktype_is="save_as_draft_btn"; type="button" name="submit" value="draft" disabled="">Save as Draft</button>@endif
+        @if($orderType=='create')<button class="btn btn-info btn-lg w-150 order_form_submit save_as_draft_btn" data-checktype_is="save_as_draft_btn" type="button" name="submit" value="draft" disabled="">Save as Draft</button>@endif
         @if($orderType=='edit')
-        <button class="btn btn-info btn-lg w-150 order_form_submit save_draft_btn" data-checktype_is="save_draft_btn"; type="button" name="submit" value="draft">
+        <button class="btn btn-info btn-lg w-150 order_form_submit save_draft_btn" data-checktype_is="save_draft_btn" type="button" name="submit" value="draft">
             {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
         @endif
-        <button class="btn btn-success btn-lg order_form_submit save_estimate_btn" data-checktype_is="save_estimate_btn"; type="button" name="submit" value="save">
+        <button class="btn btn-success btn-lg order_form_submit save_estimate_btn" data-checktype_is="save_estimate_btn" type="button" name="submit" value="save">
             @if($orderType=='create')
             {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
@@ -1107,12 +1107,12 @@ $('#productForm').on('keyup keypress', function(e) {
             calculateGrandTotal();
         });
 
-        $(document).on('click', 'button[type=submit]', function(e) {
+        $(document).on('click','.order_form_submit', function(e) {
             $('input[name=submit]').val($(this).attr('value'));
         });
 
 
-        $(document).on('click', '.order_form_submit', function(e) {
+        $(document).on('click','.order_form_submit', function(e) {
             e.preventDefault();
             $(this).prop('disabled', true);
             var getTypeSave = $(this).data('checktype_is');
