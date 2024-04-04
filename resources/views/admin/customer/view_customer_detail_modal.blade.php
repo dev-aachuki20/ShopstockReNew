@@ -18,8 +18,8 @@
                                     <th>Date</th>
                                     <th>Particulars</th>
                                     <th>Voucher Number</th>
-                                    <th>Credit</th>
                                     <th>Debit</th>
+                                    <th>Credit</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -33,8 +33,8 @@
                                     <td>{{ $data->entry_date ? \Carbon\Carbon::parse($data->entry_date)->format('d-m-Y') : '' }}</td>
                                     <td>{{ $data->type=='sales' ? "Sales" : ($data->type=='sales_return' ? "Estimate Return" : "Cash Receipt") }}</td>
                                     <td>{{ $data->voucher_number ?? ""}}</td>
-                                    <td>{{ $data->type=='sales' ? $data->amount : ""}}</td>
                                     <td>{{ $data->type=='cashreceipt' || $data->type=='sales_return' ? $data->amount : "" }}</td>
+                                    <td>{{ $data->type=='sales' ? $data->amount : ""}}</td>
                                 </tr>
                                 @php
                                     if ($data->type == 'sales') {
@@ -50,14 +50,14 @@
                             <tfoot>
                                 <tr>
                                     <th colspan="3">Grand Total</th>
-                                    <th>{{ number_format($totalSales, 2, '.', ',') }}</th>
                                     <th>{{ number_format($totalCashReceipt+$totalSalesReturn, 2, '.', ',') }}</th>
+                                    <th>{{ number_format($totalSales, 2, '.', ',') }}</th>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <th colspan="3">Closing Balance</th>
                                     <th >{{ number_format($totalSales - ($totalCashReceipt+$totalSalesReturn), 2, '.', ',') }}</th>
                                     <th></th>
-                                </tr>
+                                </tr> --}}
                             </tfoot>
                         </table>
                     </div>

@@ -20,7 +20,6 @@
                         {{$customer->is_type ?? ''}}
                       </small>
                         <small title="Customer phone number"><i class="fa fa-phone" aria-hidden="true"></i> {{$customer->phone_number}}</small>
-                        <small title="Customer total blance"><i class="fa fa-money" aria-hidden="true"></i> <i class="fa fa-inr" aria-hidden="true"></i> {{$customer->credit_limit}}</small>
                         <small title="Customer address"><i class="fa fa-map-marker" aria-hidden="true"></i> {{ $customer->area->address ?? '' }}</small>
                     </p>
                 </div>
@@ -32,8 +31,8 @@
                                 <thead>
                                     <tr>
                                         <th>Particulars</th>
-                                        <th>Credit</th>
                                         <th>Debit</th>
+                                        <th>Credit</th>
                                         <th>Closing Balance</th>
                                         <th>Action</th>
                                     </tr>
@@ -43,25 +42,38 @@
                                         <th style="border-right: none;">Opening Balance</th>
                                         <th style="border-right: none;border-left: none;"></th>
                                         <th style="border-left: none;"></th>
-                                        <th colspan="2">{{  number_format($openingBalance, 2, '.', ',')}}</th>
+                                        <th colspan="2">{{  number_format($openingBalance, 2, '.', ',')}}{{ $openingBalance<=1 ? ' Dr' : ' Cr'}} </th>
                                     </tr>
                                     @php
                                         $totalSales = 0;
                                         $totalCashReceipt = 0;
                                         $totalSalesReturn = 0;
+                                        $currentBalance = 0 ;
                                     @endphp
-                                    @foreach($monthlyData as $data)
+                                    @foreach($monthlyData as $index => $data)
+
+                                    @php
+                                        if($index === 0){
+                                            $monthlyClosingBalance = $currentBalance + $data['sales'] + $openingBalance - ($data['cashreceipt'] + $data['sales_return']);
+                                        }
+                                        else{
+                                            $monthlyClosingBalance = $currentBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
+                                        }
+                                        $monthlyClosingBalanceFormatted = number_format($monthlyClosingBalance + $openingBalance, 2, '.', ',');
+                                    @endphp
+
                                     <tr>
                                         <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data['month'])->format('F Y') }}</td>
-                                        <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
                                         <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
-                                        <td>{{ number_format($data['sales'] - ($data['cashreceipt']+$data['sales_return']), 2, '.', ',') }}</td>
+                                        <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
+                                        <td>{{ $monthlyClosingBalanceFormatted }}</td>
                                         <td><button class="customer-month-detail" data-href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></button></td>
                                     </tr>
                                     @php
                                         $totalSales += $data['sales'];
                                         $totalCashReceipt += $data['cashreceipt'];
                                         $totalSalesReturn+= $data['sales_return'];
+                                        $currentBalance += $monthlyClosingBalance;
                                     @endphp
                                     @endforeach
 
@@ -69,8 +81,8 @@
                                 <tfoot>
                                     <tr>
                                         <th>Grand Total</th>
-                                        <th>{{ number_format($totalSales, 2, '.', ',') }}</th>
                                         <th>{{ number_format($totalCashReceipt+$totalSalesReturn, 2, '.', ',') }}</th>
+                                        <th>{{ number_format($totalSales, 2, '.', ',') }}</th>
                                         <th colspan="2">{{ number_format($totalSales - ($totalCashReceipt+$totalSalesReturn) + $openingBalance , 2, '.', ',') }}</th>
                                     </tr>
                                 </tfoot>
