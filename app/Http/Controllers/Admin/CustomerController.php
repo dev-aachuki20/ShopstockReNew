@@ -42,7 +42,7 @@ class CustomerController extends Controller
         $openingBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
 
         $currentDate = Carbon::now();
-        $startDate = $currentDate->copy()->subMonths(12)->startOfMonth();
+        $startDate = $currentDate->copy()->subMonths(11)->startOfMonth();
         $endDate = $currentDate->endOfMonth();
 
         $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
