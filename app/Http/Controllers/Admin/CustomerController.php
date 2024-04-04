@@ -45,21 +45,27 @@ class CustomerController extends Controller
         $startDate = $currentDate->copy()->subMonths(12)->startOfMonth();
         $endDate = $currentDate->endOfMonth();
 
-        $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(created_at, '%Y-%m') as month, 'sales' as type")
+        $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
         ->where('customer_id', $request->id)
         ->where('payment_way', 'order_create')
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'), 'type')->get();
+        ->whereBetween('entry_date', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
 
 
-        $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(created_at, '%Y-%m') as month, 'cashreceipt' as type")
+        $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'cashreceipt' as type")
         ->where('customer_id', $request->id)
         ->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])
         ->whereNotNull('voucher_number')
         ->where('remark', '!=', 'Opening balance')
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->groupBy(DB::raw('YEAR(created_at)'), DB::raw('MONTH(created_at)'), 'type')->get();
+        ->whereBetween('entry_date', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
        // $data = $estimateData->union($cashReceiptData)->get();
+
+       $estimateReturnData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales_return' as type")
+        ->where('customer_id', $request->id)
+        ->where('payment_way', 'order_return')
+        ->whereBetween('entry_date', [$startDate, $endDate])
+        ->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
 
         $monthlyData = [];
         $currentMonth = $startDate->copy();
@@ -68,6 +74,7 @@ class CustomerController extends Controller
             $monthlyData[$monthKey]['month'] = $monthKey;
             $monthlyData[$monthKey]['sales'] = 0;
             $monthlyData[$monthKey]['cashreceipt'] = 0;
+            $monthlyData[$monthKey]['sales_return'] = 0;
             foreach($estimateData as $esrow){
                 if ($esrow['month'] === $monthKey) {
                     $monthlyData[$monthKey]['sales'] = $esrow['total_amount'];
@@ -77,6 +84,12 @@ class CustomerController extends Controller
             foreach($cashReceiptData as $cashrow){
                 if ($cashrow['month'] === $monthKey) {
                     $monthlyData[$monthKey]['cashreceipt'] = $cashrow['total_amount'];
+                    break;
+                }
+            }
+            foreach($estimateReturnData as $esreturnrow){
+                if ($esreturnrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['sales_return'] = $esreturnrow['total_amount'];
                     break;
                 }
             }
@@ -95,15 +108,21 @@ class CustomerController extends Controller
         $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")
         ->where('customer_id', $customer->id)
         ->where('payment_way', 'order_create')
-        ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$month]);
+        ->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
 
         $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")
         ->where('customer_id', $customer->id)
         ->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])
         ->whereNotNull('voucher_number')
         ->where('remark', '!=', 'Opening balance')
-        ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$month]);
-        $alldata = collect($estimateData->get())->merge($cashReceiptData->get());
+        ->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
+
+        $estimateReturnData = PaymentTransaction::selectRaw("*,'sales_return' as type")
+        ->where('customer_id', $customer->id)
+        ->where('payment_way', 'order_return')
+        ->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
+
+        $alldata = collect($estimateData->get())->merge($cashReceiptData->get())->merge($estimateReturnData->get());
         $alldata= $alldata->sortBy('entry_date');
         //dd($alldata);
         $html = view('admin.customer.view_customer_detail_modal', compact('customer','alldata','month'))->render();

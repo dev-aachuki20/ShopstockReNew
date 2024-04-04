@@ -678,6 +678,14 @@ table.dataTable tbody>tr:nth-child(even){
     border-color: #30445c !important;
 }
 
+#customerMonthDetail table tbody tr:last-child td{
+    border-bottom: 1px solid #ddd;
+}
+#customerMonthDetail table tfoot tr:last-child{
+    background-color: #f3f3f3;
+}
+
+
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {
         flex: 0 0 100%;
