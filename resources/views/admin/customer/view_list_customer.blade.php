@@ -48,16 +48,16 @@
                                         $totalSales = 0;
                                         $totalCashReceipt = 0;
                                         $totalSalesReturn = 0;
-                                        $currentBalance = 0 ;
+                                        $lastClosingBalance = 0 ;
                                     @endphp
                                     @foreach($monthlyData as $index => $data)
 
                                     @php
                                         if($index === 0){
-                                            $monthlyClosingBalance = $currentBalance + $data['sales'] + $openingBalance - ($data['cashreceipt'] + $data['sales_return']);
+                                            $monthlyClosingBalance = $lastClosingBalance + $data['sales'] + $openingBalance - ($data['cashreceipt'] + $data['sales_return']);
                                         }
                                         else{
-                                            $monthlyClosingBalance = $currentBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
+                                            $monthlyClosingBalance = $lastClosingBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
                                         }
                                         $monthlyClosingBalanceFormatted = number_format($monthlyClosingBalance + $openingBalance, 2, '.', ',');
                                     @endphp
@@ -73,7 +73,7 @@
                                         $totalSales += $data['sales'];
                                         $totalCashReceipt += $data['cashreceipt'];
                                         $totalSalesReturn+= $data['sales_return'];
-                                        $currentBalance += $monthlyClosingBalance;
+                                        $lastClosingBalance = $monthlyClosingBalance;
                                     @endphp
                                     @endforeach
 
