@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="col-md-8">
-                    <h6>{{ $customer->name ?? "" }} ( {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }} ) </h4>
+                    <h6>{{ $customer->name ? ucwords($customer->name) : "" }} ( {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }} ) </h4>
                 </div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
