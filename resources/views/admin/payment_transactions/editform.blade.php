@@ -9,7 +9,7 @@
 
             <div class="col-md-4 form-group">
                 {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
-                {!! Form::hidden('payment_type','debit') !!}
+                {!! Form::hidden('payment_type','credit') !!}
                 {!! Form::select('payment_way', $paymentWays, $transaction->payment_way??'', ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
                 <div class="error_payment_way text-danger error"></div>
             </div>

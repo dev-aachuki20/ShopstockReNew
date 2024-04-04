@@ -42,7 +42,7 @@
                                         <th style="border-right: none;">Opening Balance</th>
                                         <th style="border-right: none;border-left: none;"></th>
                                         <th style="border-left: none;"></th>
-                                        <th colspan="2">{{  number_format($openingBalance, 2, '.', ',')}}{{ $openingBalance<=1 ? ' Dr' : ' Cr'}} </th>
+                                        <th colspan="2">{{  number_format($openingBalance, 2, '.', ',')}}{{ $openingBalance<=1 ? ' Cr' : ' Dr'}} </th>
                                     </tr>
                                     @php
                                         $totalSales = 0;
@@ -64,8 +64,8 @@
 
                                     <tr>
                                         <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data['month'])->format('F Y') }}</td>
-                                        <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
                                         <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
+                                        <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
                                         <td>{{ $monthlyClosingBalanceFormatted }}</td>
                                         <td><button class="customer-month-detail" data-href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></button></td>
                                     </tr>
@@ -76,13 +76,12 @@
                                         $lastClosingBalance = $monthlyClosingBalance;
                                     @endphp
                                     @endforeach
-
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <th>Grand Total</th>
-                                        <th>{{ number_format($totalCashReceipt+$totalSalesReturn, 2, '.', ',') }}</th>
                                         <th>{{ number_format($totalSales, 2, '.', ',') }}</th>
+                                        <th>{{ number_format($totalCashReceipt+$totalSalesReturn, 2, '.', ',') }}</th>
                                         <th colspan="2">{{ number_format($totalSales - ($totalCashReceipt+$totalSalesReturn) + $openingBalance , 2, '.', ',') }}</th>
                                     </tr>
                                 </tfoot>

@@ -29,11 +29,11 @@ class CustomerListDataTable extends DataTable
             })
             ->editColumn('phone_number',function($row){
                 return $row->phone_number ?? "";
-            })            
+            })
             ->editColumn('debit',function($row){
                $getTotalBlance = getTotalBlance($row->id,1);
                $dabit_blance = "";
-               if($getTotalBlance > 0){
+               if($getTotalBlance < 0){
                 $dabit_blance = '<i class="fa fa-inr" aria-hidden="true"></i> '. number_format(abs($getTotalBlance),2);
                }
                return $dabit_blance;
@@ -41,7 +41,7 @@ class CustomerListDataTable extends DataTable
             ->editColumn('credit',function($row){
                 $getTotalBlance = getTotalBlance($row->id,1);
                 $credit_blance = "";
-                if($getTotalBlance < 0){
+                if($getTotalBlance > 0){
                     $credit_blance = '<i class="fa fa-inr" aria-hidden="true"></i> '. number_format(abs($getTotalBlance),2);
                 }
                 return $credit_blance;

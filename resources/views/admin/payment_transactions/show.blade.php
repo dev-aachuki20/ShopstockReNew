@@ -29,7 +29,7 @@
                     <p>{{ $transaction->user->name??''}}</p>
                     <small>{{ $transaction->created_at}}</small>
                 </td>
-            </tr>           
+            </tr>
             <tr>
                 <th>@lang('quickadmin.transaction.fields.amount')</th>
                 <td field-key='amount'><i class="fa fa-inr" aria-hidden="true"> {{ number_format($transaction->amount,2) }}</td>

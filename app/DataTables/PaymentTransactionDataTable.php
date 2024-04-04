@@ -44,11 +44,11 @@ class PaymentTransactionDataTable extends DataTable
             ->editColumn('payment_way', function ($row) {
                 return (isset(config('constant.paymentModifyWays')[$row->payment_way]) ? config('constant.paymentModifyWays')[$row->payment_way] : '');
             })
-            ->editColumn('credit_amount', function ($row) {
-                return ($row->payment_type == 'credit' ? number_format(abs($row->amount), 2) : '');
-            })
             ->editColumn('debit_amount', function ($row) {
                 return ($row->payment_type == 'debit' ? number_format(abs($row->amount), 2) : '');
+            })
+            ->editColumn('credit_amount', function ($row) {
+                return ($row->payment_type == 'credit' ? number_format(abs($row->amount), 2) : '');
             })
             ->editColumn('created_at', function ($row) {
                 return $row->created_at;
@@ -238,8 +238,8 @@ class PaymentTransactionDataTable extends DataTable
             Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
             Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type')),
-            Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount'),
             Column::make('debit_amount')->title(trans('quickadmin.transaction.fields.debit_amount'))->name('amount'),
+            Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount'),
             Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at')),
 
             Column::computed('action')
