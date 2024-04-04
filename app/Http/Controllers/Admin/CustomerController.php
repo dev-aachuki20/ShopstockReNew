@@ -173,7 +173,7 @@ class CustomerController extends Controller
 
         $transactionDetails = array(
             'customer_id' => $customer->id,
-            'payment_type' => 'credit',
+            'payment_type' => 'debit',
             'payment_way' => 'by_cash',
             'remark' => 'Opening balance',
             'amount' => $request->opening_blance,

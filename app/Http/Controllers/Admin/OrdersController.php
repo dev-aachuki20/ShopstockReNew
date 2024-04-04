@@ -126,7 +126,7 @@ class OrdersController extends Controller
                 $transaction = [
                     'order_id'      => $order->id,
                     'customer_id'   => $order->customer_id,
-                    'payment_type'  => ($order->order_type == 'return') ? 'debit' : 'credit',
+                    'payment_type'  => ($order->order_type == 'return') ? 'credit' : 'debit',
                     'payment_way'   => 'order_' . $order->order_type,
                     'voucher_number' => $invoiceNumber ?? $order->invoice_number,
                     'amount'        => round((float)str_replace(',', '', $order->total_amount)),

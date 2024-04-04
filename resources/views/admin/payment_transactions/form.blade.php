@@ -1,6 +1,6 @@
 
 <div class="panel panel-default col-md-12">
-    <div class="panel-body row">        
+    <div class="panel-body row">
         <div class="col-md-4 form-group formValidate">
             {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
             <select class="form-control select2" name="customer_id" id="customer_id" required>
@@ -37,7 +37,7 @@
 
         <div class="col-md-4 form-group">
             {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
-            {!! Form::hidden('payment_type','debit') !!}
+            {!! Form::hidden('payment_type','credit') !!}
             {!! Form::select('payment_way', $paymentWays, old('payment_way'), ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
             @if($errors->has('payment_way'))
             <p class="help-block red text-danger">
