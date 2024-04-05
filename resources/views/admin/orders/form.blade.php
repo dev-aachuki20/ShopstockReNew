@@ -6,7 +6,11 @@
                 {!! Form::hidden('order_type', $orderType) !!}
                 {!! Form::hidden('type', optional(request())->route('type')) !!}
                 {!! Form::hidden('deleted_opids') !!}
-                {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
+                @if(isset($order->customer_id))
+                    {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList', 'readonly'=>'readonly']) !!}
+                @else
+                    {!! Form::select('customer_id', $customers, isset($customer->id) ? $customer->id : '', ['class' => 'form-control select2 customers', 'id'=>'customerList']) !!}
+                @endif
             </div>
             <div class="error_customer_id text-danger error"></div>
         </div>

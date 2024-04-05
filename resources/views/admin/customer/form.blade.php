@@ -36,7 +36,7 @@
 
       <div class="col-md-6 col-sm-12 col-lg-6 form-group">
           {!! Form::label('credit_limit', trans('quickadmin.customers.fields.credit_limit'), ['class' => 'control-label ']) !!}
-          {!! Form::text('credit_limit', $customer->credit_limit ?? 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
+          {!! Form::text('credit_limit', (isset($customer->credit_limit))?(int)$customer->credit_limit: 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
           <div class="error_credit_limit text-danger error"></div>
       </div>
       <div class="col-md-12"></div>
@@ -92,7 +92,7 @@
                   </div>
                   <div class="modal-body">
                       <div class="form-group">
-                          <label for="naem">ADDRESS:</label>
+                          <label for="naem">Address:</label>
                           <input type="text" class="form-control" id="add_new_name" placeholder="Enter address">
                           <span class="error_new_address text-danger error"></span>
                       </div>

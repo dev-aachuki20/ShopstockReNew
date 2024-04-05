@@ -61,8 +61,8 @@ class PaymentTransactionDataTable extends DataTable
                 // }
                 // if (Gate::check('product_edit')) {
                 $typeAction = $this->type;
-                $today = now()->format('Y-m-d');
-                $date_created = $row->created_at->format('Y-m-d');
+                $today = \Carbon\Carbon::now()->format('Y-m-d');               
+                $date_created = ($row->created_at) ? $row->created_at->format('Y-m-d') : null;
 
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                 if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
@@ -123,7 +123,7 @@ class PaymentTransactionDataTable extends DataTable
                 $typeAction = $this->type;
                 if($typeAction=='sales')
                 {
-                    return $row->order->is_modified ? 'estimates-trans-active' : '';
+                    return $row->order && $row->order->is_modified ? 'estimates-trans-active' : '';
                 }
                 elseif($typeAction=='cash_reciept'){
                         return $row->is_modified ? 'estimates-trans-active' : '';
@@ -230,24 +230,31 @@ class PaymentTransactionDataTable extends DataTable
      */
     public function getColumns(): array
     {
-        return [
+        $type = $this->type;
 
-             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
+        $columns = [
+            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             //Column::make('list_checkbox')->title('<input type="checkbox" id="select-all"  class="select-checkbox" />')->orderable(false)->searchable(false),
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
-            Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type')),
-            Column::make('debit_amount')->title(trans('quickadmin.transaction.fields.debit_amount'))->name('amount'),
-            Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount'),
-            Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at')),
+            Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type'))
+        ];    
+        if ($type === 'sales' || $type === 'cancelled') {
+            $columns[] = Column::make('debit_amount')->title(trans('quickadmin.transaction.fields.debit_amount'))->name('amount');
+        }
+        if($type === 'sales_return' || $type === 'cash_reciept' || $type === 'cancelled'){
+            $columns[] = Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount');
+        }     
 
-            Column::computed('action')
-                ->exportable(false)
-                ->printable(false)
-                ->width(60)
-                ->addClass('text-center')->title(trans('quickadmin.qa_action')),
-        ];
+        $columns[] =  Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at'));
+        $columns[] =  Column::computed('action')
+                        ->exportable(false)
+                        ->printable(false)
+                        ->width(60)
+                        ->addClass('text-center')->title(trans('quickadmin.qa_action'));         
+        return $columns;
+           
     }
 
     /**
