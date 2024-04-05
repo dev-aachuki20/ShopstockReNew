@@ -35,7 +35,7 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.customer.list');
     }
-    public function viewCostomer(Request $request ,  )
+    public function viewCostomer(Request $request )
     {
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customer = Customer::findOrFail($request->id);
@@ -50,6 +50,7 @@ class CustomerController extends Controller
         $endDate = ($year == $currentYear) ? Carbon::create($year, $currentMonth, 1)->endOfMonth() : Carbon::create($year, 12, 1)->endOfMonth();
 
         $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+
 
         $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
         ->where('customer_id', $request->id)->where('payment_way', 'order_create')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
@@ -97,7 +98,8 @@ class CustomerController extends Controller
         $firstopeningBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
 
         $year = substr($month, 0, 4);
-        $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+        // $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+        $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customer->id,$month);
 
         //dd($openingBalance);
         $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_create')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);

@@ -423,7 +423,6 @@ if (!function_exists('GetYearOpeningBalance')) {
     function GetYearOpeningBalance($firstopeningBalance=0, $customerID, $year)
     {
         $customer = Customer::findOrFail($customerID);
-
         $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
 
         if ($year < $customerCreatedAtYear)
@@ -436,22 +435,48 @@ if (!function_exists('GetYearOpeningBalance')) {
         }
         else
         {
-            $estimateDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_debit_amount, 'sales' as type")
-            ->where('customer_id', $customerID)->where('payment_way', 'order_create')->whereYear('entry_date', '<', $year)->first();
-
-            $cashReceiptDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_cashreceipt_amount, 'cashreceipt' as type")
-            ->where('customer_id', $customerID)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')
-            ->where('remark', '!=', 'Opening balance')->whereYear('entry_date', '<', $year)->first();
-
-            $estimateReturnDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_salereturn_amount, 'sales_return' as type")
-            ->where('customer_id', $customerID)->where('payment_way', 'order_return')->whereYear('entry_date', '<', $year)->first();
-
-            $total_debit_amount = $estimateDataquery->total_debit_amount ?? 0;
-            $total_credit_amount = ($cashReceiptDataquery->total_cashreceipt_amount ?? 0) + ($estimateReturnDataquery->total_salereturn_amount ?? 0);
-            $newopening_balance = $firstopeningBalance + $total_debit_amount - $total_credit_amount;
-            $openingBalance = $newopening_balance;
+            // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) - SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS new_opening_balance FROM payment_transactions WHERE entry_date <= '2024-01-01' AND customer_id = 1;
+            $getAllAmount = PaymentTransaction::selectRaw('customer_id')
+            ->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
+            ->selectRaw("SUM(CASE WHEN payment_type='credit' THEN amount ELSE 0 END) AS total_credit_amount")
+            ->selectRaw("SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) - SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS new_opening_balance")->where('customer_id', $customerID)->whereYear('entry_date', '<', $year)->first();
+            $openingBalance = $getAllAmount->new_opening_balance;
         }
+        return $openingBalance;
+    }
+}
 
+if (!function_exists('GetMonthWiseOpeningBalance')) {
+    function GetMonthWiseOpeningBalance($firstopeningBalance=0, $customerID, $yearmonth)
+    {
+        $customer = Customer::findOrFail($customerID);
+        $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
+        $year = substr($yearmonth, 0, 4);
+        $month = substr($yearmonth, 5, 2);
+        $startDate = Carbon::create($year, 1, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $thisYearOpeningBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+
+        // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount FROM payment_transactions WHERE entry_date BETWEEN '2024-01-01' AND '2024-04-01' AND customer_id = 1;
+        $query = PaymentTransaction::selectRaw('customer_id')
+        ->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
+        ->selectRaw("SUM(CASE WHEN payment_type='credit' THEN amount ELSE 0 END) AS total_credit_amount")
+        ->where('customer_id', $customerID)->whereBetween('entry_date', [$startDate, $endDate]);
+        //dd($startDate , $endDate);
+        if ($year < $customerCreatedAtYear)
+        {
+           $openingBalance = 0;
+        }
+        elseif ($year == $customerCreatedAtYear)
+        {
+            $getAllAmount = $query->first();
+            $openingBalance = $getAllAmount->total_debit_amount - $getAllAmount->total_credit_amount;
+        }
+        else
+        {
+            $getAllAmount = $query->first();
+            $openingBalance = $thisYearOpeningBalance + $getAllAmount->total_debit_amount - $getAllAmount->total_credit_amount;
+        }
         return $openingBalance;
     }
 }
