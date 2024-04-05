@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Uploads;
@@ -414,5 +415,43 @@ if (!function_exists('glassProductMeasurement')) {
         } else if ($type == 'one_line') {
             return implode(' , ', $glassProductMeasurementList);
         }
+    }
+}
+
+
+if (!function_exists('GetYearOpeningBalance')) {
+    function GetYearOpeningBalance($firstopeningBalance=0, $customerID, $year)
+    {
+        $customer = Customer::findOrFail($customerID);
+
+        $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
+
+        if ($year < $customerCreatedAtYear)
+        {
+           $openingBalance = 0;
+        }
+        elseif ($year == $customerCreatedAtYear)
+        {
+            $openingBalance = $firstopeningBalance;
+        }
+        else
+        {
+            $estimateDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_debit_amount, 'sales' as type")
+            ->where('customer_id', $customerID)->where('payment_way', 'order_create')->whereYear('entry_date', '<', $year)->first();
+
+            $cashReceiptDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_cashreceipt_amount, 'cashreceipt' as type")
+            ->where('customer_id', $customerID)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')
+            ->where('remark', '!=', 'Opening balance')->whereYear('entry_date', '<', $year)->first();
+
+            $estimateReturnDataquery = PaymentTransaction::selectRaw("SUM(amount) as total_salereturn_amount, 'sales_return' as type")
+            ->where('customer_id', $customerID)->where('payment_way', 'order_return')->whereYear('entry_date', '<', $year)->first();
+
+            $total_debit_amount = $estimateDataquery->total_debit_amount ?? 0;
+            $total_credit_amount = ($cashReceiptDataquery->total_cashreceipt_amount ?? 0) + ($estimateReturnDataquery->total_salereturn_amount ?? 0);
+            $newopening_balance = $firstopeningBalance + $total_debit_amount - $total_credit_amount;
+            $openingBalance = $newopening_balance;
+        }
+
+        return $openingBalance;
     }
 }
