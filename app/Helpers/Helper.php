@@ -454,15 +454,16 @@ if (!function_exists('GetMonthWiseOpeningBalance')) {
         $year = substr($yearmonth, 0, 4);
         $month = substr($yearmonth, 5, 2);
         $startDate = Carbon::create($year, 1, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month, 1)->subMonth()->endOfMonth();
         $thisYearOpeningBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
-
-        // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount FROM payment_transactions WHERE entry_date BETWEEN '2024-01-01' AND '2024-04-01' AND customer_id = 1;
+        // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount FROM payment_transactions WHERE entry_date BETWEEN '2024-01-01' AND '2024-03-31' AND customer_id = 1;
+        //dd($startDate,$endDate);
         $query = PaymentTransaction::selectRaw('customer_id')
         ->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
         ->selectRaw("SUM(CASE WHEN payment_type='credit' THEN amount ELSE 0 END) AS total_credit_amount")
+        ->where('remark', '<>', 'Opening balance')
         ->where('customer_id', $customerID)->whereBetween('entry_date', [$startDate, $endDate]);
-        //dd($startDate , $endDate);
+
         if ($year < $customerCreatedAtYear)
         {
            $openingBalance = 0;
@@ -470,13 +471,14 @@ if (!function_exists('GetMonthWiseOpeningBalance')) {
         elseif ($year == $customerCreatedAtYear)
         {
             $getAllAmount = $query->first();
-            $openingBalance = $getAllAmount->total_debit_amount - $getAllAmount->total_credit_amount;
+            $openingBalance = (float)$thisYearOpeningBalance + ((float)$getAllAmount->total_debit_amount - (float)$getAllAmount->total_credit_amount);
         }
         else
         {
             $getAllAmount = $query->first();
-            $openingBalance = $thisYearOpeningBalance + $getAllAmount->total_debit_amount - $getAllAmount->total_credit_amount;
+            $openingBalance = (float)$thisYearOpeningBalance + ((float)$getAllAmount->total_debit_amount - (float)$getAllAmount->total_credit_amount);
         }
+
         return $openingBalance;
     }
 }
