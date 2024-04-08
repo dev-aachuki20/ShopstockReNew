@@ -181,7 +181,6 @@ $(document).ready(function(){
         var yearmonth = '{{$month}}';
         var type = $(this).attr('data-value');
         var url = "{{ route('admin.customers.printPaymentHistory') }}/"+type+"/{{encrypt($customer->id)}}/"+yearmonth;
-       // var printUrl = "{{ route('admin.customers.printPaymentHistory') }}/"+type+"/{{encrypt($customer->id)}}/"+yearmonth;
         console.log('yearmonth',url);
         window.open(url,'_target');
     });
