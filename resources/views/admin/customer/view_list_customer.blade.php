@@ -31,12 +31,14 @@
                                     <form action="" id="yearFilterForm">
                                         <div class="row">
                                             <div class="col-lg-6 form-group">
-                                                <label for="year">Select Year</label>
-                                                <select name="year" id="year" data-customerid={{$customer->id}}>
-                                                    @foreach ($yearlist as $data)
-                                                    <option value="{{ $data }}" {{ $year == $data ? 'selected' : '' }}>{{ $data }}</option>
-                                                    @endforeach
-                                                </select>
+                                               <div class="selectyear d-flex align-items-center">
+                                                    <label for="year" class="mb-0">Select Year</label>
+                                                    <select class="form-control" name="year" id="year" data-customerid={{$customer->id}}>
+                                                        @foreach ($yearlist as $data)
+                                                        <option value="{{ $data }}" {{ $year == $data ? 'selected' : '' }}>{{ $data }}</option>
+                                                        @endforeach
+                                                    </select>
+                                               </div>
                                             </div>
                                         </div>
                                     </form>

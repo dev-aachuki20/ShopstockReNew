@@ -723,7 +723,10 @@ table.dataTable tbody>tr:nth-child(even){
 .card .card-header .btn.circlebtn{
     border-radius: 100%;
 }
-
+.selectyear label {
+    white-space: nowrap;
+    margin-right: 15px;
+}
 
 
 
