@@ -77,7 +77,8 @@ class PaymentTransactionDataTable extends DataTable
                         }
                     }
                     if (Gate::check('estimate_access')) {
-                        $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
+
+                        $action .= ($this->type == 'cancelled' && $row->payment_way == "by_cash")? '':'<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
 
                         if ($typeAction == 'sales'){
                             if(OrderEditHistory::where('order_id', $row->order_id)->where('update_status', '!=', 'add')->exists()){

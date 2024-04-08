@@ -141,7 +141,16 @@ $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTr
                                     @php
                                     $sno = 0;
                                     @endphp
-                                    @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_at')->get() as $item)
+                                    @if($type == "cancelled")
+                                        @php
+                                            $orderProducts = $order->orderProduct()->withTrashed()->get();
+                                        @endphp
+                                    @else
+                                        @php
+                                            $orderProducts = $order->orderProduct()->withTrashed()->whereNull('deleted_at')->get();
+                                        @endphp
+                                    @endif
+                                    @foreach($orderProducts as $item)
                                     <tr>
                                         <td class="text-left">{{ ++$sno }}</td>
                                         <td>
