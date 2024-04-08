@@ -24,6 +24,28 @@
                     </p>
                 </div>
                 <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <form action="" id="yearFilterForm">
+                                        <div class="row">
+                                            <div class="col-lg-6 form-group">
+                                                <label for="year">Select Year</label>
+                                                <select name="year" id="year" data-customerid={{$customer->id}}>
+                                                    @foreach ($yearlist as $data)
+                                                    <option value="{{ $data }}" {{ $year == $data ? 'selected' : '' }}>{{ $data }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
                     <!-- Start payement history  -->
                     <div class="panel panel-default mt-0">
                         <div class="panel-body table-responsive payment-history-content party-list-managementTable">
@@ -42,7 +64,7 @@
                                         <th style="border-right: none;">Opening Balance</th>
                                         <th style="border-right: none;border-left: none;"></th>
                                         <th style="border-left: none;"></th>
-                                        <th colspan="2">{{  number_format($openingBalance, 2, '.', ',')}}{{ $openingBalance<=1 ? ' Cr' : ' Dr'}} </th>
+                                        <th colspan="2">{{ number_format(abs($openingBalance), 2, '.', ',')}}{{ $openingBalance<=1 ? ' Cr' : ' Dr'}} </th>
                                     </tr>
                                     @php
                                         $totalSales = 0;
@@ -59,15 +81,16 @@
                                         else{
                                             $monthlyClosingBalance = $lastClosingBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
                                         }
-                                        $monthlyClosingBalanceFormatted = number_format($monthlyClosingBalance + $openingBalance, 2, '.', ',');
+                                        // $monthlyClosingBalanceFormatted = number_format($monthlyClosingBalance + $openingBalance, 2, '.', ',');
+                                        $monthlyClosingBalanceFormatted = $monthlyClosingBalance + $openingBalance;
                                     @endphp
 
                                     <tr>
                                         <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data['month'])->format('F Y') }}</td>
                                         <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
                                         <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
-                                        <td>{{ $monthlyClosingBalanceFormatted }}</td>
-                                        <td><button class="customer-month-detail" data-href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></button></td>
+                                        <td>{{ number_format(abs($monthlyClosingBalanceFormatted), 2, '.', ',') }}{{ $monthlyClosingBalanceFormatted<=1 ? ' Cr' : ' Dr'}}</td>
+                                        <td><a class="customer-month-detail" href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></a></td>
                                     </tr>
                                     @php
                                         $totalSales += $data['sales'];
@@ -107,22 +130,38 @@
 
 $(document).ready(function () {
 
-$(document).on("click", ".customer-month-detail", function () {
-        var hrefUrl = $(this).attr('data-href');
-        $('.modal-backdrop').remove();
-        $.ajax({
-            type: 'get',
-            url: hrefUrl,
-            success: function (response) {
-                //$('#preloader').css('display', 'none');
-                if(response.success) {
-                    $('.popup_render_div').html(response.htmlView);
-                    $('#customerMonthDetail').modal('show');
-                    $('#customerMonthDetail').css('z-index', '99999');
-                }
-            }
-        });
+    $.ajaxSetup({
+        headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
     });
+
+    // $(document).on("click", ".customer-month-detail", function (e) {
+    //     e.preventDefault();
+    //     var hrefUrl = $(this).attr('data-href');
+    //     $('.modal-backdrop').remove();
+    //     $.ajax({
+    //         type: 'get',
+    //         url: hrefUrl,
+    //         success: function (response) {
+    //             //$('#preloader').css('display', 'none');
+    //             if(response.success) {
+    //                 $('.popup_render_div').html(response.htmlView);
+    //                 $('#customerMonthDetail').modal('show');
+    //                 $('#customerMonthDetail').css('z-index', '99999');
+    //             }
+    //         }
+    //     });
+    // });
+
+    $(document).on('change','#yearFilterForm #year', function(e){
+        e.preventDefault();
+        var year = $(this).val();
+        var customerId = $(this).attr('data-customerid');
+        var hrefUrl = "{{ route('admin.customers.view_customer') }}"+ '?id=' + customerId + '&year=' + year;
+        window.location.href = hrefUrl;
+    });
+
 });
 
 </script>

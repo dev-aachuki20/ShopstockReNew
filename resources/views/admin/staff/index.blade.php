@@ -18,38 +18,27 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h4> @lang('quickadmin.user-management.title')</h4>
-                      </div> 
-                    <div class="card-body">
-                        <div class="row align-items-center pb-3 mb-3 cart_filter_box">
-                            <div class="col-auto  mt-md-0 mt-3 ml-auto">
-                                @if ($type != 'deleted')
-                                <div class="row align-items-center">
-                                    <div class="col-auto px-1">
-                                        @can('staff_create')
-                                        <button type="button" class="addnew-btn addRecordBtn sm_btn circlebtn" data-toggle="modal" data-target="#centerModal" data-href="{{ route('staff.create')}}"><x-svg-icon icon="add" /></button>
-                                        @endcan
-                                    </div>
-                                    <div class="col-auto px-1">
-                                        @can('staff_print')
-                                        <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn" id="print-button"><x-svg-icon icon="print" /></a>
-                                        @endcan
-                                    </div>
-                                    {{-- <div class="col-auto pl-1">
-                                            @can('staff_export')
-                                            <a href="{{ route('staff.export')}}" class="excelbtn btn h-10 col circlebtn" id="excel-button"><x-svg-icon icon="excel" /></a>
+                        <div class="">
+                            @if ($type != 'deleted')
+                            <div class="row align-items-center">
+                                <div class="col-auto pr-1">
+                                    @can('staff_create')
+                                    <button type="button" class="addnew-btn addRecordBtn sm_btn circlebtn" data-toggle="modal" data-target="#centerModal" data-href="{{ route('staff.create')}}"><x-svg-icon icon="add" /></button>
                                     @endcan
                                 </div>
                                 <div class="col-auto pl-1">
-                                    @can('staff_rejoin')
-                                    <a href="{{ route('staff.typeindex',['type'=> 'deleted'])}}" class="recycleicon btn h-10 col circlebtn" id="excel-button"><x-svg-icon icon="rejoin-btn" /></a>
+                                    @can('staff_print')
+                                    <a href="{{ route('staff.print') }}" class="printbtn btn h-10 col circlebtn" id="print-button"><x-svg-icon icon="print" /></a>
                                     @endcan
-                                </div> --}}
+                                </div>
                             </div>
                             @endif
                         </div>
-                    </div>
+                      </div>
+                    <div class="card-body">
+
                     <div class=" fixed_Search">
                         {{$dataTable->table(['class' => 'table dt-responsive', 'style' => 'width:100%;','id'=>'dataaTable'])}}
                     </div>

@@ -66,8 +66,16 @@ class CustomerListDataTable extends DataTable
      */
     public function query(Customer $model): QueryBuilder
     {
-        //return $model->newQuery();
-        $query = $model->newQuery()->select(['customers.*'])->orderBy('Name','ASC');
+       // $query = $model->newQuery()->select(['customers.*'])->orderBy('Name','ASC');
+       $query = $model->newQuery()
+        ->select('customers.*')
+        ->whereExists(function ($query) {
+            $query->select('id')
+                ->from('payment_transactions')
+                ->whereColumn('payment_transactions.customer_id', 'customers.id')
+                ->where('payment_transactions.remark', '<>', 'Opening balance');
+        })
+        ->orderBy('customers.Name', 'ASC');
         return $this->applyScopes($query);
     }
 

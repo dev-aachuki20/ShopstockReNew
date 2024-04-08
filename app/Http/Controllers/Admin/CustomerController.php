@@ -35,23 +35,28 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.customer.list');
     }
-    public function viewCostomer(Request $request)
+    public function viewCostomer(Request $request )
     {
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customer = Customer::findOrFail($request->id);
-        $openingBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+        $firstopeningBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
 
-        $currentDate = Carbon::now();
-        $startDate = $currentDate->copy()->subMonths(11)->startOfMonth();
-        $endDate = $currentDate->endOfMonth();
+        $currentYear = Carbon::now()->year;
+        $yearlist = range(2021, $currentYear);
+
+        $currentMonth = Carbon::now()->month;
+        $year = $request->year ?? $currentYear;
+        $startDate = Carbon::create($year, 1, 1)->startOfMonth();
+        $endDate = ($year == $currentYear) ? Carbon::create($year, $currentMonth, 1)->endOfMonth() : Carbon::create($year, 12, 1)->endOfMonth();
+
+        $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+
 
         $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
         ->where('customer_id', $request->id)->where('payment_way', 'order_create')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
 
-
         $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'cashreceipt' as type")->where('customer_id', $request->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')
         ->where('remark', '!=', 'Opening balance')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
-
 
         $estimateReturnData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales_return' as type")->where('customer_id', $request->id)->where('payment_way', 'order_return')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
 
@@ -85,11 +90,18 @@ class CustomerController extends Controller
         }
         // Sort the monthly data by month
         ksort($monthlyData);
-        return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData'));
+        return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData','yearlist','year'));
     }
 
     public function viewCustomerDetail(Customer $customer,string $month)
     {
+        $firstopeningBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+
+        $year = substr($month, 0, 4);
+        // $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+        $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customer->id,$month);
+
+        //dd($openingBalance);
         $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_create')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
 
         $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")->where('customer_id', $customer->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
@@ -98,9 +110,9 @@ class CustomerController extends Controller
 
         $alldata = collect($estimateData->get())->merge($cashReceiptData->get())->merge($estimateReturnData->get());
         $alldata= $alldata->sortBy('entry_date');
-
-        $html = view('admin.customer.view_customer_detail_modal', compact('customer','alldata','month'))->render();
-        return response()->json(['success' => true, 'htmlView' => $html]);
+        return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
+        // $html = view('admin.customer.view_customer_month_detail', compact('customer','alldata','month'))->render();
+        // return response()->json(['success' => true, 'htmlView' => $html]);
     }
 
 

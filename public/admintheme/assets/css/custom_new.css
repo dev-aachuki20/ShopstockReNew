@@ -685,6 +685,47 @@ table.dataTable tbody>tr:nth-child(even){
     background-color: #f3f3f3;
 }
 
+.payment-history-customer tbody>tr:nth-of-type(odd){
+    background-color: #f9f9f9;
+}
+.payment-history-customer tbody>tr>td,
+.payment-history-customer tfoot>tr>th,
+.payment-history-customer tfoot>tr>td{
+    border-color: #f4f4f4 !important;
+}
+.payment-history-customer tfoot>tr>th{
+    color: #3b4863;
+}
+.dbl-btns{
+    gap: 10px;
+}
+.dbl-btns .btn-primary{
+    height: 34px;
+}
+.Blist-btn{
+    background-color: #062142;
+    color: #fff;
+    margin-top: 20px;
+}
+.Blist-btn:hover,
+.Blist-btn:focus{
+    background-color: #db5102 !important;
+    color: #fff !important;
+}
+.payment-detail-btn{
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+.payment-detail-btn:hover{
+    color: #db5102;
+}
+.card .card-header .btn.circlebtn{
+    border-radius: 100%;
+}
+
+
+
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {
@@ -803,6 +844,10 @@ table.dataTable tbody>tr:nth-child(even){
     }
     .main-navbar>.form-inline>.navbar-nav .nav-link{
         padding-right: 10px !important;
+    }
+    .dbl-btns{
+        flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
     }
 }
 
