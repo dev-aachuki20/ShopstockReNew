@@ -449,6 +449,7 @@ if (!function_exists('GetYearOpeningBalance')) {
 if (!function_exists('GetMonthWiseOpeningBalance')) {
     function GetMonthWiseOpeningBalance($firstopeningBalance=0, $customerID, $yearmonth)
     {
+        //dd($yearmonth);
         $customer = Customer::findOrFail($customerID);
         $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
         $year = substr($yearmonth, 0, 4);

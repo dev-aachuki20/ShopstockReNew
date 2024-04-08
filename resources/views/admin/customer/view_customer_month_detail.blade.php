@@ -15,8 +15,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.qa_payment_history')</h4>
                   <div class="dbl-btns d-flex">
-                    <button class="printbtn btn btn-primary"><i class="fa fa-print"></i> Print Product Ledger</button>
-                    <button class="printbtn btn btn-primary"><i class="fa fa-print"></i> Print Statement</button>
+
+                    <button class="printbtn btn btn-primary" id="print-ledger-btn" data-value="print-product-ledger"><i class="fa fa-print"></i> Print Product Ledger</button>
+                    <button class="printbtn btn btn-primary" id="print-statement-btn" data-value="print-statement"><i class="fa fa-print"></i> Print Statement</button>
                   </div>
                 </div>
                 <div class="col-md-12">
@@ -62,7 +63,9 @@
                                 @endphp
                                 <tr>
                                     <td>{{ $data->entry_date ? \Carbon\Carbon::parse($data->entry_date)->format('d-m-Y') : '' }}</td>
-                                    <td><button class="payment-detail-btn">{{ $data->type=='sales' ? "Sales" : ($data->type=='sales_return' ? "Estimate Return" : "Cash Receipt") }}</button></td>
+                                    <td>
+                                        <button class="payment-detail-btn view_detail" data-url={{ $data->type=='cashreceipt' ? route('admin.transactions.show', encrypt($data->id)) : ($data->type=='sales' ? route('admin.orders.show', encrypt($data->order_id)) : route('admin.orders.show', encrypt($data->order_id))) }}>{{ $data->type=='sales' ? "Sales" : ($data->type=='sales_return' ? "Estimate Return" : "Cash Receipt") }}</button>
+                                    </td>
                                     <td>{{ $data->voucher_number ?? ""}}</td>
                                     <td>{!! $data->type == 'sales' ? '<i class="fa fa-inr"></i> ' . $data->amount : '' !!}</td>
                                     <td>{!! $data->type=='cashreceipt' || $data->type=='sales_return' ? '<i class="fa fa-inr"></i> ' . $data->amount : "" !!}</td>
@@ -71,10 +74,13 @@
                                 @php
                                     if ($data->type == 'sales') {
                                         $totalSales += $data->amount;
+                                        $type = 'sales';
                                     } elseif ($data->type == 'cashreceipt') {
                                         $totalCashReceipt += $data->amount;
+                                        $type = 'cash_reciept';
                                     } elseif ($data->type == 'sales_return') {
                                         $totalSalesReturn += $data->amount;
+                                        $type = 'sales_return';
                                     }
 
                                     $lastBalance = $Balance;
@@ -110,7 +116,26 @@
   </section>
 
 
+<!-- view Modal -->
+<div class="modal fade " id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            @if ($type=='cash_reciept' || $type=='sales')
+                <h5 class="modal-title head-title" id="exampleModalLongTitle"></h5>
+            @else
+            <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
+            @endif
 
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body show_html">
+        </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('customJS')
@@ -119,7 +144,48 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script>
+$(document).ready(function(){
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
 
+    $(document).on('click', '.view_detail', function() {
+        $("#body").prepend('<div class="loader" id="loader_div"></div>');
+        $("#view_model_Modal").modal('show');
+        $('.show_html').html('');
+        var url = $(this).data('url');
+        var head_title = $(this).attr('data-customerName');
+        if (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: {
+            type : '{{$type}}'
+            },
+            success: function(data) {
+            $("#loader_div").remove();
+            $('.show_html').html(data.html);
+            $("#view_model_Modal .head-title").html(head_title);
+            },
+            error: function () {
+            $("#loader_div").remove();
+            }
+        });
+        }
+    });
+
+    //Print Statement and Print ledger click event
+    $(document).on('click','#print-statement-btn,#print-ledger-btn',function(){
+        var yearmonth = '{{$month}}';
+        var type = $(this).attr('data-value');
+        var url = "{{ route('admin.customers.printPaymentHistory') }}/"+type+"/{{encrypt($customer->id)}}/"+yearmonth;
+       // var printUrl = "{{ route('admin.customers.printPaymentHistory') }}/"+type+"/{{encrypt($customer->id)}}/"+yearmonth;
+        console.log('yearmonth',url);
+        window.open(url,'_target');
+    });
+});
 
 </script>
 @endsection

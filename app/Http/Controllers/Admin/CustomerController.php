@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
 use Auth;
 use Illuminate\Support\Facades\DB;
+use Mpdf\Mpdf;
 
 class CustomerController extends Controller
 {
@@ -34,85 +35,6 @@ class CustomerController extends Controller
     {
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.customer.list');
-    }
-    public function viewCostomer(Request $request )
-    {
-        abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $customer = Customer::findOrFail($request->id);
-        $firstopeningBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-
-        $currentYear = Carbon::now()->year;
-        $yearlist = range(2021, $currentYear);
-
-        $currentMonth = Carbon::now()->month;
-        $year = $request->year ?? $currentYear;
-        $startDate = Carbon::create($year, 1, 1)->startOfMonth();
-        $endDate = ($year == $currentYear) ? Carbon::create($year, $currentMonth, 1)->endOfMonth() : Carbon::create($year, 12, 1)->endOfMonth();
-
-        $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
-
-
-        $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
-        ->where('customer_id', $request->id)->where('payment_way', 'order_create')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
-
-        $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'cashreceipt' as type")->where('customer_id', $request->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')
-        ->where('remark', '!=', 'Opening balance')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
-
-        $estimateReturnData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales_return' as type")->where('customer_id', $request->id)->where('payment_way', 'order_return')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
-
-        $monthlyData = [];
-        $currentMonth = $startDate->copy();
-        while ($currentMonth <= $endDate) {
-            $monthKey = $currentMonth->format('Y-m');
-            $monthlyData[$monthKey]['month'] = $monthKey;
-            $monthlyData[$monthKey]['sales'] = 0;
-            $monthlyData[$monthKey]['cashreceipt'] = 0;
-            $monthlyData[$monthKey]['sales_return'] = 0;
-            foreach($estimateData as $esrow){
-                if ($esrow['month'] === $monthKey) {
-                    $monthlyData[$monthKey]['sales'] = $esrow['total_amount'];
-                    break;
-                }
-            }
-            foreach($cashReceiptData as $cashrow){
-                if ($cashrow['month'] === $monthKey) {
-                    $monthlyData[$monthKey]['cashreceipt'] = $cashrow['total_amount'];
-                    break;
-                }
-            }
-            foreach($estimateReturnData as $esreturnrow){
-                if ($esreturnrow['month'] === $monthKey) {
-                    $monthlyData[$monthKey]['sales_return'] = $esreturnrow['total_amount'];
-                    break;
-                }
-            }
-            $currentMonth->addMonth();
-        }
-        // Sort the monthly data by month
-        ksort($monthlyData);
-        return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData','yearlist','year'));
-    }
-
-    public function viewCustomerDetail(Customer $customer,string $month)
-    {
-        $firstopeningBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-
-        $year = substr($month, 0, 4);
-        // $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
-        $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customer->id,$month);
-
-        //dd($openingBalance);
-        $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_create')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
-
-        $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")->where('customer_id', $customer->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
-
-        $estimateReturnData = PaymentTransaction::selectRaw("*,'sales_return' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_return')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
-
-        $alldata = collect($estimateData->get())->merge($cashReceiptData->get())->merge($estimateReturnData->get());
-        $alldata= $alldata->sortBy('entry_date');
-        return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
-        // $html = view('admin.customer.view_customer_month_detail', compact('customer','alldata','month'))->render();
-        // return response()->json(['success' => true, 'htmlView' => $html]);
     }
 
 
@@ -326,7 +248,8 @@ class CustomerController extends Controller
     }
 
 
-    public function historyFilter(Request $request){
+    public function historyFilter(Request $request)
+    {
         $customerId = $request->customer;
         $openingBalance = 0;
         $openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
@@ -346,18 +269,162 @@ class CustomerController extends Controller
         }
         $view = view('admin.customer.payment_history', compact('customer','openingBalance'))->render();
         return response()->json(array('success' => true,'viewRender' =>$view), 200);
-     }
+    }
 
-     public function getCustomerNameList(Request $request){
-            $customerlist =   Customer::withTrashed() ->where('name', 'like', "%{$request->name}%")->get();
-            $html = "";
-            if(count($customerlist) > 0){
-                $html .= "<ul>";
-                foreach($customerlist as $row){
-                    $html .= "<li>".$row->name."</li>";
-                }
-                $html .= "</ul>";
+    public function getCustomerNameList(Request $request)
+    {
+        $customerlist =   Customer::withTrashed() ->where('name', 'like', "%{$request->name}%")->get();
+        $html = "";
+        if(count($customerlist) > 0){
+            $html .= "<ul>";
+            foreach($customerlist as $row){
+                $html .= "<li>".$row->name."</li>";
             }
-            return response()->json(array('success' => true,'viewData' =>$html), 200);
-     }
+            $html .= "</ul>";
+        }
+        return response()->json(array('success' => true,'viewData' =>$html), 200);
+    }
+
+
+    public function viewCostomer(Request $request )
+    {
+        abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $customer = Customer::findOrFail($request->id);
+        $firstopeningBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+
+        $currentYear = Carbon::now()->year;
+        $yearlist = range(2021, $currentYear);
+
+        $currentMonth = Carbon::now()->month;
+        $year = $request->year ?? $currentYear;
+        $startDate = Carbon::create($year, 1, 1)->startOfMonth();
+        $endDate = ($year == $currentYear) ? Carbon::create($year, $currentMonth, 1)->endOfMonth() : Carbon::create($year, 12, 1)->endOfMonth();
+
+        $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+
+
+        $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
+        ->where('customer_id', $request->id)->where('payment_way', 'order_create')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
+
+        $cashReceiptData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'cashreceipt' as type")->where('customer_id', $request->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')
+        ->where('remark', '!=', 'Opening balance')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
+
+        $estimateReturnData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales_return' as type")->where('customer_id', $request->id)->where('payment_way', 'order_return')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
+
+        $monthlyData = [];
+        $currentMonth = $startDate->copy();
+        while ($currentMonth <= $endDate) {
+            $monthKey = $currentMonth->format('Y-m');
+            $monthlyData[$monthKey]['month'] = $monthKey;
+            $monthlyData[$monthKey]['sales'] = 0;
+            $monthlyData[$monthKey]['cashreceipt'] = 0;
+            $monthlyData[$monthKey]['sales_return'] = 0;
+            foreach($estimateData as $esrow){
+                if ($esrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['sales'] = $esrow['total_amount'];
+                    break;
+                }
+            }
+            foreach($cashReceiptData as $cashrow){
+                if ($cashrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['cashreceipt'] = $cashrow['total_amount'];
+                    break;
+                }
+            }
+            foreach($estimateReturnData as $esreturnrow){
+                if ($esreturnrow['month'] === $monthKey) {
+                    $monthlyData[$monthKey]['sales_return'] = $esreturnrow['total_amount'];
+                    break;
+                }
+            }
+            $currentMonth->addMonth();
+        }
+        // Sort the monthly data by month
+        ksort($monthlyData);
+        return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData','yearlist','year'));
+    }
+
+    public function viewCustomerDetail(Customer $customer,string $month)
+    {
+        $firstopeningBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+
+        $year = substr($month, 0, 4);
+        // $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+        $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customer->id,$month);
+
+        //dd($openingBalance);
+        $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_create')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
+
+        $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")->where('customer_id', $customer->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
+
+        $estimateReturnData = PaymentTransaction::selectRaw("*,'sales_return' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_return')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
+
+        $alldata = collect($estimateData->get())->merge($cashReceiptData->get())->merge($estimateReturnData->get());
+        $alldata= $alldata->sortBy('entry_date');
+        return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
+        // $html = view('admin.customer.view_customer_month_detail', compact('customer','alldata','month'))->render();
+        // return response()->json(['success' => true, 'htmlView' => $html]);
+    }
+
+    public function printPaymentHistory($type,$customerId,$yearmonth)
+    {
+        ini_set('max_execution_time', 300);
+        $from = null;
+        $to = null;
+
+        $year = substr($yearmonth, 0, 4);
+        $month = substr($yearmonth, 5, 2);
+        $startDate = Carbon::create($year,$month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+        try{
+            if(!is_numeric($customerId)){
+                $customerId = decrypt($customerId);
+            }
+           //dd($startDate,$endDate);
+            $openingBalance = 0;
+            if($customerId){
+                // $openingBalance = PaymentTransaction::where('customer_id',$customerId)->where('payment_way','by_cash')->value('amount');
+                //$openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->sum('amount');
+
+                $firstopeningBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+                $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customerId,$yearmonth);
+
+                // $previousDebitBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','debit')->sum('amount');
+
+                // $previousCreditBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','credit')->sum('amount');
+
+
+                // $openingBalance = $openingBalance + ((float)$previousCreditBalance - (float)$previousDebitBalance);
+
+                $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
+                        $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
+                }])->where('id',$customerId)->first();
+
+                //dd($customer,$openingBalance);
+                $pdfData['customer']  = $customer;
+                $pdfData['from_date'] = $startDate;
+                $pdfData['to_date']   = $endDate;
+                $pdfData['openingBalance']   = $openingBalance;
+                if($type == 'print-product-ledger')
+                {
+                    $pdfHtml = view('admin.exports.pdf.ledger_print', $pdfData)->render();
+                    $mpdf = new Mpdf();
+                    $mpdf->WriteHTML($pdfHtml);
+                    $mpdf->Output('Print_Ledeger_'.$yearmonth.'.pdf', 'I');
+                }else if($type == 'print-statement')
+                {
+                    $pdfHtml = view('admin.exports.pdf.statement_print',$pdfData)->render();
+                    $mpdf = new Mpdf();
+                    $mpdf->WriteHTML($pdfHtml);
+                    $mpdf->Output('Print_Statement_'.$yearmonth.'.pdf', 'I');
+                }
+            }
+
+        }catch(\Exception $e){
+            dd($e->getMessage());
+            return abort(404);
+        }
+    }
+
+
 }
