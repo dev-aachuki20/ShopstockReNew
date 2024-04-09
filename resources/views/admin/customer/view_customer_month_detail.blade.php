@@ -53,7 +53,7 @@
                                 $totalCashReceipt = 0;
                                 $totalSalesReturn = 0;
                                 $lastBalance = 0;
-                                $type=null;
+
                                 @endphp
                                 @foreach ($alldata as $data)
                                 @php
@@ -65,7 +65,7 @@
                                 <tr>
                                     <td>{{ $data->entry_date ? \Carbon\Carbon::parse($data->entry_date)->format('d-m-Y') : '' }}</td>
                                     <td>
-                                        <button class="payment-detail-btn view_detail" data-url={{ $data->type=='cashreceipt' ? route('admin.transactions.show', encrypt($data->id)) : ($data->type=='sales' ? route('admin.orders.show', encrypt($data->order_id)) : route('admin.orders.show', encrypt($data->order_id))) }}>{{ $data->type=='sales' ? "Sales" : ($data->type=='sales_return' ? "Estimate Return" : "Cash Receipt") }}</button>
+                                        <button class="payment-detail-btn view_detail" data-url={{ $data->type=='cashreceipt' ? route('admin.transactions.show', encrypt($data->id)) : ($data->type=='sales' ? route('admin.orders.show', encrypt($data->order_id)) : route('admin.orders.show', encrypt($data->order_id))) }} data-actiontype={{ $data->type}}>{{ $data->type=='sales' ? "Sales" : ($data->type=='sales_return' ? "Estimate Return" : "Cash Receipt") }}</button>
                                     </td>
                                     <td>{{ $data->voucher_number ?? ""}}</td>
                                     <td>{!! $data->type == 'sales' ? '<i class="fa fa-inr"></i> ' . $data->amount : '' !!}</td>
@@ -75,13 +75,10 @@
                                 @php
                                     if ($data->type == 'sales') {
                                         $totalSales += $data->amount;
-                                        $type = 'sales';
                                     } elseif ($data->type == 'cashreceipt') {
                                         $totalCashReceipt += $data->amount;
-                                        $type = 'cash_reciept';
                                     } elseif ($data->type == 'sales_return') {
                                         $totalSalesReturn += $data->amount;
-                                        $type = 'sales_return';
                                     }
 
                                     $lastBalance = $Balance;
@@ -153,13 +150,15 @@ $(document).ready(function(){
         $("#view_model_Modal").modal('show');
         $('.show_html').html('');
         var url = $(this).data('url');
+        var type = $(this).attr('data-actiontype');
+        console.log(type);
         var head_title = $(this).attr('data-customerName');
         if (url) {
         $.ajax({
             type: "GET",
             url: url,
             data: {
-            type : '{{$type}}'
+            type : type
             },
             success: function(data) {
             $("#loader_div").remove();

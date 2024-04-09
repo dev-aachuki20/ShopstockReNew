@@ -737,7 +737,15 @@ table.dataTable tbody>tr:nth-child(even){
 }
 
 .editprofile_page.section-body .card .card-body form .form-group .input-group input{
-    min-height: 40px;
+    min-height: 42px;
+    height: 42px;
+}
+
+.editprofile_page .input-group-text,
+.editprofile_page select.form-control:not([size]):not([multiple]),
+.editprofile_page .form-control:not(.form-control-sm):not(.form-control-lg) {
+    height: 42px;
+    width: 42px !important;
 }
 
 

@@ -2711,8 +2711,7 @@ select.form-control:not([size]):not([multiple]),
 .form-control:not(.form-control-sm):not(.form-control-lg) {
     font-size: 15px;
     /*    padding: 5px 7px;*/
-    height: 40px;
-    width: 40px;
+    height: 42px;
 }
 
 textarea.form-control {
