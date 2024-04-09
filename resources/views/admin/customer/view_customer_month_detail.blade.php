@@ -149,21 +149,18 @@ $(document).ready(function(){
         $("#body").prepend('<div class="loader" id="loader_div"></div>');
         $("#view_model_Modal").modal('show');
         $('.show_html').html('');
-        var url = $(this).data('url');
-        var type = $(this).attr('data-actiontype');
-        console.log(type);
-        var head_title = $(this).attr('data-customerName');
-        if (url) {
+        var hrefurl = $(this).data('url');
+        var actiontype = $(this).attr('data-actiontype');
+        if (hrefurl) {
         $.ajax({
             type: "GET",
-            url: url,
+            url: hrefurl,
             data: {
-            type : type
+            type : actiontype
             },
             success: function(data) {
             $("#loader_div").remove();
             $('.show_html').html(data.html);
-            //$("#view_model_Modal .head-title").html(head_title);
             },
             error: function () {
             $("#loader_div").remove();
@@ -175,10 +172,9 @@ $(document).ready(function(){
     //Print Statement and Print ledger click event
     $(document).on('click','#print-statement-btn,#print-ledger-btn',function(){
         var yearmonth = '{{$month}}';
-        var type = $(this).attr('data-value');
-        var url = "{{ route('admin.customers.printPaymentHistory') }}/"+type+"/{{encrypt($customer->id)}}/"+yearmonth;
-        console.log('yearmonth',url);
-        window.open(url,'_target');
+        var actiontype = $(this).attr('data-value');
+        var hrefurl = "{{ route('admin.customers.printPaymentHistory') }}/"+actiontype+"/{{encrypt($customer->id)}}/"+yearmonth;
+        window.open(hrefurl,'_target');
     });
 });
 
