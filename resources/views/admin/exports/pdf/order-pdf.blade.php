@@ -204,6 +204,9 @@
       }
     </style>
 @endsection
+
+
+
 @section('content')
     @php
     $isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
@@ -395,8 +398,18 @@
                 </tr>
             </tfoot>
         </table>
-        <h6 style="margin-left:6px;">THANK YOU</h6>
-    </main>
+            <h6 style="margin-left:6px;">THANK YOU</h6>
+
+
+
+
+
+
+            <h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6>
+            <h6 style="margin-left:6px;">THANK YOU</h6>
+            <h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6>
+    
+        </main>
     
 @endsection
 

@@ -814,6 +814,9 @@ class OrdersController extends Controller
 
             $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
             $mpdf = new Mpdf();
+
+            $mpdf->SetHTMLHeader(view('admin.exports.pdf.order_pdf_header')->render()); 
+            $mpdf->SetHTMLFooter('');
             $mpdf->WriteHTML($pdfHtml);
             $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
 
