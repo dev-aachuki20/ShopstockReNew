@@ -185,7 +185,7 @@
                     <td class="text-center" style="font-size: 18px; font-weight:bold;">{{ ucwords($customer->name) }}</td>
                 </tr>
                 <tr>
-                    <td class="sm-font my-3 text-center">Address : {{ $customer->area->address or ''  }}</td>
+                    <td class="sm-font my-3 text-center">Address : {{ $customer->area->address ?? ''  }}</td>
                 </tr>
                 <tr>
                     <td class="sm-font text-center">Item Wise Ledger</td>
@@ -300,8 +300,8 @@
                                                         @endif
                                                     </td>
                                                     <td style="font-size:12px;">
-                                                        
-                        
+
+
                                                         @php
                                                         $quantityString = '';
 
@@ -341,7 +341,7 @@
                                                         }
                                                         @endphp
 
-                                                        {{ $quantityString }} 
+                                                        {{ $quantityString }}
                                                     </td>
                                                     <td style="font-size:12px;">
                                                         {{ removeTrailingZeros($item->price) }}
