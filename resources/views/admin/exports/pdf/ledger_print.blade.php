@@ -291,7 +291,7 @@
                                                             ({{ $item->is_sub_product ?? '' }})
                                                         @endif
 
-                                                        @if(in_array($item->product->product_category_id, config('constant.product_category_id')) && isset($item->other_details))
+                                                        @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
                                                         <p style="margin-top:0px; margin-bottom:0px;"> {{ glassProductMeasurement($item->other_details,'one_line') }}</p>
                                                         @endif
 
@@ -300,9 +300,13 @@
                                                         @endif
                                                     </td>
                                                     <td style="font-size:12px;">
+                                                        
+                        
                                                         @php
                                                         $quantityString = '';
-                                                        if(!in_array($item->product->product_category_id,config('constant.product_category_id'))){
+
+
+                                                        if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
                                                             if(!is_null($item->height)){
                                                                 $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
                                                             }
@@ -333,11 +337,11 @@
                                                         }
 
                                                         if(!is_null($item->quantity)){
-                                                            $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->unit_type).' ';
+                                                            $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
                                                         }
                                                         @endphp
 
-                                                        {{ $quantityString }}
+                                                        {{ $quantityString }} 
                                                     </td>
                                                     <td style="font-size:12px;">
                                                         {{ removeTrailingZeros($item->price) }}
