@@ -362,8 +362,6 @@ class CustomerController extends Controller
         $alldata = collect($estimateData->get())->merge($cashReceiptData->get())->merge($estimateReturnData->get());
         $alldata= $alldata->sortBy('entry_date');
         return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
-        // $html = view('admin.customer.view_customer_month_detail', compact('customer','alldata','month'))->render();
-        // return response()->json(['success' => true, 'htmlView' => $html]);
     }
 
     public function printPaymentHistory($type,$customerId,$yearmonth)
@@ -380,27 +378,16 @@ class CustomerController extends Controller
             if(!is_numeric($customerId)){
                 $customerId = decrypt($customerId);
             }
-           //dd($startDate,$endDate);
+
             $openingBalance = 0;
             if($customerId){
-                // $openingBalance = PaymentTransaction::where('customer_id',$customerId)->where('payment_way','by_cash')->value('amount');
-                //$openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->sum('amount');
-
                 $firstopeningBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
                 $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customerId,$yearmonth);
-
-                // $previousDebitBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','debit')->sum('amount');
-
-                // $previousCreditBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','credit')->sum('amount');
-
-
-                // $openingBalance = $openingBalance + ((float)$previousCreditBalance - (float)$previousDebitBalance);
 
                 $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
                         $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
                 }])->where('id',$customerId)->first();
 
-                //dd($customer,$openingBalance);
                 $pdfData['customer']  = $customer;
                 $pdfData['from_date'] = $startDate;
                 $pdfData['to_date']   = $endDate;

@@ -99,6 +99,7 @@
                                         $totalCashReceipt += $data['cashreceipt'];
                                         $totalSalesReturn+= $data['sales_return'];
                                         $lastClosingBalance = $monthlyClosingBalance;
+
                                     @endphp
                                     @endforeach
                                 </tbody>

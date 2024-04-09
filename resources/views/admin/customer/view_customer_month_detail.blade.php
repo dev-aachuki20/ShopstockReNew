@@ -53,6 +53,7 @@
                                 $totalCashReceipt = 0;
                                 $totalSalesReturn = 0;
                                 $lastBalance = 0;
+                                $type=null;
                                 @endphp
                                 @foreach ($alldata as $data)
                                 @php
@@ -121,12 +122,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
         <div class="modal-header">
-            @if ($type=='cash_reciept' || $type=='sales')
-                <h5 class="modal-title head-title" id="exampleModalLongTitle"></h5>
-            @else
-            <h5 class="modal-title" id="exampleModalLongTitle">@lang('quickadmin.order.view-title-'.$type)</h5>
-            @endif
-
+            <h5 class="modal-title head-title" id="exampleModalLongTitle">View Detail</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
@@ -151,7 +147,8 @@ $(document).ready(function(){
       }
     });
 
-    $(document).on('click', '.view_detail', function() {
+    $(document).on('click', '.view_detail', function(e) {
+        e.preventDefault();
         $("#body").prepend('<div class="loader" id="loader_div"></div>');
         $("#view_model_Modal").modal('show');
         $('.show_html').html('');
@@ -167,7 +164,7 @@ $(document).ready(function(){
             success: function(data) {
             $("#loader_div").remove();
             $('.show_html').html(data.html);
-            $("#view_model_Modal .head-title").html(head_title);
+            //$("#view_model_Modal .head-title").html(head_title);
             },
             error: function () {
             $("#loader_div").remove();
