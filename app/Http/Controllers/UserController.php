@@ -7,7 +7,6 @@ use App\DataTables\UserTypeDataTable;
 use App\Exports\UserExport;
 use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffUpdateRequest;
-use App\Models\Address;
 use App\Models\Role;
 use App\Models\User;
 use App\Rules\MatchOldPassword;
@@ -166,11 +165,10 @@ class UserController extends Controller
     public function showprofile(){
 
         abort_if(Gate::denies('profile_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $addresses = Address::all();
         $user = auth()->user();
        // $user = Auth::user();
       //dd($user->username);
-        return view('admin.profile.show', compact('addresses','user'));
+        return view('admin.profile.show', compact('user'));
     }
 
     public function updateprofile(Request $request){
@@ -182,9 +180,6 @@ class UserController extends Controller
             'username' => ['required','string','max:40','unique:users,username,'.$user->id],
             // 'email' => ['required','email','unique:users,email,' . $user->id],
             'phone' => ['nullable','digits:10','numeric'],
-            'address_id' => ['required','numeric'],
-        ],[
-            'address_id.required' => 'The city field is required.'
         ]);
         //dd($validatedData);
         $user->update($validatedData);
@@ -254,14 +249,14 @@ class UserController extends Controller
     }
 
     public function userStatusChange(Request $request){
-        abort_if(Gate::denies('staff_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');       
+        abort_if(Gate::denies('staff_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($request->_id);
         $active_inactive =  $request->active_inactive;
         $is_active = 0;
         if($active_inactive == "Active"){
             $is_active = 1;
         }
-        User::where('id',$id)->update(['is_active' => $is_active,'updated_by'=> Auth::id()]);  
+        User::where('id',$id)->update(['is_active' => $is_active,'updated_by'=> Auth::id()]);
         return response()->json(['success' => 'Status Update successfully.']);
     }
 }

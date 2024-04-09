@@ -728,6 +728,18 @@ table.dataTable tbody>tr:nth-child(even){
     margin-right: 15px;
 }
 
+.panel-body.payment-history-customer .table tr th:last-child, .panel-body.payment-history-customer .table tr td:last-child {
+    text-align: start !important;
+}
+
+#edithead, #editbody{
+    display: none;
+}
+
+.editprofile_page.section-body .card .card-body form .form-group .input-group input{
+    min-height: 40px;
+}
+
 
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {

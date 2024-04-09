@@ -14,6 +14,5 @@ class RoleUserTableSeeder extends Seeder
         User::findOrFail(1)->assignRole(1);
         User::findOrFail(2)->assignRole(2);
         User::findOrFail(3)->assignRole(3);
-        User::findOrFail(4)->assignRole(4);
     }
 }

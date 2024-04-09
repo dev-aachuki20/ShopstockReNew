@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -112,16 +111,12 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
 
     Route::resource('/roles', RoleController::class);
 
-
     Route::post('/user-status-change', [UserController::class, 'userStatusChange'])->name('user_status_change');
     Route::get('/profiles', [UserController::class, 'showprofile'])->name('user.profile');
     Route::post('/profile-update', [UserController::class, 'updateprofile'])->name('profile.update');
     Route::post('/profile-image', [UserController::class, 'updateprofileImage'])->name('profile-image.update');
     Route::get('/change-password', [UserController::class, 'showchangepassform'])->name('user.change-password');
     Route::post('/change-password', [UserController::class, 'updatePassword'])->name('reset-password');
-    Route::resource('/address', AddressController::class);
-    Route::get('/address-printView/{address_id?}', [AddressController::class, 'printView'])->name('address.print');
-    Route::get('/address-export/{address_id?}', [AddressController::class, 'export'])->name('address.export');
 
     Route::resource('/staff', UserController::class);
     Route::get('/staff/password/{id}', [UserController::class, 'staffpassword'])->name('staff.password');

@@ -8,7 +8,6 @@
         </a>
 </div>
 <ul class="sidebar-menu">
-    <li class="menu-header">Main</li>
     <li class="{{ Request::is('dashboard*') ? 'active' : '' }}">
         <a href="{{ route('dashboard') }}" class="nav-link">
             <x-side-bar-svg-icon icon="dashboard" />

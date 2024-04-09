@@ -117,55 +117,6 @@ class PermissionsTableSeeder extends Seeder
                 'created_at' => $createDate,
                 'updated_at' => $updateDate,
             ],
-            [
-                'name'      => 'address_access',
-                'title'      => 'Menu Access',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
-            [
-                'name'      => 'address_create',
-                'title'      => 'Add',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
-            [
-                'name'      => 'address_edit',
-                'title'      => 'Edit',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
-
-            [
-                'name'      => 'address_delete',
-                'title'      => 'Delete',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
-            [
-                'name'      => 'address_print',
-                'title'      => 'Print',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
-            [
-                'name'      => 'address_export',
-                'title'      => 'Export',
-                'guard_name'=>'web',
-                'route_name'=>'city',
-                'created_at' => $createDate,
-                'updated_at' => $updateDate,
-            ],
 
             [
                 'name'      => 'staff_access',
@@ -564,7 +515,7 @@ class PermissionsTableSeeder extends Seeder
                 'route_name'=>'unit-management',
                 'created_at' => $createDate,
                 'updated_at' => $updateDate,
-            ],     
+            ],
             [
                 'name'      => 'split_access',
                 'title'      => 'Menu Access',
@@ -945,7 +896,7 @@ class PermissionsTableSeeder extends Seeder
                 'route_name'=>'estimate-management',
                 'created_at' => $createDate,
                 'updated_at' => $updateDate,
-            ],  
+            ],
         ];
 
         Permission::insert($permissions);

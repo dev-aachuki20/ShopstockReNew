@@ -8,7 +8,7 @@
 @section('main-content')
 
 <section class="section">
-    <div class="section-body">
+    <div class="section-body editprofile_page">
       <div class="row mt-sm-4">
         <div class="col-12 col-md12 col-lg6">
           <div class="card">
@@ -69,14 +69,14 @@
                     {{ $user->phone ?? '' }}
                   </span>
                 </p>
-                <p class="clearfix">
+                {{-- <p class="clearfix">
                   <span class="float-left">
                     @lang('quickadmin.profile.fields.address')
                   </span>
                   <span class="float-right text-muted">
                     {{ $user->address->address ?? ''}}
                   </span>
-                </p>
+                </p> --}}
               </div>
             </div>
 
@@ -157,7 +157,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    {{-- <div class="col-lg-6">
                         <div class="form-group">
                             <label>@lang('quickadmin.profile.fields.address')</label>
                                 <div class="input-group">
@@ -180,7 +180,7 @@
                                     @enderror
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-12">
                       <div class="form-group">
                       <button type="submit" class="btn btn-submit-block btn-block" tabindex="4">

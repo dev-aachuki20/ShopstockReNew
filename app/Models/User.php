@@ -68,9 +68,7 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
 
-    public function address(){
-        return $this->belongsTo(Address::class, 'address_id','id');
-    }
+
 
     public function uploads()
     {

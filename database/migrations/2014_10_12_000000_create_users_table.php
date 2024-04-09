@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->string('username')->unique();
-            $table->string('auth_pin')->nullable();
-            $table->integer('address_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable()->default(null);
             $table->tinyInteger('is_active')->default(1)->comment('1=> active, 0=>deactive');
