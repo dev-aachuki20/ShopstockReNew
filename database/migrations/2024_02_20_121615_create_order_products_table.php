@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->integer('order_id')->unsigned()->index();
             $table->integer('product_id')->unsigned()->index();
-            $table->integer('quantity');
+            $table->decimal('quantity', 15, 2);
             $table->decimal('price', 15, 2);
-            $table->integer('height')->nullable();
-			$table->integer('width')->nullable();
-			$table->integer('length')->nullable();
+            $table->decimal('height', 15, 2)->nullable();
+			$table->decimal('width', 15, 2)->nullable();
+			$table->decimal('length', 15, 2)->nullable();
             $table->decimal('total_price', 15, 2);
 			$table->tinyInteger('is_draft')->default(0);
             $table->text('description')->default(null)->nullable();
