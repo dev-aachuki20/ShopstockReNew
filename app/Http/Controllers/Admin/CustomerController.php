@@ -18,8 +18,9 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
 use Auth;
+use PDF;
 use Illuminate\Support\Facades\DB;
-use Mpdf\Mpdf;
+// use Mpdf\Mpdf;
 
 class CustomerController extends Controller
 {
@@ -394,16 +395,37 @@ class CustomerController extends Controller
                 $pdfData['openingBalance']   = $openingBalance;
                 if($type == 'print-product-ledger')
                 {
-                    $pdfHtml = view('admin.exports.pdf.ledger_print', $pdfData)->render();
-                    $mpdf = new Mpdf();
-                    $mpdf->WriteHTML($pdfHtml);
-                    $mpdf->Output('Print_Ledeger_'.$yearmonth.'.pdf', 'I');
+                    // $pdfHtml = view('admin.exports.pdf.ledger_print', $pdfData)->render();
+                    // $mpdf = new Mpdf();
+                    // $mpdf->SetHTMLHeader(view('admin.exports.pdf.ledger_pdf_header',$pdfData)->render());
+                    // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
+                    // $mpdf->WriteHTML($pdfHtml);
+                    // $mpdf->Output('Print_Ledeger_'.$yearmonth.'.pdf', 'I');
+                    //return view('admin.exports.pdf.ledger_print', $pdfData);
+
+
+                    $pdfFileName = 'Print_Ledeger_'.$yearmonth.'.pdf';
+                    $pdf = PDF::loadView('admin.exports.pdf.ledger_print',$pdfData);
+                    $pdf->setPaper('A5', 'portrait');
+                    $pdf->setOption('charset', 'UTF-8');
+                    return $pdf->stream($pdfFileName, ['Attachment' => false]);
+
                 }else if($type == 'print-statement')
                 {
-                    $pdfHtml = view('admin.exports.pdf.statement_print',$pdfData)->render();
-                    $mpdf = new Mpdf();
-                    $mpdf->WriteHTML($pdfHtml);
-                    $mpdf->Output('Print_Statement_'.$yearmonth.'.pdf', 'I');
+                    // $pdfHtml = view('admin.exports.pdf.statement_print',$pdfData)->render();
+                    // $mpdf = new Mpdf();
+                    // $mpdf->SetHTMLHeader(view('admin.exports.pdf.statement_pdf_header',$pdfData)->render());
+                    // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
+                    // $mpdf->WriteHTML($pdfHtml);
+                    // $mpdf->Output('Print_Statement_'.$yearmonth.'.pdf', 'I');
+
+                    $pdfFileName = 'Print_Statement_'.$yearmonth.'.pdf';
+                    $pdf = PDF::loadView('admin.exports.pdf.statement_print',$pdfData);
+                    $pdf->setPaper('A5', 'portrait');
+                    $pdf->setOption('charset', 'UTF-8');
+                    return $pdf->stream($pdfFileName, ['Attachment' => false]);
+
+                    //return view('admin.exports.pdf.statement_pdf_header', $pdfData);
                 }
             }
 

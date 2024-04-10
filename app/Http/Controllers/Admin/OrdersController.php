@@ -21,9 +21,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use PDF;
-// use Dompdf\Dompdf;
-// use Dompdf\Options;
-use Mpdf\Mpdf;
 use Illuminate\Support\Facades\Cache;
 
 class OrdersController extends Controller
@@ -812,13 +809,18 @@ class OrdersController extends Controller
 
             //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
-            $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
-            $mpdf = new Mpdf();
+            // $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
+            // $mpdf = new Mpdf();
+            // $mpdf->SetHTMLHeader(view('admin.exports.pdf.order_pdf_header', compact("pdfData","order","title"))->render());
+            // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
+            // $mpdf->WriteHTML($pdfHtml);
+            // $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
 
-            $mpdf->SetHTMLHeader(view('admin.exports.pdf.order_pdf_header')->render()); 
-            $mpdf->SetHTMLFooter('');
-            $mpdf->WriteHTML($pdfHtml);
-            $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
+            $pdfFileName = 'order_invoice_'.$id.'.pdf';
+            $pdf = PDF::loadView('admin.exports.pdf.order-pdf', compact("pdfData","order","title"));
+            $pdf->setPaper('A5', 'portrait');
+            $pdf->setOption('charset', 'UTF-8');
+            return $pdf->stream($pdfFileName, ['Attachment' => false]);
 
         }catch(\Exception $e){
             return abort(404);

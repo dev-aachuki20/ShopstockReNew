@@ -4,7 +4,7 @@
 
     <style>
        .table {
-             width: 100%; 
+             width: 100%;
              /* width: 70%;  */
              border-collapse: collapse;
              border-spacing: 0;
@@ -23,10 +23,10 @@
              font-size: 12px;
          }
 
-         
+
          .table tfoot tr td {
              margin-top: 40px;
-             padding: 3px 10px; 
+             padding: 3px 10px;
              white-space: nowrap;
              color:#000 !important;
          }
@@ -66,21 +66,21 @@
 
          .invoice-info th {
              /* width: 150px; */
-             text-align: right; 
+             text-align: right;
          }
 
          .invoice-info td {
              /* width: 200px; */
              text-align: right;
-              
+
          }
 
          .invoice-info th,
          .invoice-info td {
              padding-bottom: 0px;
-              
+
          }
-      
+
         .cancel-watermark {
             position: relative;
         }
@@ -120,7 +120,7 @@
             transform: translate(-50%, -50%);
             background-repeat: no-repeat;
         }
-        
+
         .table_head td{
             font-size:13px;
         }
@@ -159,10 +159,10 @@
         #ItemTable thead th:first-child{
             text-align:center !important;
         }
-        /* .header{
+        .header{
             padding-bottom:0;
             margin-top: -80px;
-        } */
+        }
         .text-align-center{
             text-align:center !important;
         }
@@ -172,20 +172,20 @@
             font-size:16px;
         }
         @page{
-        margin-top: 50px; /* create space for header */
-        margin-bottom: 50px; /* create space for footer */
+        margin-top: 100px; /* create space for header */
+        margin-bottom: 70px; /* create space for footer */
         }
 
-        /* header{
-        position: fixed; 
+        header{
+        position: fixed;
         left: 0px;
         right: 0px;
         height: 200px;
-        margin-top: -30px;
+        margin-top: -60px;
         margin-bottom:100px !important;
         padding-bottom: 20px !important;
         z-index: 1000;
-        } */
+        }
 
         footer{
         position: fixed;
@@ -195,7 +195,7 @@
         height: 50px;
         margin-bottom: -10px;
       }
-     
+
       footer .pagenum:before {
       content: counter(page);
       }
@@ -203,10 +203,7 @@
         margin-top: 10px;
       }
     </style>
-@endsection
-
-
-
+@stop
 @section('content')
     @php
     $isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
@@ -218,37 +215,40 @@
                 <!-- <td style="padding: 40px 0 30px;vertical-align: top;"> -->
                 <td style="vertical-align: top;">
 
-                    <table class="table_head" style="width: 100%;border-spacing: 0;">
+                    <table class="table_head" style="width: 100%;">
                         <tr>
                             <td class="text-center">
-                                <h2 class="title_hd" style="margin-top: 0;">Estimate</h2>
+                                    <h2 class="title_hd">Estimate</h2>
                             </td>
                         </tr>
-                        <tr>
-                            <td style="padding-left: 0;padding-right: 0;padding-top: 10px;">
-                                <table style="width: 100%; padding-bottom:10px;border-spacing: 0;">
-                                    <tr>
-                                        <td style="padding-left: 0;padding-right: 0;">
-                                            <table style="width: 100%;border-spacing: 0;">
-                                                <tr><td style="padding-left: 0;padding-right: 0;"><strong>Bill To:</strong></td></tr>
+
+                       <table style="width: 100%; padding-bottom:10px">
+                            <tr>
+                                    <td colspan="2">
+                                          <table style="width: 100%;">
                                                 <tr>
-                                                    <td class="font-italic" style="padding-left: 0;padding-right: 0;">
-                                                        <address>
-                                                            {{ $order->customer->name ??'' }}
-                                                            {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
-                                                            <br>  {{ $order->customer->area->address ?? '' }}
-                                                        </address>
+                                                    <td>
+                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Bill To:</strong></div>
                                                     </td>
+
+                                                    <td style="width: 150px; float:right;backgound:red; text-align:right" >
+                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Estimate #:</strong> {{ $order->invoice_number }}</div>
+                                                    </td>
+
                                                 </tr>
-                                            </table>
-                                        </td>
-                                        <td style="text-align: right;padding-left: 0;padding-right: 0;">
-                                            <table style="width: 100%;border-spacing: 0;">
-                                                <tr><td style="padding-left: 0;padding-right: 0;"><strong>Estimate #:</strong> {{ $order->invoice_number }}</td></tr>
+
                                                 <tr>
-                                                    <td style="vertical-align: top;padding-left: 0;padding-right: 0;">
+                                                    <td class="font-italic">
+                                                            <address>
+                                                                {{ $order->customer->name ?? '' }}
+                                                                {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
+                                                              <br>  {{ $order->customer->area->address ?? '' }}
+                                                            </address>
+                                                    </td>
+
+                                                    <td style="vertical-align: top;">
                                                         @php
-                                                        
+
                                                         $orderType = $order->order_type;
                                                         if($orderType == 'create'){
                                                             $orderType = 'Estimate' ;
@@ -258,18 +258,19 @@
                                                         @endphp
                                                         <address style="text-align: right;vertical-align: top;">
                                                         <strong>Type:</strong>  {{ $orderType }}<br>
-                                                        <strong>Date:</strong>{{ date('d-m-Y', strtotime($order->invoice_date)) }}<br>                                                            
+                                                        <strong>Date:</strong>{{ date('d-m-Y', strtotime($order->invoice_date)) }}<br>
                                                         </address>
                                                     </td>
                                                 </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
+                                          </table>
+                                    </td>
+                            </tr>
+                       </table>
+
                     </table>
                 </td>
+
+
             </tr>
         </table>
     </header>
@@ -279,7 +280,7 @@
             <tr>
                 <td style="margin: 0px; font-size:12px;">
                     <p class="text-justify">
-                        <strong>@lang('quickadmin.transaction.fields.remark')</strong> : {{ $order->remark ?? ''}}
+                        <strong>Remark</strong> : {{ $order->remark ?? ''}}
                     </p>
                 </td>
             </tr>
@@ -289,7 +290,7 @@
             <tr>
                 <td style="margin: 0px; font-size:12px;">
                 <p>
-                    <strong>@lang('quickadmin.order.fields.sold_by')</strong> : {{ $order->sold_by ?? ''}}
+                    <strong>Sold By</strong> : {{ $order->sold_by ?? ''}}
                 </p>
                 </td>
             </tr>
@@ -298,7 +299,7 @@
             <tr>
                 <td style="margin: 0px; font-size:12px;" class="font-bold">
                 <p>
-                    
+
                 </p>
                 </td>
             </tr>
@@ -314,7 +315,7 @@
                     <th class="text-left">@lang('quickadmin.order.fields.product_name')</th>
                     <th class="text-left">@lang('quickadmin.order.fields.quantity')</th>
                     <th  class="text-center">@lang('quickadmin.order.fields.price')</th>
-                    <th class="text-center" style="padding-left:1px">@lang('quickadmin.order.fields.sub_total')</th> 
+                    <th class="text-center" style="padding-left:1px">@lang('quickadmin.order.fields.sub_total')</th>
                 </tr>
 
             </thead>
@@ -342,6 +343,7 @@
                     </td>
                     <td>
                         @php
+
                             $quantityString = '';
                             if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
                                 if(!is_null($item->height)){
@@ -349,9 +351,9 @@
                                 }
 
                                 if(!is_null($item->height) && !is_null($item->width)){
-                                    $quantityString .= ' x ';                                                            
+                                    $quantityString .= ' x ';
                                 }else if(!is_null($item->height) && !is_null($item->length)){
-                                    $quantityString .= ' x ';                                                            
+                                    $quantityString .= ' x ';
                                 }
 
                                 if(!is_null($item->width)){
@@ -359,9 +361,9 @@
                                 }
 
                                 if(!is_null($item->length) && !is_null($item->width)){
-                                    $quantityString .= ' x ';                                                            
+                                    $quantityString .= ' x ';
                                 }else if(!is_null($item->height) && !is_null($item->length)){
-                                    $quantityString .= ' x ';                                                            
+                                    $quantityString .= ' x ';
                                 }
 
                                 if(!is_null($item->length)){
@@ -373,11 +375,11 @@
                                 }
                             }
                             if(!is_null($item->quantity)){
-                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
+                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->unit_type).' ';
                             }
                         @endphp
 
-                        {{ $quantityString }}  
+                        {{ $quantityString }}
                     </td>
                     <td class="text-center">{{ removeTrailingZeros($item->price) }}</td>
                     <td class="text-center">{{ number_format(round($item->total_price),0) }}</td>
@@ -388,30 +390,22 @@
                 @if($order->is_add_shipping)
                     <tr style="border: 1px solid #000000;">
                         <td colspan="3" style="text-align:right; "></td>
-                        <td  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>@lang('quickadmin.order.fields.shipping_amount')</b></td>
+                        <td  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Shipping Amount</b></td>
                         <td class="text-right" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($order->shipping_amount,0) ?? 0}}</td>
                     </tr>
                 @endif
                 <tr style="border: 1px solid #000000;">
-                    <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>@lang('quickadmin.order.fields.grand_total')</b></td>
+                    <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Grand Total</b></td>
                     <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
                 </tr>
             </tfoot>
         </table>
-            <h6 style="margin-left:6px;">THANK YOU</h6>
+        <h6 style="margin-left:6px;">THANK YOU</h6>
+    </main>
 
 
 
 
+@stop
 
 
-            <h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6>
-            <h6 style="margin-left:6px;">THANK YOU</h6>
-            <h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6><h6 style="margin-left:6px;">THANK YOU</h6>
-    
-        </main>
-    
-@endsection
-
-
-   

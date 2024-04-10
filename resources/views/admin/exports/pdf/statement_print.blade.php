@@ -20,7 +20,7 @@
         .table th {
             white-space: nowrap;
             color:#000;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
         }
         .table th p{
@@ -149,28 +149,16 @@
     $openingBalance = $openingBalance ?? 0;
     @endphp
 
-
-
-    <header>
-        <table class="table main" style="margin-bottom: 20px;">
-            <thead>
-                <tr>
-                    <td class="text-center" style="font-size: 18px; font-weight:bold;">{{ ucwords($customer->name) }}</td>
-                </tr>
-                <tr>
-                    <td class="sm-font my-3 text-center">Address : {{ $customer->area->address ?? ''  }}</td>
-                </tr>
-                <tr>
-                    <td class="sm-font text-center">Statement</td>
-                </tr>
-                <tr>
-                    @if(!is_null($from_date) && !is_null($to_date))
-                        <td class="sm-font text-center">{{ \Carbon\Carbon::parse($from_date)->format('d F Y') }} to {{ \Carbon\Carbon::parse($to_date)->format('d F Y') }}</td>
-                    @endif
-                </tr>
-            </thead>
-        </table>
-    </header>
+    <div class="main">
+        <div class="text-center">
+                <p class="font-18 font-800">{{ ucwords($customer->name) }}</p>
+                <p class="sm-font my-3">Address : {{ $customer->area->address ?? ''  }}</p>
+                <p class="sm-font">Statement</p>
+                @if(!is_null($from_date) && !is_null($to_date))
+                    <p class="sm-font">{{ \Carbon\Carbon::parse($from_date)->format('d F Y') }} to {{ \Carbon\Carbon::parse($to_date)->format('d F Y') }}</p>
+                @endif
+        </div>
+    </div>
 
     <table class="table heading_wrap">
         <thead>
@@ -191,19 +179,19 @@
                         @endif
 
                         <tr>
-                            <td style="padding-top:12px; padding-bottom:12px; font-size:12px;">
+                            <td>
                                 {{ \Carbon\Carbon::parse($transaction->entry_date)->format('d-m-Y') }}
                             </td>
 
-                            <td class="w-100" style="font-size:12px;">
+                            <td class="w-100">
                                     {{ $transaction->remark }}
                             </td>
 
-                            <td style="font-size:12px;">
+                            <td>
                                 {{ $transaction->voucher_number }}
                             </td>
 
-                            <td style="font-size:12px;">
+                            <td>
                                 @if($transaction->payment_type == 'debit')
                                 <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($transaction->amount,0) }}
                                     @php
@@ -211,7 +199,7 @@
                                     @endphp
                                 @endif
                             </td>
-                            <td style="font-size:12px;">
+                            <td>
                                 @if($transaction->payment_type == 'credit')
                                 <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($transaction->amount,0) }}
 
@@ -232,24 +220,24 @@
         </tbody>
         <tfoot>
             <tr class="text-right">
-                <td colspan="3" class="text-right" style="font-size:12px;text-align: right; padding-right: 9px; padding-top:8px; padding-bottom:8px;">
+                <td colspan="3" class="text-right" style="text-align: right; padding-right: 9px;">
                     <strong>Opening Balance</strong>
                 </td>
-                <td style="padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td>
                     <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ isset($openingBalance) ? number_format(abs($openingBalance),0) : '0.00' }} </strong>
                 </td>
                 <td></td>
             </tr>
 
             <tr class="text-right space-wrap">
-                <td colspan="3" class="text-right" style="text-align: right; padding-right: 9px; padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td colspan="3" class="text-right" style="text-align: right; padding-right: 9px;">
                     <strong>Current Balance</strong>
                 </td>
-                <td style="padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td>
                     @if(isset($debitTotal) && $debitTotal > 0)
                         <strong><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($debitTotal,0) }}</strong></td>
                     @endif
-                <td style="padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td>
                     @if(isset($creditTotal) && $creditTotal > 0)
                         <strong><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($creditTotal,0) }}</strong></td>
                     @endif
@@ -260,10 +248,10 @@
                 $closingBalance = $closingBalance + $openingBalance;
             @endphp
             <tr class="text-right">
-                <td colspan="3" class="text-right" style="text-align: right; padding-right: 9px; padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td colspan="3" class="text-right" style="text-align: right; padding-right: 9px;">
                     <strong>Closing Balance</strong>
                 </td>
-                <td style="padding-top:8px; padding-bottom:8px; font-size:12px;">
+                <td>
                     <strong><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($closingBalance),0) }}</strong>
                 </td>
                 <td></td>
@@ -272,7 +260,7 @@
     </table>
 
     <footer>
-        <table style="padding-left:8px; margin-top:50px">
+        <table style="padding-left:8px;">
             <tr>
                 <td style="margin: 0px; font-size:12px;" class="font-bold">
                 <p>
