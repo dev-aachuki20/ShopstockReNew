@@ -196,50 +196,49 @@
                             </td>
                         </tr>
 
-                       <table style="width: 100%; padding-bottom:10px">
+                        <table style="width: 100%; padding-bottom:10px">
                             <tr>
-                                    <td colspan="2">
-                                          <table style="width: 100%;">
-                                                <tr>
-                                                    <td>
-                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Bill To:</strong></div>
-                                                    </td>
+                                <td colspan="2">
+                                    <table style="width: 100%;">
+                                        <tr>
+                                            <td>
+                                                <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Bill To:</strong></div>
+                                            </td>
 
-                                                    <td style="width: 150px; float:right;backgound:red; text-align:right" >
-                                                        <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Estimate #:</strong> {{ $order->invoice_number }}</div>
-                                                    </td>
+                                            <td style="width: 150px; float:right;backgound:red; text-align:right" >
+                                                <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Estimate #:</strong> {{ $order->invoice_number }}</div>
+                                            </td>
+                                        </tr>
 
-                                                </tr>
+                                        <tr>
+                                            <td class="font-italic">
+                                                <address>
+                                                    {{ $order->customer->name ?? '' }}
+                                                    {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
+                                                    <br>  {{ $order->customer->area->address ?? '' }}
+                                                </address>
+                                            </td>
 
-                                                <tr>
-                                                    <td class="font-italic">
-                                                            <address>
-                                                                {{ $order->customer->name ?? '' }}
-                                                                {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
-                                                              <br>  {{ $order->customer->area->address ?? '' }}
-                                                            </address>
-                                                    </td>
+                                            <td style="vertical-align: top;">
+                                                @php
 
-                                                    <td style="vertical-align: top;">
-                                                        @php
-
-                                                        $orderType = $order->order_type;
-                                                        if($orderType == 'create'){
-                                                            $orderType = 'Estimate' ;
-                                                        }else if($orderType == 'return'){
-                                                            $orderType = 'Estimate Return';
-                                                        }
-                                                        @endphp
-                                                        <address style="text-align: right;vertical-align: top;">
-                                                        <strong>Type:</strong>  {{ $orderType }}<br>
-                                                        <strong>Date:</strong>{{ date('d-m-Y', strtotime($order->invoice_date)) }}<br>
-                                                        </address>
-                                                    </td>
-                                                </tr>
-                                          </table>
-                                    </td>
+                                                $orderType = $order->order_type;
+                                                if($orderType == 'create'){
+                                                    $orderType = 'Estimate' ;
+                                                }else if($orderType == 'return'){
+                                                    $orderType = 'Estimate Return';
+                                                }
+                                                @endphp
+                                                <address style="text-align: right;vertical-align: top;">
+                                                <strong>Type:</strong>  {{ $orderType }}<br>
+                                                <strong>Date:</strong>{{ date('d-m-Y', strtotime($order->invoice_date)) }}<br>
+                                                </address>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
-                       </table>
+                        </table>
 
                     </table>
                 </td>
@@ -317,7 +316,6 @@
                     </td>
                     <td>
                         @php
-
                             $quantityString = '';
                             if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
                                 if(!is_null($item->height)){
@@ -349,9 +347,10 @@
                                 }
                             }
                             if(!is_null($item->quantity)){
-                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->unit_type).' ';
+                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
                             }
                         @endphp
+
 
                         {{ $quantityString }}
                     </td>
