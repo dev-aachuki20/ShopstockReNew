@@ -290,7 +290,6 @@
                                                 @php
                                                         $quantityString = '';
 
-
                                                         if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
                                                             if(!is_null($item->height)){
                                                                 $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
@@ -347,11 +346,9 @@
                                     $amount = (float)$transaction->amount;
                                     $debitTotal += $amount;
                                     $balance += round($amount);
-
                                 @endphp
                                 <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($amount),0) }}
                             @endif
-
                         </td>
                         <td style="vertical-align: middle;">
                             @if($transaction->payment_type == 'credit')

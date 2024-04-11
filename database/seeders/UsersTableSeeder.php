@@ -19,7 +19,7 @@ class UsersTableSeeder extends Seeder
             'name'           => 'Super Admin',
             'email'          => 'superadmin@admin.com',
             'username'       => 'superadmin@admin.com',
-            'password'       => bcrypt('12345678'),
+            'password'       => bcrypt('Password'),
             'remember_token' => null,
             'email_verified_at' => date('Y-m-d H:i:s'),
             'created_by'     => 1,

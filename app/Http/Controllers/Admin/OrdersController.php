@@ -822,6 +822,8 @@ class OrdersController extends Controller
             $pdf->setOption('charset', 'UTF-8');
             return $pdf->stream($pdfFileName, ['Attachment' => false]);
 
+            //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
+
         }catch(\Exception $e){
             return abort(404);
         }

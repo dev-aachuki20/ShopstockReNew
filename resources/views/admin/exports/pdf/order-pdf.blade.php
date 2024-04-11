@@ -81,46 +81,6 @@
 
          }
 
-        .cancel-watermark {
-            position: relative;
-        }
-       .cancel-watermark:after{
-            content: "";
-            background: url("{{ asset('images/cancel-watermark.png') }}") no-repeat center center;
-            background-size: 100%;
-            /* background-color: red; */
-            opacity: 0.1;
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            width: 100%;
-            max-width:400px;
-            height: 300px;
-            margin:0 auto;
-            transform: translate(-50%, -50%);
-            background-repeat: no-repeat;
-        }
-
-        .split-watermark {
-            position: relative;
-        }
-        .split-watermark:after{
-            content: "";
-            background: url("{{ asset('images/split-watermark.png') }}") no-repeat center center;
-            background-size: 100%;
-            /* background-color: red; */
-            opacity: 0.1;
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            width: 100%;
-            max-width:400px;
-            height: 300px;
-            margin:0 auto;
-            transform: translate(-50%, -50%);
-            background-repeat: no-repeat;
-        }
-
         .table_head td{
             font-size:13px;
         }
@@ -202,15 +162,29 @@
       main{
         margin-top: 10px;
       }
+
+      .cancelled-watermark {
+        position: fixed;
+        top: 19%;
+        left: 25%;
+        transform: translate(-50%, -50%);
+        color: rgba(255, 0, 0, 0.2);
+        transform: rotate(-20deg);
+        font-size: 60px;
+    }
     </style>
 @stop
 @section('content')
     @php
-    $isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
+    //$isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
     $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->deleted_at : null;
     @endphp
+
+    @if (!is_null($order->deleted_at))
+    <div class="cancelled-watermark">Cancelled</div>
+    @endif
     <header>
-        <table class="header {{ !is_null(@$order->deleted_at) ? 'cancel-watermark' : '' }} {{ !is_null($isSplit)&& is_null($order->deleted_at) && !is_null($paytdeleted_at) ? 'split-watermark' : '' }}">
+        <table class="header">
             <tr>
                 <!-- <td style="padding: 40px 0 30px;vertical-align: top;"> -->
                 <td style="vertical-align: top;">
