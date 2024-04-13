@@ -13,10 +13,10 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
-          <div class="card"> 
+          <div class="card">
             <div class="card-header">
               <h4> @lang('quickadmin.order-management2.title-case-reciept')</h4>
-            </div>           
+            </div>
             <div class="card-body">
             <form action="{{ route('admin.transactions.store') }}"  id="cash-reciept-form" method="POST"  name="productForm" enctype="multipart/form-data">
               <div class="row">

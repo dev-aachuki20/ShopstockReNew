@@ -53,6 +53,11 @@ class CustomerListDataTable extends DataTable
                     $url = route('admin.customers.view_customer',['id'=> $row->id]);
                     $action .= '<a href="'.$url.'" class="btn btn-icon btn-info m-1 view_detail">'.$editIcon.'</a>';
                 }
+                if (Gate::check('customer_edit')) {
+                    $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
+                    $editUrl = route("admin.customers.edit",['customer' => $row->id] );
+                    $action .= '<a href="'.$editUrl.'" class="btn btn-icon btn-info m-1">'.$editIcon.'</a>';
+                }
                 // if (Gate::check('customer_delete')) {
                 //     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                 //     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_customer" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
@@ -66,16 +71,31 @@ class CustomerListDataTable extends DataTable
      */
     public function query(Customer $model): QueryBuilder
     {
-       // $query = $model->newQuery()->select(['customers.*'])->orderBy('Name','ASC');
-       $query = $model->newQuery()
-        ->select('customers.*')
-        ->whereExists(function ($query) {
-            $query->select('id')
-                ->from('payment_transactions')
-                ->whereColumn('payment_transactions.customer_id', 'customers.id')
-                ->where('payment_transactions.remark', '<>', 'Opening balance');
-        })
-        ->orderBy('customers.Name', 'ASC');
+        //dd($this->listtype);
+        $listtype = isset(request()->listtype) && request()->listtype ? $this->listtype  : 'ledger';
+        //dd($listtype);
+        switch ($listtype) {
+            case 'ledger':
+                $query = $model->newQuery()
+                ->select('customers.*')
+                ->whereExists(function ($query) {
+                    $query->select('id')
+                        ->from('payment_transactions')
+                        ->whereColumn('payment_transactions.customer_id', 'customers.id')
+                        ->where('payment_transactions.remark', '<>', 'Opening balance');
+                })
+                ->orderBy('customers.Name', 'ASC');
+                break;
+
+            case 'all':
+                $query = $model->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
+                break;
+            default:
+            // Handle unknown type here
+            return abort(404);
+            break;
+        }
+
         return $this->applyScopes($query);
     }
 

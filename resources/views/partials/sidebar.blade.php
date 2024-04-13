@@ -136,11 +136,11 @@
             </li>
             @endif
             @if (Gate::check('customer_access'))
-            <li class="{{ Request::is('admin/customers') ||  Request::is('admin/customers/*/edit') ? 'active' : '' }}">
+            {{-- <li class="{{ Request::is('admin/customers') ||  Request::is('admin/customers/*/edit') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.customers.index') }}">
                     @lang('quickadmin.customer-management.fields.alter_list')
                 </a>
-            </li>
+            </li> --}}
             <li class="{{ Request::is('admin/customer/list') || Request::is('admin/customer/*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.customer_list') }}">
                     @lang('quickadmin.customer-management.fields.list')

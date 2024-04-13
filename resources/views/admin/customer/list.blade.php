@@ -13,7 +13,21 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>@lang('quickadmin.customer-management.fields.list')</h4>                 
+                    <h4>@lang('quickadmin.customer-management.fields.list')</h4>
+                    <div class="col-md-8">
+                        <form action="" id="listfilter">
+                            <div class="row">
+                                <div class="col-lg-6 form-group">
+                                   <div class=" d-flex align-items-center">
+                                        <select class="form-control" name="listtype" id="listtype">
+                                            <option value="all" {{ $listtype == 'all' ? 'selected' : '' }}>All</option>
+                                            <option value="ledger" {{ $listtype == 'ledger' ? 'selected' : '' }}>Ledger</option>
+                                        </select>
+                                   </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
@@ -36,14 +50,15 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
-  var DataaTable = $('#customer-table').DataTable();      
+  var DataaTable = $('#customer-table').DataTable();
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
 // delete
-      $(document).on('click','.delete_customer',function(){
+      $(document).on('click','.delete_customer',function(e){
+        e.preventDefault();
         var delete_id = $(this).data('id');
         var delete_url = "{{ route('admin.customers.destroy',['customer'=> ':cId']) }}";
         delete_url = delete_url.replace(':cId', delete_id);
@@ -57,18 +72,18 @@
         },
         dangerMode: true,
         }).then(function(willDelete) {
-        if(willDelete) {  
+        if(willDelete) {
             $.ajax({
             type: "DELETE",
-            url: delete_url,              
+            url: delete_url,
             success: function(data) {
               if ($.isEmptyObject(data.error)) {
                 DataaTable.ajax.reload();
                 var alertType = "{{ trans('quickadmin.alert-type.success') }}";
                 var message = "{{ trans('messages.crud.delete_record') }}";
                 var title = "Customer";
-                showToaster(title,alertType,message);                    
-              } 
+                showToaster(title,alertType,message);
+              }
             },
             error: function (xhr) {
               swal("Error", 'Some mistake is there.', 'error');
@@ -78,7 +93,16 @@
 
         })
       });
-// delete
+
+
+      $(document).on('change','#listfilter #listtype', function(e){
+        e.preventDefault();
+        var listtype = $(this).val();
+        console.log(listtype);
+        var hrefUrl = "{{ route('admin.customer_list') }}"+ '?listtype=' + listtype;
+        console.log(hrefUrl);
+        window.location.href = hrefUrl;
+    });
 })
 </script>
 @endsection

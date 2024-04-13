@@ -371,8 +371,11 @@
                     <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Grand Total</b></td>
                     <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
                 </tr>
+
             </tfoot>
         </table>
+
+        <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
         <h6 style="margin-left:6px;">THANK YOU</h6>
     </main>
 

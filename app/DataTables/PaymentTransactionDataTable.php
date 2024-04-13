@@ -143,7 +143,6 @@ class PaymentTransactionDataTable extends DataTable
     public function query(PaymentTransaction $model): QueryBuilder
     {
         $type = $this->type;
-
         switch ($type) {
             case 'sales_return':
                 $model = $model->where('payment_way', 'order_return');

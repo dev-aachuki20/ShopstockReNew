@@ -52,9 +52,13 @@
                                 $totalSales = 0;
                                 $totalCashReceipt = 0;
                                 $totalSalesReturn = 0;
-                                $lastBalance = 0;
+                                $lastBalance = (float)$openingBalance;
 
                                 @endphp
+                                <tr>
+                                    <th colspan="3" class="text-right">Opening Balance</th>
+                                    <td colspan="3"><i class="fa fa-inr"></i> {{number_format($openingBalance, 2, '.', ',')}}</td>
+                                </tr>
                                 @foreach ($alldata as $data)
                                 @php
                                     $debitAmount = $data->type=='sales' ? $data->amount : 0;
@@ -86,10 +90,6 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <th colspan="3" class="text-right">Opening Balance</th>
-                                    <td colspan="3"><i class="fa fa-inr"></i> {{number_format($openingBalance, 2, '.', ',')}}</td>
-                                </tr>
                                 <tr>
                                     <th colspan="3" class="text-right">Current Balance</th>
                                     <td><i class="fa fa-inr"></i> {{ number_format($totalSales, 2, '.', ',') }}</td>

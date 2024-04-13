@@ -62,6 +62,17 @@ class SettingSeeder extends Seeder
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'created_by' => 1,
             ],
+            [
+                'key'    => 'custom_invoice_print_message',
+                'value'  =>  'Please check your Estimate Details. If there is any query , kindly contact with us.',
+                'type'   => 'text',
+                'details' => null,
+                'display_name'=>'Custom Print-Invoice Bottom Message',
+                'group'  => 'web',
+                'status' => 1,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
 
             [
                 'key'    => 'shipping_amount',

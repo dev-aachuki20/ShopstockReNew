@@ -89,6 +89,15 @@
 @section('customJS')
 <script src="{{ asset('admintheme/assets/js/jquery.validate.min.js') }}"></script>
 <script type="text/javascript">
+    var is_formsubmit = "{{ session('success') ? 'Yes' : 'No' }}";
+    if(is_formsubmit == "Yes"){
+        var alertType = "{{ trans('quickadmin.alert-type.success') }}";
+        var message = "Successfully added!";
+        var title = "Cash Receipt";
+        showToaster(title, alertType, message);
+    }
+
+
     var remainingBalance = 0;
     $('#cash-reciept-form').validate({
         focusInvalid: false,

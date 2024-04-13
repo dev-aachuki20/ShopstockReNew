@@ -32,10 +32,12 @@ class CustomerController extends Controller
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return $dataTable->render('admin.customer.index');
     }
-    public function customerList(CustomerListDataTable $dataTable)
+
+    public function customerList(Request $request,CustomerListDataTable $dataTable)
     {
+        $listtype = $request->listtype ?? 'ledger';
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return $dataTable->render('admin.customer.list');
+        return $dataTable->with(['listtype'=>$listtype])->render('admin.customer.list',compact('listtype'));
     }
 
 
