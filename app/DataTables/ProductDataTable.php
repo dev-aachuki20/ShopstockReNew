@@ -37,12 +37,12 @@ class ProductDataTable extends DataTable
             })
             ->editColumn('calculation_type',function($row){
                 $html = "";
-                $calculation = config('constant.calculationType');                
+                $calculation = config('constant.calculationType');
                 $html .= $calculation[$row->calculation_type];
                 $html .= '<br/>'.$row->product_unit_name;
                 return $html ?? "";
             })
-            ->editColumn('group_id',function($row){
+            ->addColumn('group.name',function($row){
                 $grupName = $row->group_name.'<br>'. $row->sub_group_name;
                 return $grupName ?? "";
             })
@@ -60,12 +60,12 @@ class ProductDataTable extends DataTable
             })
             ->addColumn('action',function($row){
                 $action='';
-                if($this->isRecycle == "isRecycle"){            
+                if($this->isRecycle == "isRecycle"){
                     if (Gate::check('product_undo')) {
                         $editIcon = '<i class="fa fa-undo" aria-hidden="true"></i>';
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 recycle_group" data-id="'.encrypt($row->id).'">'.$editIcon.'</a>';
-                    }    
-                }else{ 
+                    }
+                }else{
                     if (Gate::check('product_access')) {
                         $editIcon = view('components.svg-icon', ['icon' => 'view'])->render();
                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-id="'.encrypt($row->id).'" data-product_name="'.$row->name.'" >'.$editIcon.'</a>';
@@ -78,10 +78,16 @@ class ProductDataTable extends DataTable
                     if (Gate::check('product_delete')) {
                         $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_product" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
-                    }                    
+                    }
                 }
                 return $action;
-            })->rawColumns(['action','calculation_type','group_id','price','min_sale_price','wholesaler_price','retailer_price']);
+            })
+            ->filterColumn('group.name', function ($query, $keyword) {
+                $query->whereHas('group', function ($q) use ($keyword) {
+                    $q->where('groups.name', 'like', "%$keyword%");
+                });
+            })
+            ->rawColumns(['action','calculation_type','group.name','price','min_sale_price','wholesaler_price','retailer_price']);
     }
 
     /**
@@ -95,8 +101,8 @@ class ProductDataTable extends DataTable
         $query->leftJoin('groups as sub_group', 'sub_group.id', '=', 'products.sub_group_id');
         $query->leftJoin('product_units', 'product_units.id', '=', 'products.unit_type')->orderBy('products.id','DESC');
         //$query->whereNull('product_categories.deleted_at')->whereNull('groups.deleted_at');
-        if($this->isRecycle == "isRecycle"){            
-            $query->onlyTrashed();           
+        if($this->isRecycle == "isRecycle"){
+            $query->onlyTrashed();
         }
 
         return $this->applyScopes($query);
@@ -137,7 +143,7 @@ class ProductDataTable extends DataTable
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.product2.fields.name')),
             Column::make('calculation_type')->title(trans('quickadmin.product2.fields.calculation_unit')),
-            Column::make('group_id')->title(trans('quickadmin.product2.fields.group_sub_group')),
+            Column::make('group.name')->title(trans('quickadmin.product2.fields.group_sub_group')),
 
             Column::make('price')->title(trans('quickadmin.product2.fields.price')),
             Column::make('min_sale_price')->title(trans('quickadmin.product2.fields.min_sale_price')),

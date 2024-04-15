@@ -35,7 +35,7 @@ class PaymentTransactionDataTable extends DataTable
             ->editColumn('entry_date', function ($row) {
                 return date('d-m-Y', strtotime($row->entry_date)) ?? "";
             })
-            ->editColumn('customer_id', function ($row) {
+            ->addColumn('customer.name', function ($row) {
                 return $row->customer->name ?? "";
             })
             ->editColumn('voucher_number', function ($row) {
@@ -135,6 +135,11 @@ class PaymentTransactionDataTable extends DataTable
                     return '';
                 }
 
+            })
+            ->filterColumn('customer.name', function ($query, $keyword) {
+                $query->whereHas('customer', function ($q) use ($keyword) {
+                    $q->where('customers.name', 'like', "%$keyword%");
+                });
             })
             ->rawColumns(['action','list_checkbox']);
     }
@@ -238,7 +243,7 @@ class PaymentTransactionDataTable extends DataTable
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             //Column::make('list_checkbox')->title('<input type="checkbox" id="select-all"  class="select-checkbox" />')->orderable(false)->searchable(false),
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
-            Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
+            Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
             Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type'))
         ];

@@ -28,7 +28,7 @@ class GroupDataTable extends DataTable
 
     public function dataTable(QueryBuilder $query)
     {
-        
+
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
@@ -37,22 +37,22 @@ class GroupDataTable extends DataTable
                     return $row->name ?? "";
                 }else{
                     return $row->parent->name ?? "";
-                }                
+                }
             })
             // ->editColumn('parent_id',function($row){
             //     return ($row->parent_id > 0)?$row->name ?? "":"";
             // })
-            ->editColumn('products_count',function($row){
+            ->addColumn('products_count',function($row){
                 return ($row->products_count > 0)? $row->products_count :$row->subproducts_count;
             })
             ->addColumn('action',function($row){
                 $action='';
-                if($this->isRecycle == "isRecycle"){            
+                if($this->isRecycle == "isRecycle"){
                     if (Gate::check('group_undo')) {
                         $editIcon = '<i class="fa fa-undo" aria-hidden="true"></i>';
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 recycle_group" data-id="'.encrypt($row->id).'">'.$editIcon.'</a>';
-                    }    
-                }else{                    
+                    }
+                }else{
                     if (Gate::check('group_edit')) {
                         $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                         $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-info m-1 edit_group" data-id="'.encrypt($row->id).'" data-name="'.$row->name.'" data-parent_id="'.$row->parent_id.'">'.$editIcon.'</a>';
@@ -74,10 +74,10 @@ class GroupDataTable extends DataTable
         $query = $model->newQuery()->select(['groups.*'])->withCount('products')->withCount('subproducts');
        // $query->orderByRaw('CASE WHEN parent_id = 0 THEN id  ELSE parent_id END DESC');
        $query->where('parent_id','0')->orderBy('id','DESC');
-        if($this->isRecycle == "isRecycle"){            
-            $query->onlyTrashed();           
+        if($this->isRecycle == "isRecycle"){
+            $query->onlyTrashed();
         }
-        return $this->applyScopes($query);       
+        return $this->applyScopes($query);
     }
 
     /**

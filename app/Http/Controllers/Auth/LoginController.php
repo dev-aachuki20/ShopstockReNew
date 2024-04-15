@@ -20,21 +20,15 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request){
-        $validated = $request->validate([
+    public function login(Request $request)
+    {
+        $credentialsOnly = $request->validate([
             'username'    => ['required','string',new IsActive],
-            'password' => 'required|min:4',
-
-        ],[
-            'username.required' => 'The Username is required.',
-            'password.required' => 'The Password is required.',
+            'password' => ['required','string','min:4'],
         ]);
 
         $remember_me = !is_null($request->remember_me) ? true : false;
-        $credentialsOnly = [
-            'username'    => $request->username,
-            'password' => $request->password,
-        ];
+
         try {
 
             $user = User::where('username',$request->username)->first();
@@ -46,12 +40,10 @@ class LoginController extends Controller
                         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.iperror')])->withInput($request->only('username', 'password'));
                    }
                     // Staff Cannot Login Into Web
-                   
                     if ((auth()->user()->hasRole(config('app.roleid.staff')))) {
                         Auth::guard('web')->logout();
                         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.unauthorize')])->withInput($request->only('username', 'password'));
                     }
-                    //return redirect()->route('dashboard')->with('success',trans('quickadmin.qa_login_success'));
                     addToLog($request,'User','Login successfully');
                     return redirect()->route('admin.orders.create')->with(['success' => true,
                     'message' => trans('quickadmin.qa_login_success'),
