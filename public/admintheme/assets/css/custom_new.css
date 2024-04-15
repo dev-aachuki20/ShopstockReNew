@@ -749,16 +749,24 @@ table.dataTable tbody>tr:nth-child(even){
 }
 
 
-.select_filter {
+/* .select_filter {
     position: absolute;
-    top: 53px;
-    width: calc(100% - 400px);
-    right: 310PX;
+    top: 40px;
+    right: 260px;
     z-index: 2;
-}
+} */
 
 .select_filter select.form-control:not([size]):not([multiple]) {
     height: calc(1.75rem + 6px);
+    min-width: 200px;
+}
+/* .select_filter .selectgroup {
+    min-width: 200px;
+} */
+
+.dataTables_filter{
+    display: flex;
+    gap: 10px;
 }
 
 .estimates_transactions_table tbody tr td .estimate-action-icons .btn {

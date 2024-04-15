@@ -14,11 +14,11 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4>@lang('quickadmin.customer-management.fields.list')</h4>
-                    <div class="col-12">
-                        <form action="" id="listfilter" class="select_filter">
-                            <div class="row">
-                                <div class="col-xl-4 col-lg-6 col-7 form-group ml-auto">
-                                   <div class=" d-flex align-items-center">
+                    <div class="col">
+                        <form action="" id="listfilter" class="select_filter" style="display: none;">
+                            <div class="row mx-0">
+                                <div class="col-auto form-group ml-auto px-0">
+                                   <div class=" d-flex align-items-center selectgroup">
                                         <select class="form-control" name="listtype" id="listtype">
                                             <option value="all" {{ $listtype == 'all' ? 'selected' : '' }}>All</option>
                                             <option value="ledger" {{ $listtype == 'ledger' ? 'selected' : '' }}>Ledger</option>
@@ -31,7 +31,7 @@
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
-                    {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable', 'style' => 'width:100%;'])}}
+                    {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable partyListTable', 'style' => 'width:100%;'])}}
                   </div>
                 </div>
               </div>
@@ -50,7 +50,10 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
-  var DataaTable = $('#customer-table').DataTable();
+    var DataaTable = $('#customer-table').DataTable();
+    $("#customer-table_filter.dataTables_filter").append($("#listfilter"));
+    $("#listfilter").show();
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
