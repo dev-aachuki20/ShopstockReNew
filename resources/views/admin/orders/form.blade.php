@@ -305,7 +305,22 @@
 </div>
 {{-- end table html --}}
 
-
+<!-- view Modal -->
+<div class="modal fade " id="view_model_Modal" tabindex="-1" role="dialog" aria-labelledby="view_model_ModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">View Detail</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body show_html">
+        </div>
+        </div>
+    </div>
+</div>
+  <!-- view Modal -->
 
 
 <!-- Add Edit Modal -->
@@ -458,7 +473,11 @@ $('#productForm').on('keyup keypress', function(e) {
                             if (response.rowData.last_order_price != 0) {
                                 minPrePrice = response.rowData.last_order_price;
                                 $('.min-pre-price').parent('#prevOrderLink').css('display', 'block');
-                                $('.min-pre-price').parent('#prevOrderLink').attr('data-order', response.rowData.order);
+                                // $('.min-pre-price').parent('#prevOrderLink').attr('data-order', response.rowData.order);
+                                var orderId= response.rowData.order;
+                                var routeUrl = "{{ route('admin.orders.show', ':orderId') }}";
+                                routeUrl = routeUrl.replace(':orderId', orderId);
+                                $('#prevOrderLink').attr('data-order', routeUrl);
                                 $('.min-pre-price').text(minPrePrice);
                             } else {
 
@@ -1641,6 +1660,28 @@ $('#productForm').on('keyup keypress', function(e) {
                 $(".view_model_form").html(data.html);
             }
             });
+        });
+
+        $(document).on('click', '#prevOrderLink', function() {
+            $("#body").prepend('<div class="loader" id="loader_div"></div>');
+            $("#view_model_Modal").modal('show');
+            $('.show_html').html('');
+            var hrefurl = $(this).data('order');
+            //var head_title = $(this).attr('data-customerName');
+            if (hrefurl) {
+                $.ajax({
+                type: "GET",
+                url: hrefurl,
+                success: function(data) {
+                    $("#loader_div").remove();
+                    $('.show_html').html(data.html);
+                    //$("#view_model_Modal .head-title").html(head_title);
+                },
+                error: function () {
+                    $("#loader_div").remove();
+                }
+                });
+            }
         });
     });
 </script>

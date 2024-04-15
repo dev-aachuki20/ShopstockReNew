@@ -175,7 +175,7 @@ class OrdersController extends Controller
         if ($request->ajax()) {
             $id = decrypt($id);
             $order = Order::withTrashed()->find($id);
-            $type = $request->type;
+            $type = $request->type ?? 'sales';
             $html = View::make('admin.orders.prev_order_modal', compact('order', 'type'))->render();
             return response()->json(['success' => true, 'html' => $html]);
         }
