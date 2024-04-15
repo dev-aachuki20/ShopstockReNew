@@ -749,6 +749,45 @@ table.dataTable tbody>tr:nth-child(even){
 }
 
 
+.select_filter {
+    position: absolute;
+    top: 53px;
+    width: calc(100% - 400px);
+    right: 310PX;
+    z-index: 2;
+}
+
+.select_filter select.form-control:not([size]):not([multiple]) {
+    height: calc(1.75rem + 6px);
+}
+
+.estimates_transactions_table tbody tr td .estimate-action-icons .btn {
+    width: 28px;
+    height: 28px;
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons{
+   position: relative;
+   padding: 11px;
+   width: 110px;
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons a{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons a.edit_product {
+    left: 0px;
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons a.view_detail {
+    left: 30px;
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons a.view_history_detail {
+    left: 60px;
+}
+.estimates_transactions_table tbody tr td .estimate-action-icons a.delete_transaction {
+    left: 90px;
+}
+
 
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {

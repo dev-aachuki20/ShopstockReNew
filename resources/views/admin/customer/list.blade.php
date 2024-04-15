@@ -14,10 +14,10 @@
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4>@lang('quickadmin.customer-management.fields.list')</h4>
-                    <div class="col-md-8">
-                        <form action="" id="listfilter">
+                    <div class="col-12">
+                        <form action="" id="listfilter" class="select_filter">
                             <div class="row">
-                                <div class="col-lg-6 form-group">
+                                <div class="col-xl-4 col-lg-6 col-7 form-group ml-auto">
                                    <div class=" d-flex align-items-center">
                                         <select class="form-control" name="listtype" id="listtype">
                                             <option value="all" {{ $listtype == 'all' ? 'selected' : '' }}>All</option>
@@ -98,10 +98,8 @@
       $(document).on('change','#listfilter #listtype', function(e){
         e.preventDefault();
         var listtype = $(this).val();
-        console.log(listtype);
         var hrefUrl = "{{ route('admin.customer_list') }}"+ '?listtype=' + listtype;
-        console.log(hrefUrl);
-        window.location.href = hrefUrl;
+        DataaTable.ajax.url(hrefUrl).load();
     });
 })
 </script>

@@ -54,7 +54,7 @@ class PaymentTransactionDataTable extends DataTable
                 return $row->created_at;
             })
             ->addColumn('action', function ($row) {
-                $action = '';
+                $action = '<div class="estimate-action-icons">';
                 // if (Gate::check('product_access')) {
                 $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
                 $historyIcon = view('components.svg-icon', ['icon' => 'staff-rejoin'])->render();
@@ -116,6 +116,8 @@ class PaymentTransactionDataTable extends DataTable
                         }
                     }
                 }
+
+                $action .= '</div>';
 
                 return $action;
             })

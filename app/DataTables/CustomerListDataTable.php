@@ -30,7 +30,7 @@ class CustomerListDataTable extends DataTable
             ->editColumn('phone_number',function($row){
                 return $row->phone_number ?? "";
             })
-            ->editColumn('debit',function($row){
+            ->addColumn('debit',function($row){
                $getTotalBlance = getTotalBlance($row->id,1);
                $dabit_blance = "";
                if($getTotalBlance < 0){
@@ -38,7 +38,7 @@ class CustomerListDataTable extends DataTable
                }
                return $dabit_blance;
             })
-            ->editColumn('credit',function($row){
+            ->addColumn('credit',function($row){
                 $getTotalBlance = getTotalBlance($row->id,1);
                 $credit_blance = "";
                 if($getTotalBlance > 0){
@@ -63,7 +63,8 @@ class CustomerListDataTable extends DataTable
                 //     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_customer" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                 // }
                 return $action;
-            })->rawColumns(['action','debit','credit']);
+            })
+            ->rawColumns(['action','debit','credit']);
     }
 
     /**
@@ -71,9 +72,7 @@ class CustomerListDataTable extends DataTable
      */
     public function query(Customer $model): QueryBuilder
     {
-        //dd($this->listtype);
         $listtype = isset(request()->listtype) && request()->listtype ? $this->listtype  : 'ledger';
-        //dd($listtype);
         switch ($listtype) {
             case 'ledger':
                 $query = $model->newQuery()
@@ -83,15 +82,13 @@ class CustomerListDataTable extends DataTable
                         ->from('payment_transactions')
                         ->whereColumn('payment_transactions.customer_id', 'customers.id')
                         ->where('payment_transactions.remark', '<>', 'Opening balance');
-                })
-                ->orderBy('customers.Name', 'ASC');
+                });
                 break;
 
             case 'all':
                 $query = $model->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
                 break;
             default:
-            // Handle unknown type here
             return abort(404);
             break;
         }
