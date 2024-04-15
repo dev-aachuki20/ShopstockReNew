@@ -190,7 +190,7 @@
             let debit = parseFloat(findOption.attr('data-debit'));
             let credit = parseFloat(findOption.attr('data-credit'));
             remainingBalance = debit - credit;
-            remainingBalance = Math.abs(remainingBalance);
+            //remainingBalance = Math.abs(remainingBalance);
 
             $("#remain_balance").val(remainingBalance);
             // var addRemainingElement = '<div class="col-md-4">' +
@@ -213,7 +213,13 @@
             if (remainingBalance >= amount) {
                 var remain = remainingBalance - amount;
                 $('#remain_balance').val(remain.toFixed(0));
-            } else {
+            }
+            else if(remainingBalance < 0)
+            {
+                var remain = remainingBalance - amount;
+                $('#remain_balance').val(remain.toFixed(0));
+            }
+            else {
                 $('#remain_balance').val(remainingBalance);
                 if (!isNaN(amount)) {
                     var alertMess = '<p id="amount_error" class="help-block red text-danger">Amount should be less than remain balance</p>';
