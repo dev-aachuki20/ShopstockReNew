@@ -29,6 +29,8 @@ class ProductDataTable extends DataTable
 
     public function dataTable(QueryBuilder $query)
     {
+        //$query = $query->orderBy('id', 'DESC');
+
         return datatables()
         ->eloquent($query)
             ->addIndexColumn()
@@ -99,7 +101,7 @@ class ProductDataTable extends DataTable
         $query = $model->newQuery()->select(['products.*','groups.name as group_name','sub_group.name as sub_group_name','product_units.name as product_unit_name']);
         $query->leftJoin('groups', 'groups.id', '=', 'products.group_id');
         $query->leftJoin('groups as sub_group', 'sub_group.id', '=', 'products.sub_group_id');
-        $query->leftJoin('product_units', 'product_units.id', '=', 'products.unit_type')->orderBy('products.id','DESC');
+        $query->leftJoin('product_units', 'product_units.id', '=', 'products.unit_type');
         //$query->whereNull('product_categories.deleted_at')->whereNull('groups.deleted_at');
         if($this->isRecycle == "isRecycle"){
             $query->onlyTrashed();
@@ -114,7 +116,7 @@ class ProductDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('product-table')
+                    ->setTableId('products-table')
                     ->parameters([
                         'responsive' => true,
                         'pageLength' => 70,
@@ -122,15 +124,10 @@ class ProductDataTable extends DataTable
                     ])
                     ->columns($this->getColumns())
                     ->minifiedAjax()
-                    ->dom('lBfrtip')
-                    ->orderBy(1)
+                    ->dom('lfrtip')
+                    ->orderBy(1,'DESC');
                     // ->selectStyleSingle()
-                    ->buttons([
-                        // Button::make('excel'),
-                        // Button::make('csv'),
-                        // Button::make('pdf'),
-                        // Button::make('print'),
-                    ]);
+
     }
 
     /**
@@ -141,7 +138,7 @@ class ProductDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.product2.fields.name')),
+            Column::make('name')->title(trans('quickadmin.product2.fields.name'))->orderable(true),
             Column::make('calculation_type')->title(trans('quickadmin.product2.fields.calculation_unit')),
             Column::make('group.name')->title(trans('quickadmin.product2.fields.group_sub_group')),
 

@@ -73,7 +73,7 @@ class GroupDataTable extends DataTable
     {
         $query = $model->newQuery()->select(['groups.*'])->withCount('products')->withCount('subproducts');
        // $query->orderByRaw('CASE WHEN parent_id = 0 THEN id  ELSE parent_id END DESC');
-       $query->where('parent_id','0')->orderBy('id','DESC');
+       $query->where('parent_id','0');
         if($this->isRecycle == "isRecycle"){
             $query->onlyTrashed();
         }
@@ -95,7 +95,7 @@ class GroupDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom('lBfrtip')
-                    //->orderBy(1)
+                    ->orderBy(1)
                     // ->selectStyleSingle()
                     ->buttons([
                         // Button::make('excel'),
@@ -112,7 +112,7 @@ class GroupDataTable extends DataTable
     {
         return [
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('name')->title(trans('quickadmin.group_master.fields.name'))->orderable(false),
+            Column::make('name')->title(trans('quickadmin.group_master.fields.name')),
            // Column::make('parent_id')->title(trans('quickadmin.group_master.fields.sub_group')),
             Column::make('products_count')->title(trans('admin_master.product.products'))->orderable(false),
             Column::computed('action')
