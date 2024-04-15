@@ -65,7 +65,7 @@
                     <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $role ? $role->name : '' }}</td>
                     <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $staff->username ?? '' }}</td>
                     {{-- <td style="padding: 8px;border: 1px solid #000;border-right: none;border-top: none;" align="center">{{ $staff->email ?? '' }}</td> --}}
-                    <td style="padding: 8px;border: 1px solid #000;border-top: none;" align="center">{{ $staff->created_at ?? '' }}</td>
+                    <td style="padding: 8px;border: 1px solid #000;border-top: none;" align="center">{{ $staff->created_at ? $staff->created_at->format('d-m-Y h:i A') : '' }}</td>
                 </tr>
                 @empty
                 <tr>
