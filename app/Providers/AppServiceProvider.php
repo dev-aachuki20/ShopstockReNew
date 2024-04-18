@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -22,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Validator::extend('matches_original_password', function ($attribute, $value, $parameters, $validator) {
+            $originalPassword = getSetting('report_customer_password');
+            return $value === $originalPassword;
+        });
 
     }
 }

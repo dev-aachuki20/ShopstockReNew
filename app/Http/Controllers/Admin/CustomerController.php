@@ -66,9 +66,7 @@ class CustomerController extends Controller
             'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'],
             'area_id' => ['required','numeric'],
             'is_type' => ['required','string','max:50'],
-            'opening_blance' => ['required','numeric'],
         ],[
-            'opening_blance.required'=>'The opening balance field is required.',
             'area_id.required' => 'The area address field is required.',
             'is_type.required' => 'The type field is required.',
         ]);
@@ -108,31 +106,18 @@ class CustomerController extends Controller
         $customer =  Customer::create($data);
         addToLog($request,'Customer','Create', $customer);
 
-        $transactionDetails = array(
-            'customer_id' => $customer->id,
-            'payment_type' => 'debit',
-            'payment_way' => 'by_cash',
-            'remark' => 'Opening balance',
-            'amount' => $request->opening_blance,
-            'entry_date' => Carbon::now()->format(config('app.date_format')),
-            'created_by' => Auth::id(),
-        );
         // group add
-            if($request->is_type == "wholesaler"){
-                if($request->has('groups')){
-                    foreach($request->groups as $row){
-                        $groupData = [
-                            'group_id' =>  $row,
-                            'customer_id' => $customer->id,
-                        ];
-                        CustomerGroup::create($groupData);
-                    }
+        if($request->is_type == "wholesaler"){
+            if($request->has('groups')){
+                foreach($request->groups as $row){
+                    $groupData = [
+                        'group_id' =>  $row,
+                        'customer_id' => $customer->id,
+                    ];
+                    CustomerGroup::create($groupData);
                 }
             }
-        // group add
-
-        $transaction = PaymentTransaction::create($transactionDetails);
-        addToLog($request,'PaymentTransaction','Create From Customer', $transaction);
+        }
         return response()->json(['success' => 'Created successfully.']);
     }
 
@@ -254,8 +239,7 @@ class CustomerController extends Controller
     public function historyFilter(Request $request)
     {
         $customerId = $request->customer;
-        $openingBalance = 0;
-        $openingBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
+        $openingBalance =0 ;
         if(is_null($request->from_date) && is_null($request->to_date)){
              $customer = Customer::findOrFail($customerId);
         }else{
@@ -264,7 +248,7 @@ class CustomerController extends Controller
 
              $previousDebitBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','debit')->sum('amount');
              $previousCreditBalance = PaymentTransaction::whereDate('entry_date','<',date('Y-m-d', strtotime($startDate)))->where('customer_id',$customerId)->where('payment_type','credit')->sum('amount');
-             $openingBalance = $openingBalance + ((float)$previousCreditBalance - (float)$previousDebitBalance);
+             $openingBalance = ((float)$previousCreditBalance - (float)$previousDebitBalance);
 
              $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
                      $query->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
@@ -293,19 +277,25 @@ class CustomerController extends Controller
     {
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customer = Customer::findOrFail($request->id);
-        $firstopeningBalance = PaymentTransaction::where('customer_id',$request->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-
+        $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
         $currentYear = Carbon::now()->year;
         $yearlist = range(2021, $currentYear);
-
         $currentMonth = Carbon::now()->month;
         $year = $request->year ?? $currentYear;
-        $startDate = Carbon::create($year, 1, 1)->startOfMonth();
+        $customerCreatedAtMonth = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->month;
+        if ($year == $customerCreatedAtYear)
+        {
+            $startDate = Carbon::create($year,$customerCreatedAtMonth, 1)->startOfMonth();
+        }
+        elseif($year < $customerCreatedAtYear){
+            $startDate = Carbon::create($customerCreatedAtYear,1, 1)->startOfMonth();
+        }
+        else{
+            $startDate = Carbon::create($year,1, 1)->startOfMonth();
+        }
+
         $endDate = ($year == $currentYear) ? Carbon::create($year, $currentMonth, 1)->endOfMonth() : Carbon::create($year, 12, 1)->endOfMonth();
-
-        $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
-
-
+        $openingBalance = GetYearOpeningBalance($customer->id,$year);
         $estimateData = PaymentTransaction::selectRaw("SUM(amount) as total_amount, DATE_FORMAT(entry_date, '%Y-%m') as month, 'sales' as type")
         ->where('customer_id', $request->id)->where('payment_way', 'order_create')->whereBetween('entry_date', [$startDate, $endDate])->groupBy(DB::raw('YEAR(entry_date)'), DB::raw('MONTH(entry_date)'), 'type')->get();
 
@@ -342,6 +332,8 @@ class CustomerController extends Controller
             }
             $currentMonth->addMonth();
         }
+
+        //dd($monthlyData);
         // Sort the monthly data by month
         ksort($monthlyData);
         return view('admin.customer.view_list_customer',compact('customer','openingBalance','monthlyData','yearlist','year'));
@@ -349,13 +341,8 @@ class CustomerController extends Controller
 
     public function viewCustomerDetail(Customer $customer,string $month)
     {
-        $firstopeningBalance = PaymentTransaction::where('customer_id',$customer->id)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-
         $year = substr($month, 0, 4);
-        // $openingBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
-        $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customer->id,$month);
-
-        //dd($openingBalance);
+        $openingBalance = GetMonthWiseOpeningBalance($customer->id,$month);
         $estimateData = PaymentTransaction::selectRaw("*,'sales' as type")->where('customer_id', $customer->id)->where('payment_way', 'order_create')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
 
         $cashReceiptData = PaymentTransaction::selectRaw("*, 'cashreceipt' as type")->where('customer_id', $customer->id)->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->whereRaw("DATE_FORMAT(entry_date, '%Y-%m') = ?", [$month]);
@@ -384,8 +371,8 @@ class CustomerController extends Controller
 
             $openingBalance = 0;
             if($customerId){
-                $firstopeningBalance = PaymentTransaction::where('customer_id',$customerId)->whereIn('payment_way',['by_cash','by_split'])->where('remark','Opening balance')->orderBy('id','ASC')->sum('amount');
-                $openingBalance = GetMonthWiseOpeningBalance($firstopeningBalance,$customerId,$yearmonth);
+
+                $openingBalance = GetMonthWiseOpeningBalance($customerId,$yearmonth);
 
                 $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
                         $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));

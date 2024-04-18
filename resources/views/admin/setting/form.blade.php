@@ -14,6 +14,8 @@
 
                     @if ($setting->type === 'image')
                         <input type="file" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key }}" autocomplete="true">
+                    @elseif ($setting->type === 'password')
+                    <input type="password" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? decrypt($setting->value) : old(decrypt($setting->value)) }}" id="{{ $setting->key}}" autocomplete="true">
                     @elseif ($setting->type === 'number')
                         @if ($setting->key == 'invoice_allow_day_admin_accountant')
                             @can('setting_invoice_allow_days')
@@ -23,7 +25,7 @@
                             <input type="number" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
                         @endif
 
-                        @elseif ($setting->type === 'text')
+                    @elseif ($setting->type === 'text')
                         <input type="text" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
                     @elseif($setting->type == 'text_area')
                         @if($setting->details)

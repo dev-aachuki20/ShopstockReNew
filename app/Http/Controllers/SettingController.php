@@ -58,6 +58,10 @@ class SettingController extends Controller
 
                         $setting_value = null;
 
+                    }
+                    elseif($setting->type === 'password'){
+                        $setting->value = encrypt($setting_value);
+
                     } else {
                         // Handle other fields
                         $setting->value = $setting_value;

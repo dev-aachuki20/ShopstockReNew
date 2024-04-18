@@ -797,6 +797,72 @@ table.dataTable tbody>tr:nth-child(even){
 }
 
 
+/* ---Select2 Css------- */
+#area-filter-form .select2-selection__rendered {
+    height: 100%;
+    padding: 0px;
+}
+
+#area-filter-form .select2-container .select2-selection--multiple {
+    padding: 4px 45px 8px 15px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+#area-filter-form .select2-results {
+    padding-top: 10px !important;
+}
+
+#area-filter-form .select2-selection--multiple .select2-selection__choice {
+    background-color: #000000;
+    border: 1px solid #000000;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+}
+
+
+#area-filter-form .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+    font-weight: 400;
+    font-size: 23px;
+}
+#area-filter-form button#reset-filter {
+    border-radius: 4px;
+    height: 47px;
+}
+#area-filter-form .closebtn {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    background: #db5102;
+    width: 30px;
+    height: 30px;
+    padding: 0px !important;
+    font-size: 20px !important;
+    line-height: 1;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.customer_report_table table.dataTable tbody tr td:first-child, .customer_report_table table.dataTable thead>tr>th:first-child {
+    width: 0%;
+    min-width: 15px;
+}
+.customer_report_table table.dataTable thead>tr>th {
+   padding: 10px 15px;
+}
+
+
+
+/* ------------Responsive Css------------ */
+
+
 @media screen and (min-width: 1200px) and (max-width: 1499px) {
     /*.product-detail {
         flex: 0 0 100%;

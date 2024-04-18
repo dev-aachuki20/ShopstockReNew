@@ -128,6 +128,9 @@ if (!function_exists('getSetting')) {
         if ($setting) {
             if ($setting->type == 'image') {
                 $result = $setting->image_url;
+            }
+            elseif($setting->type == 'password'){
+                $result = decrypt($setting->value);
             } elseif ($setting->type == 'video') {
                 $result = $setting->video_url;
             } else {
@@ -420,7 +423,7 @@ if (!function_exists('glassProductMeasurement')) {
 
 
 if (!function_exists('GetYearOpeningBalance')) {
-    function GetYearOpeningBalance($firstopeningBalance=0, $customerID, $year)
+    function GetYearOpeningBalance($customerID, $year)
     {
         $customer = Customer::findOrFail($customerID);
         $customerCreatedAtYear = Carbon::createFromFormat('Y-m-d H:i:s', $customer->created_at)->year;
@@ -431,7 +434,7 @@ if (!function_exists('GetYearOpeningBalance')) {
         }
         elseif ($year == $customerCreatedAtYear)
         {
-            $openingBalance = $firstopeningBalance;
+            $openingBalance = 0;
         }
         else
         {
@@ -447,7 +450,7 @@ if (!function_exists('GetYearOpeningBalance')) {
 }
 
 if (!function_exists('GetMonthWiseOpeningBalance')) {
-    function GetMonthWiseOpeningBalance($firstopeningBalance=0, $customerID, $yearmonth)
+    function GetMonthWiseOpeningBalance($customerID, $yearmonth)
     {
         //dd($yearmonth);
         $customer = Customer::findOrFail($customerID);
@@ -456,7 +459,7 @@ if (!function_exists('GetMonthWiseOpeningBalance')) {
         $month = substr($yearmonth, 5, 2);
         $startDate = Carbon::create($year, 1, 1)->startOfMonth();
         $endDate = Carbon::create($year, $month, 1)->subMonth()->endOfMonth();
-        $thisYearOpeningBalance = GetYearOpeningBalance($firstopeningBalance,$customer->id,$year);
+        $thisYearOpeningBalance = GetYearOpeningBalance($customer->id,$year);
         // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount FROM payment_transactions WHERE entry_date BETWEEN '2024-01-01' AND '2024-03-31' AND customer_id = 1;
         //dd($startDate,$endDate);
         $query = PaymentTransaction::selectRaw('customer_id')
@@ -481,5 +484,26 @@ if (!function_exists('GetMonthWiseOpeningBalance')) {
         }
 
         return $openingBalance;
+    }
+}
+
+
+if (!function_exists('getTotalBlanceAreaWise')) {
+    /**
+     * Return the total debit amount into payment transaction table.
+     *
+     * @return string
+     */
+    function getTotalBlanceAreaWise($area_id){
+
+        $customers = Customer::where('area_id',$area_id)->pluck('id')->toArray();
+
+        $totalDebit = PaymentTransaction::where('payment_type','debit')->whereIn('customer_id',$customers)->sum('amount');
+
+        $totalCredit = PaymentTransaction::where('payment_type','credit')->whereIn('customer_id',$customers)->sum('amount');
+
+        $totalBalance = (float)$totalDebit-(float)$totalCredit;
+
+        return $totalBalance;
     }
 }

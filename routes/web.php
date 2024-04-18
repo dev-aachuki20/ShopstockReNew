@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\Master\ProductUnitController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\PaymentTransactionsController;
+use App\Http\Controllers\PasswordProtectionController;
+use App\Http\Controllers\ReportsCustomerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -102,6 +104,14 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
 
     Route::post('checkInvoiceNumber', [OrdersController::class, 'checkInvoiceNumber'])->name('orders.checkInvoiceNumber');
     Route::post('/add-glass-product-view', [OrdersController::class, 'addGlassProductView'])->name('addGlassProductView');
+
+    Route::get('/protected-page', [PasswordProtectionController::class,'showProtectedPage'])->name('protected.page');
+    Route::post('protect-page/verify-user',[PasswordProtectionController::class,'VerifyPasswordProtect'])->name('password.verify');
+
+
+    Route::get('reports/customers/index',[ReportsCustomerController::class,'index'])->name('reports.customer.index')->middleware('password.modal');
+    Route::get('reports/customers/allprint',[ReportsCustomerController::class,'allCustomerPrintView'])->where('area_id', '.*')->name('reports.customer.allprint');
+
 });
 
 

@@ -416,6 +416,8 @@ return [
 	],
 
 	'reports' => [
+        'report_management' => 'Report Management',
+        'customer_report' => 'Customer Report',
 		'title' => 'Report',
 		'order' => 'Order',
 		'order_sell_record' => 'Invoice Sell Record',

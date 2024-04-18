@@ -74,34 +74,42 @@
                                         $totalSalesReturn = 0;
                                         $lastClosingBalance = 0 ;
                                     @endphp
-                                    @foreach($monthlyData as $index => $data)
 
-                                    @php
-                                        if($index === 0){
-                                            $monthlyClosingBalance = $lastClosingBalance + $data['sales'] + $openingBalance - ($data['cashreceipt'] + $data['sales_return']);
-                                        }
-                                        else{
-                                            $monthlyClosingBalance = $lastClosingBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
-                                        }
-                                        // $monthlyClosingBalanceFormatted = number_format($monthlyClosingBalance + $openingBalance, 2, '.', ',');
-                                        $monthlyClosingBalanceFormatted = $monthlyClosingBalance + $openingBalance;
-                                    @endphp
+                                    @forelse($monthlyData as $index => $data)
 
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data['month'])->format('F Y') }}</td>
-                                        <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
-                                        <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
-                                        <td>{{ number_format(abs($monthlyClosingBalanceFormatted), 2, '.', ',') }}{{ $monthlyClosingBalanceFormatted<=1 ? ' Cr' : ' Dr'}}</td>
-                                        <td><a class="customer-month-detail" href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></a></td>
-                                    </tr>
-                                    @php
-                                        $totalSales += $data['sales'];
-                                        $totalCashReceipt += $data['cashreceipt'];
-                                        $totalSalesReturn+= $data['sales_return'];
-                                        $lastClosingBalance = $monthlyClosingBalance;
+                                        @php
+                                            if($index === 0){
+                                                $monthlyClosingBalance = $lastClosingBalance + $data['sales'] + $openingBalance - ($data['cashreceipt'] + $data['sales_return']);
+                                            }
+                                            else{
+                                                $monthlyClosingBalance = $lastClosingBalance + $data['sales'] - ($data['cashreceipt'] + $data['sales_return']);
+                                            }
 
-                                    @endphp
-                                    @endforeach
+                                            $monthlyClosingBalanceFormatted = $monthlyClosingBalance + $openingBalance;
+                                        @endphp
+
+                                        <tr>
+                                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $data['month'])->format('F Y') }}</td>
+                                            <td>{{ number_format($data['sales'], 2, '.', ',') }}</td>
+                                            <td>{{ number_format($data['cashreceipt']+$data['sales_return'], 2, '.', ',') }}</td>
+                                            <td>{{ number_format(abs($monthlyClosingBalanceFormatted), 2, '.', ',') }}{{ $monthlyClosingBalanceFormatted<=1 ? ' Cr' : ' Dr'}}</td>
+                                            <td><a class="customer-month-detail" href="{{ route('admin.customers.view_customer_detail', ['customer' => $customer->id, 'month' => $data['month']]) }}"><x-svg-icon icon="view" /></a></td>
+                                        </tr>
+                                        @php
+                                            $totalSales += $data['sales'];
+                                            $totalCashReceipt += $data['cashreceipt'];
+                                            $totalSalesReturn+= $data['sales_return'];
+                                            $lastClosingBalance = $monthlyClosingBalance;
+
+                                        @endphp
+
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">No records found</td>
+                                        </tr>
+                                    @endforelse
+
+
                                 </tbody>
                                 <tfoot>
                                     <tr>

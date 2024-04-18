@@ -65,7 +65,7 @@ class CustomerDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('customer-table')
+                    ->setTableId('customers-table')
                     ->parameters([
                         'responsive' => true,
                         'pageLength' => 70,

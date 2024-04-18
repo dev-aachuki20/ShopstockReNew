@@ -26,20 +26,12 @@
           <div class="error_area_id text-danger error"></div>
       </div>
 
-      @if(!isset($customer))
-      <div class="col-md-6 col-sm-12 col-lg-6 form-group">
-          {!! Form::label('opening_blance', trans('quickadmin.customers.fields.opening_blance'), ['class' => 'control-label ']) !!} <span class="text-danger">*</span>
-          {!! Form::text('opening_blance', $customer->opening_blance ?? 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter opening balance', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
-          <div class="error_opening_blance text-danger error"></div>
-      </div>
-      @endif
-
       <div class="col-md-6 col-sm-12 col-lg-6 form-group">
           {!! Form::label('credit_limit', trans('quickadmin.customers.fields.credit_limit'), ['class' => 'control-label ']) !!}
           {!! Form::text('credit_limit', (isset($customer->credit_limit))?(int)$customer->credit_limit: 0, ['class' => 'form-control only_integer', 'placeholder' => 'Enter credit limit', 'min'=>"0" ,'autocomplete'=>"off" ]) !!}
           <div class="error_credit_limit text-danger error"></div>
       </div>
-      <div class="col-md-12"></div>
+
       <div class="col-md-6 mb-3">
           {!! Form::label('is_type', trans('quickadmin.customers.fields.is_type'), ['class' => 'control-label']) !!} <span class="text-danger">*</span>
           <span class="select_group_list" style="@if(($customer->is_type ??'') != 'wholesaler') display: none @endif"><input type="checkbox" id="select_all"> <label for="select_all">Select All</label></span>
@@ -133,7 +125,7 @@
                   $('.selected_product').prop('checked', isChecked);
               });
               $(document).on('click','.selected_product',function(){
-                    checkboxChecked();                   
+                    checkboxChecked();
               });
 
 
@@ -151,12 +143,12 @@
                       $('.select_group_list').css('display', 'none');
                   }
               });
-              // 
+              //
               $(document).on('input', '.only_integer', function(evt) {
                   var inputValue = $(this).val();
                 if(inputValue.length > 10){
                     $(this).val($(this).val().substring(0, 10));
-                }else{  
+                }else{
                     $(this).val(inputValue.replace(/[^0-9]/g, ''));
                 }
               });
@@ -191,7 +183,7 @@
                               var title = "Customer";
                               showToaster(title, alertType, message);
                               setTimeout(() => {
-                                  window.location.replace("{{route('admin.customers.index')}}");
+                                  window.location.replace("{{route('admin.customer_list')}}");
                               }, 1500);
                           } else {
                               $('.save_btn').prop('disabled', false);
@@ -204,20 +196,20 @@
                   });
               });
 
-              // area add 
+              // area add
               $("#areaList").select2({}).on('select2:open', function() {
                   let a = $(this).data('select2');
                   if (!$('.select2-area_add').length) {
                       a.$results.parents('.select2-results').append('<div class="select2-area_add select_2_add_btn"><button class="btns addNewAreaTypeBtn get-customer"><i class="fa fa-plus-circle"></i> Add New</button></div>');
                   }
               });
-              // area add 
+              // area add
 
               $(document).on('keyup', function(e) {
                   if (e.key === 'Enter') {
                       if ($('#add_newModal').is(':visible')) {
                           $('.add_unittype_btn').click();
-                      } 
+                      }
                     //   else {
                     //       $('#customerForm').submit();
                     //   }
@@ -273,12 +265,12 @@
                   $(`.error_new_${key}`).html(value);
               });
           }
-         
+
           function checkboxChecked(){
             var checkValue = "Yes";
             $(".selected_product").each(function(){
                 if(!$(this).is(":checked")){
-                    checkValue = "No";                       
+                    checkValue = "No";
                 }
             });
             if(checkValue == "Yes"){

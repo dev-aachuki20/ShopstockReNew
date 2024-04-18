@@ -221,7 +221,28 @@
 </ul>
 </li>
 
-
+@can('report_access')
+    <li class="dropdown {{ Request::is('admin/reports*') ? 'active' : '' }}">
+        <a href="#" class="nav-link has-dropdown">
+            <x-side-bar-svg-icon icon="user" />
+            <span>@lang('quickadmin.reports.report_management')</span>
+        </a>
+        <ul class="dropdown-menu">
+            @if (Gate::check('report_customer_access'))
+            <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.reports.customer.index') }}">
+                    @lang('quickadmin.reports.customer_report')
+                </a>
+            </li>
+            {{-- <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.protected.page') }}">
+                    @lang('quickadmin.reports.customer_report')
+                </a>
+            </li> --}}
+            @endif
+        </ul>
+    </li>
+@endcan
 
 @can('setting_access')
 <li class="{{ Request::is('settings*') ? 'active' : '' }}">

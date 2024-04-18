@@ -96,6 +96,18 @@ class SettingSeeder extends Seeder
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'created_by' => 1,
             ],
+
+            [
+                'key'    => 'report_customer_password',
+                'value'  =>  encrypt('12345678'),
+                'type'   => 'password',
+                'details' => null,
+                'display_name'=>'View Customer Report Password',
+                'group'  => 'web',
+                'status' => 1,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
         ];
 
         Setting::insert($settings);

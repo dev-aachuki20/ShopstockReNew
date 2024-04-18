@@ -81,8 +81,10 @@ class PaymentTransactionDataTable extends DataTable
                         $action .= ($this->type == 'cancelled' && $row->payment_way == "by_cash")? '':'<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
 
                         if ($typeAction == 'sales'){
-                            if(OrderEditHistory::where('order_id', $row->order_id)->where('update_status', '!=', 'add')->exists()){
-                                $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                            if (Gate::check('estimate_history')) {
+                                if(OrderEditHistory::where('order_id', $row->order_id)->where('update_status', '!=', 'add')->exists()){
+                                    $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                                }
                             }
                         }
                     }
@@ -92,14 +94,15 @@ class PaymentTransactionDataTable extends DataTable
                     }
                     if (Gate::check('transaction_access')) {
                         $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
-
-                        if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->count() > 1){
-                            $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                        if (Gate::check('estimate_history')) {
+                            if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->count() > 1){
+                                $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                            }
                         }
                     }
                 }
                 else if ($typeAction == 'modified_sales'){
-                    if (Gate::check('estimate_access')) {
+                    if (Gate::check('estimate_history')) {
                         $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $viewIcon . '</a>';
                     }
                 }

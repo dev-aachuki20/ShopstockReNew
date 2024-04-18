@@ -3,7 +3,7 @@
 <head>
   <title>{{ config('app.app_name') }} | @yield('title')</title>
   <meta name="description" content="@yield('metdescp')">
-  
+
   @include('partials.hscript')
 
   @yield('customCss')
@@ -11,7 +11,7 @@
 </head>
 
 <body id="body">
-  {{-- <div class="loader"></div> --}}
+  <div class="loader"></div>
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       @include('partials.header')
