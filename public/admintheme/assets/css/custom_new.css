@@ -491,6 +491,9 @@ body,
 .sub_product_div select{
     height: 34px !important;
 }
+.section-body .card .card-body form .form-group .input-group input.passwordh_42{
+    height: 42px !important;
+}
 .add-product.form-group{
     text-align: right;
 }

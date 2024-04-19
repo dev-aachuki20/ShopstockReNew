@@ -4,18 +4,25 @@
 
                 @foreach ($settings as $setting)
                 <div class="form-group">
-                    @if ($setting->key == 'invoice_allow_day_admin_accountant')
-                    @can('setting_invoice_allow_days')
+
                     <label for="{{ $setting->key }}">{{ $setting->display_name }}</label>
-                    @endcan
-                    @else
-                    <label for="{{ $setting->key }}">{{ $setting->display_name }}</label>
-                    @endif
 
                     @if ($setting->type === 'image')
                         <input type="file" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key }}" autocomplete="true">
+
                     @elseif ($setting->type === 'password')
-                    <input type="password" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? decrypt($setting->value) : old(decrypt($setting->value)) }}" id="{{ $setting->key}}" autocomplete="true">
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                          </div>
+                        </div>
+
+                        <input type="password" class="form-control passwordh_42" name="{{ $setting->key }}" value="{{ isset($settings) ? decrypt($setting->value) : old($setting->key) }}" id="{{ $setting->key }}" autocomplete="true">
+                        <span class="current-password-toggle-icon pass-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'{{ $setting->key }}');"></i></span>
+                    </div>
+
                     @elseif ($setting->type === 'number')
                         @if ($setting->key == 'invoice_allow_day_admin_accountant')
                             @can('setting_invoice_allow_days')

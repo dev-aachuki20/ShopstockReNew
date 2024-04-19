@@ -53,24 +53,18 @@
 <script src="{{ asset('admintheme/assets/bundles/summernote/summernote-bs4.min.js') }}"></script>
 
 <script>
-$(document).ready(function(){
+function ChangeEyeIcon(em,id)
+{
+    em.toggleClass("fa-eye fa-eye-slash");
+    var input = $("#"+id);
+    if (input.attr("type") === "password") {
+    input.attr("type", "text");
+    } else {
+    input.attr("type", "password");
+    }
+}
 
-    // $('textarea.summernote').summernote({
-    //     placeholder: 'Type somthing...',
-    //     tabsize: 2,
-    //     height: 200,
-    //     fontNames: ['Arial', 'Helvetica', 'Times New Roman', 'Courier New','sans-serif'],
-    //     toolbar: [
-    //         ['style', ['style']],
-    //         ['font', ['bold', 'underline', 'clear']],
-    //         ['fontname', ['fontname']],
-    //         // ['color', ['color']],
-    //         ['para', ['ul', 'ol', 'paragraph']],
-    //         ['table', ['table']],
-    //         ['insert', ['link', /*'picture', 'video'*/]],
-    //         ['view', [/*'fullscreen',*/ 'codeview', /*'help'*/]],
-    //     ],
-    // });
+$(document).ready(function(){
 
     $(document).on('submit','#settingform',function(e){
         e.preventDefault();
