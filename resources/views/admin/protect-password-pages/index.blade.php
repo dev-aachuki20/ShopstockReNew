@@ -1,6 +1,6 @@
 
 @extends('layouts.app')
-@section('title')@lang('quickadmin.reports.customer_report') @endsection
+@section('title')View Page Verify @endsection
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
@@ -16,7 +16,7 @@
                         <div class="modal-dialog modal-md modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalCenterTitle">Please Enter Report View Password</h5>
+                                    <h5 class="modal-title" id="exampleModalCenterTitle">Please Enter View Password</h5>
 
                                 </div>
                                 <div class="modal-body">
@@ -69,20 +69,15 @@
                 },
                 data: formData,
                 success: function(response) {
-                    var alertType = response['alert-type'];
-                    var message = response['message'];
-                    var title = "Password";
-                    showToaster(title, alertType, message);
-                    $('#VerifyPassForm')[0].reset();
-
-                    window.location.href = "{{ route('admin.reports.customer.index') }}";
-
+                    if(response['success']){
+                        location.reload();
+                    }
                 },
                 error: function(xhr) {
                     var errors = xhr.responseJSON.errors;
                     for (const elementId in errors) {
                         $("#VerifyPassForm #" + elementId).addClass('is-invalid');
-                        var errorHtml = '<div><span class="error text-danger">' + errors[elementId] + '</span></';
+                        var errorHtml = '<div><span class="error text-danger">' + errors[elementId] + '</span></div>';
                         $(errorHtml).insertAfter($("#VerifyPassForm #" + elementId).parent());
                     }
                     $("#VerifyPassForm button[type=submit]").prop('disabled', false);

@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Gate;
 
 class PasswordProtectionController extends Controller
 {
-    public function showProtectedPage()
-    {
-        //abort_if(Gate::denies('report_customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.protect-password-pages.index');
-    }
 
     public function VerifyPasswordProtect(Request $request)
     {
@@ -23,6 +18,7 @@ class PasswordProtectionController extends Controller
         ]);
 
         $request->session()->put('password_entered', true);
-        return redirect()->intended();
+        return response()->json(['success' => true]);
     }
+
 }

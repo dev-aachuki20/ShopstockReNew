@@ -77,7 +77,7 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::get('/get_product_add_form', [ProductController::class, 'create'])->name('get_product_add_form');
 
     Route::resource('/customers', CustomerController::class);
-    Route::get('/customer/list', [CustomerController::class, 'customerList'])->name('customer_list');
+    Route::get('/customer/list', [CustomerController::class, 'customerList'])->name('customer_list')->middleware('password.modal');
     Route::get('/customer/view-customer', [CustomerController::class, 'viewCostomer'])->name('customers.view_customer');
     Route::get('/customer/view-customer-detail/{customer}/{month}', [CustomerController::class, 'viewCustomerDetail'])->name('customers.view_customer_detail');
     Route::post('/customer/history-filter', [CustomerController::class, 'historyFilter'])->name('customers.historyFilter');

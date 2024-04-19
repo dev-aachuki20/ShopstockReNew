@@ -8,10 +8,10 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Session;
 
 class ReportsCustomerController extends Controller
 {
-
 
     public function index(ReportCustomerDataTable $dataTable)
     {

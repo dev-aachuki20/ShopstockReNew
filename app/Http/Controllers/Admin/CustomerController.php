@@ -27,6 +27,7 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index(CustomerDataTable $dataTable)
     {
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');

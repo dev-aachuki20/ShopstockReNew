@@ -15,13 +15,17 @@ class PasswordProtectionMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if password is entered
-        if ($request->session()->has('password_entered')) {
+
+        if($request->ajax()){
             return $next($request);
         }
 
-        // Render password modal form HTML
+        if (!$request->ajax() && $request->session()->has('password_entered'))
+        {
+            $request->session()->forget('password_entered');
+            return $next($request);
+        }
+
         return response(view('admin.protect-password-pages.index'));
-        //return $next($request);
     }
 }
