@@ -14544,6 +14544,13 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 }
 /*Select2 ReadOnly End*/
 
+
+#estimate-delete-form .cart_filter_box{
+    align-items: end !important;
+    padding-bottom: 0px !important;
+}
+
+
 @media (max-width: 1550px) {
     #invoice-filter-form > .row {
         row-gap: 15px;

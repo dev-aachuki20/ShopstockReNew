@@ -83,6 +83,8 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::post('/customer/history-filter', [CustomerController::class, 'historyFilter'])->name('customers.historyFilter');
     Route::post('/customer/name-list', [CustomerController::class, 'getCustomerNameList'])->name('customers.namelist');
     Route::get('/customer/print-history/{type?}/{customerId?}/{yearmonth?}',[CustomerController::class, 'printPaymentHistory'])->name('customers.printPaymentHistory');
+    Route::post('/customer/date-estimates/delete', [CustomerController::class, 'deleteCustomerDateEstimates'])->name('customers.deleteEstimates');
+
 
     Route::get('orders-return', [OrdersController::class, 'returnCreate'])->name('orders.return');
     Route::get('orders/draft-invoice',[OrdersController::class, 'draftInvoice'])->name('orders.draftInvoice');

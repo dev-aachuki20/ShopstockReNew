@@ -862,6 +862,20 @@ table.dataTable tbody>tr:nth-child(even){
 }
 
 
+.selectyearlabel label{
+    text-transform: capitalize;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+.selectyearlabel .selectyear select.form-control:not([size]):not([multiple]) {
+    height: calc(2.25rem + -4px);
+}
+
+.deletedate_box.cart_filter_box{
+    align-items: end !important;
+    padding-bottom: 0px !important;
+}
+
 
 /* ------------Responsive Css------------ */
 

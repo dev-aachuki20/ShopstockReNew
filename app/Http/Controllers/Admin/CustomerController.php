@@ -10,6 +10,7 @@ use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Group;
 use App\Models\CustomerGroup;
+use App\Models\Order;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
@@ -425,5 +426,42 @@ class CustomerController extends Controller
         }
     }
 
+    public function deleteCustomerDateEstimates(Request $request)
+    {
+        $customer = Customer::findOrFail($request->customer_id);
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+
+        try{
+            DB::beginTransaction();
+            Order::where('customer_id', $customer->id)
+            ->whereBetween('invoice_date', [$from_date, $to_date])
+            ->get()
+            ->each(function($order) {
+            $order->delete();
+            });
+
+            PaymentTransaction::where('customer_id', $customer->id)
+            ->whereBetween('entry_date', [$from_date, $to_date])
+            ->get()
+            ->each(function($transaction) {
+                $transaction->delete();
+            });
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => trans('messages.crud.delete_record'),
+            ], 200);
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            //dd($e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' =>"Something Went Wrong !",
+            ], 505);
+        }
+    }
 
 }
