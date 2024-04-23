@@ -395,7 +395,7 @@
                     @php
                         $closingBalance = ((float)$debitTotal+(float)$openingBalance) - (float)$creditTotal;
                     @endphp
-                    <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($closingBalance),0) }} </strong>
+                    <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($closingBalance,0) }} </strong>
                 </td>
                 <td>
                     <strong> </strong>

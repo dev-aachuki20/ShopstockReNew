@@ -252,7 +252,7 @@
                     <strong>Closing Balance</strong>
                 </td>
                 <td>
-                    <strong><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($closingBalance),0) }}</strong>
+                    <strong><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($closingBalance,0) }}</strong>
                 </td>
                 <td></td>
             </tr>
