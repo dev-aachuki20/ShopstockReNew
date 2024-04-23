@@ -22,6 +22,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use PDF;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class OrdersController extends Controller
 {
@@ -55,115 +56,131 @@ class OrdersController extends Controller
      */
     public function store(StoreOrdersRequest $request)
     {
-         abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $isDraft = $request->submit == 'draft' ? true : false;
+        abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
+        try{
+            DB::beginTransaction();
+            $isDraft = $request->submit == 'draft' ? true : false;
 
-        if (!$checkOrder) {
-            $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
-            $inputs = array(
-                'customer_id'    => $request->customer_id,
-                'order_type'     => $request->order_type,
-                'invoice_number' => $invoiceNumber,
-                'area_id'        => $request->area_id,
-                'invoice_date'   => $request->invoice_date,
-                'shipping_amount' => (float)str_replace(',', '', $request->shipping_amount) ?? null,
-                'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',', '', $request->total_amount)),
-                'remark'         => $request->remark,
-                'sold_by'        => $request->sold_by,
-                'created_by'     => Auth::user()->id,
-                'is_draft'       => $isDraft ? 1 : 0,
-                'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
-            );
-            $order = Order::create($inputs);
-            addToLog($request, 'Order', 'Create', $order);
+            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
 
-        } else {
-            $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
-            $totalAmount = round((float)str_replace(',', '', $request->total_amount));
-            $checkOrder->update([
-                'shipping_amount' => $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null,
-                'total_amount'   => $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount),
-                'remark'         => $request->remark,
-                'sold_by'        => $request->sold_by,
-                'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
-            ]);
-            $order = $checkOrder;
-        }
+            if (!$checkOrder) {
+                $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
+                $inputs = array(
+                    'customer_id'    => $request->customer_id,
+                    'order_type'     => $request->order_type,
+                    'invoice_number' => $invoiceNumber,
+                    'area_id'        => $request->area_id,
+                    'invoice_date'   => $request->invoice_date,
+                    'shipping_amount' => (float)str_replace(',', '', $request->shipping_amount) ?? null,
+                    'total_amount'   => $isDraft ? 0.00 : round((float)str_replace(',', '', $request->total_amount)),
+                    'remark'         => $request->remark,
+                    'sold_by'        => $request->sold_by,
+                    'created_by'     => Auth::user()->id,
+                    'is_draft'       => $isDraft ? 1 : 0,
+                    'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
+                );
+                $order = Order::create($inputs);
+                addToLog($request, 'Order', 'Create', $order);
 
-        // dd($inputs,$order);
-
-        $orderProducts = $request->get('products');
-        $allOrderProducts = array();
-        foreach ($orderProducts as $oProduct) {
-            $createOrderProduct = [
-                'product_id' => $oProduct['product_id'],
-                'quantity'   => $oProduct['quantity'],
-                'price'      => (float)str_replace(',', '', $oProduct['price']) ?? null,
-                'height'     => $oProduct['height'] ?? null,
-                'width'      => $oProduct['width'] ?? null,
-                'length'     => $oProduct['length'] ?? null,
-                'is_draft'   => $oProduct['is_draft'] ?? 0,
-                'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] : null,
-                'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
-                'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
-                'total_price'   => round((float)str_replace(',', '', $oProduct['total_price'])) ?? 0.00,
-            ];
-            $allOrderProducts[] = $createOrderProduct;
-        }
-        if (count($allOrderProducts) > 0) {
-            $createdProducts = $order->orderProduct()->createMany($allOrderProducts);
-            $createdProductIds = $createdProducts->pluck('id')->toArray();
-        }
-
-        if (!$isDraft) {
-            $checkPaymentTransaction = PaymentTransaction::where('order_id', $order->id)->first();
-            if (!$checkPaymentTransaction) {
-                $transaction = [
-                    'order_id'      => $order->id,
-                    'customer_id'   => $order->customer_id,
-                    'payment_type'  => ($order->order_type == 'return') ? 'credit' : 'debit',
-                    'payment_way'   => 'order_' . $order->order_type,
-                    'voucher_number' => $invoiceNumber ?? $order->invoice_number,
-                    'amount'        => round((float)str_replace(',', '', $order->total_amount)),
-                    'created_by'    => Auth::user()->id,
-                    'entry_date'    => date('Y-m-d', strtotime($request->invoice_date)),
-                    'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
-                ];
-                PaymentTransaction::create($transaction);
-                addToLog($request, 'Estimate', 'Create', $transaction);
             } else {
-                // 'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
-                $checkPaymentTransaction->update([
-                    'amount'        => round((float)str_replace(',', '', $order->total_amount))
+                $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
+                $totalAmount = round((float)str_replace(',', '', $request->total_amount));
+                $checkOrder->update([
+                    'shipping_amount' => $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null,
+                    'total_amount'   => $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount),
+                    'remark'         => $request->remark,
+                    'sold_by'        => $request->sold_by,
+                    'is_add_shipping' => $request->is_add_shipping == 'on' ? 1 : 0
                 ]);
+                $order = $checkOrder;
             }
-        }
 
-        if (!$isDraft && count($allOrderProducts) > 0) {
-            $requestData =  $request->all();
-            $requestData['products'] = orderProduct::where('order_id',$order->id)->get()->toArray();
-            $this->recordOrderHistory($order, $requestData,null,$createdProductIds);  //Check History
-        }
-       $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
-        if ($order->order_type == 'return') {
+            // dd($inputs,$order);
+
+            $orderProducts = $request->get('products');
+            $allOrderProducts = array();
+            foreach ($orderProducts as $oProduct) {
+                $createOrderProduct = [
+                    'product_id' => $oProduct['product_id'],
+                    'quantity'   => $oProduct['quantity'],
+                    'price'      => (float)str_replace(',', '', $oProduct['price']) ?? null,
+                    'height'     => $oProduct['height'] ?? null,
+                    'width'      => $oProduct['width'] ?? null,
+                    'length'     => $oProduct['length'] ?? null,
+                    'is_draft'   => $oProduct['is_draft'] ?? 0,
+                    'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] : null,
+                    'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
+                    'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
+                    'total_price'   => round((float)str_replace(',', '', $oProduct['total_price'])) ?? 0.00,
+                ];
+                $allOrderProducts[] = $createOrderProduct;
+            }
+            if (count($allOrderProducts) > 0) {
+                $createdProducts = $order->orderProduct()->createMany($allOrderProducts);
+                $createdProductIds = $createdProducts->pluck('id')->toArray();
+            }
+
+            if (!$isDraft) {
+                $checkPaymentTransaction = PaymentTransaction::where('order_id', $order->id)->first();
+                if (!$checkPaymentTransaction) {
+                    $transaction = [
+                        'order_id'      => $order->id,
+                        'customer_id'   => $order->customer_id,
+                        'payment_type'  => ($order->order_type == 'return') ? 'credit' : 'debit',
+                        'payment_way'   => 'order_' . $order->order_type,
+                        'voucher_number' => $invoiceNumber ?? $order->invoice_number,
+                        'amount'        => round((float)str_replace(',', '', $order->total_amount)),
+                        'created_by'    => Auth::user()->id,
+                        'entry_date'    => date('Y-m-d', strtotime($request->invoice_date)),
+                        'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+                    ];
+                    PaymentTransaction::create($transaction);
+                    addToLog($request, 'Estimate', 'Create', $transaction);
+                } else {
+                    // 'amount'        => round((float)str_replace(',', '', $order->total_amount)) + (float)$checkPaymentTransaction->amount
+                    $checkPaymentTransaction->update([
+                        'amount'        => round((float)str_replace(',', '', $order->total_amount))
+                    ]);
+                }
+            }
+
+            if (!$isDraft && count($allOrderProducts) > 0) {
+                $requestData =  $request->all();
+                $requestData['products'] = orderProduct::where('order_id',$order->id)->get()->toArray();
+                $this->recordOrderHistory($order, $requestData,null,$createdProductIds);  //Check History
+            }
+            $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
+
+            $checkOrder ? $order->update(['is_modified' => 1]) : '';
+
+            DB::commit();
+
+            if ($order->order_type == 'return') {
+                return response()->json([
+                    'success' => true,
+                    'message'     => 'Successfully created!',
+                    'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
+                    // 'printPdfUrl' => route('admin.orders.printPdf', encrypt($order->id)),
+                    'redirectUrl' => route('admin.orders.return'),
+                ], 200);
+            }
+
             return response()->json([
                 'success' => true,
                 'message'     => 'Successfully created!',
                 'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
-                // 'printPdfUrl' => route('admin.orders.printPdf', encrypt($order->id)),
-                'redirectUrl' => route('admin.orders.return'),
+                // 'printPdfUrl' => route('admin.orders.printPdf',encrypt($order->id)),
+                'redirectUrl' => route('admin.orders.create'),
             ], 200);
-        }
 
-        return response()->json([
-            'success' => true,
-            'message'     => 'Successfully created!',
-            'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
-            // 'printPdfUrl' => route('admin.orders.printPdf',encrypt($order->id)),
-            'redirectUrl' => route('admin.orders.create'),
-        ], 200);
+        }catch(\Exception $e){
+            //dd($e->getMessage(),$e->getCode(),$e->getLine() );
+            DB::rollBack();
+            \Log::error("Error in OrdersController::store (".$e->getCode(). ")" . $e->getMessage() . " at line " . $e->getLine());
+
+            return response()->json(['success' => false , 'message'=>'error'],500);
+        }
     }
 
     /**
@@ -348,151 +365,166 @@ class OrdersController extends Controller
     public function update(UpdateOrdersRequest $request, $id)
     {
         abort_if(Gate::denies('estimate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $type = $request->type; //sales
-        $isDraft = $request->submit == 'draft' ? true : false;
-        $checkDraftStatus = $isDraft == true ? 0 : 1;
-        $order = $checkProductOrder = Order::findOrFail($id);
-        if (!$isDraft) {
-            $this->recordOrderHistory($order, $request->all());  //Check History
-        }
 
-        $beforIs_draft = $order['is_draft'];
-        $inputs = array(
-            'invoice_date'   => $request->invoice_date,
-            'shipping_amount' => isset($request->shipping_amount) ? (float)str_replace(',', '', $request->shipping_amount) : null,
-            'total_amount'   => $isDraft ? 0.00 : round($request->total_amount),
-            'remark'         => $request->remark,
-            'sold_by'        => $request->sold_by,
-            'created_by'     => Auth::user()->id,
-            'is_draft'       => $isDraft ? 1 : 0,
-            'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
-        );
-        if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $checkDraftStatus) {
-            $inputs['updated_by'] = Auth::user()->id;
-            $order->update($inputs);
-            addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
-        } else {
-            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $checkDraftStatus])->first();
-            if ($checkOrder) {
-                $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
-                $totalAmount = round((float)str_replace(',', '', $request->total_amount));
-                $inputs['shipping_amount'] = $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null;
-                $inputs['total_amount']   = $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount);
+        try{
+
+            DB::beginTransaction();
+
+            $type = $request->type; //sales
+            $isDraft = $request->submit == 'draft' ? true : false;
+            $checkDraftStatus = $isDraft == true ? 0 : 1;
+            $order = $checkProductOrder = Order::findOrFail($id);
+            if (!$isDraft) {
+                $this->recordOrderHistory($order, $request->all());  //Check History
+            }
+
+            $beforIs_draft = $order['is_draft'];
+            $inputs = array(
+                'invoice_date'   => $request->invoice_date,
+                'shipping_amount' => isset($request->shipping_amount) ? (float)str_replace(',', '', $request->shipping_amount) : null,
+                'total_amount'   => $isDraft ? 0.00 : round($request->total_amount),
+                'remark'         => $request->remark,
+                'sold_by'        => $request->sold_by,
+                'created_by'     => Auth::user()->id,
+                'is_draft'       => $isDraft ? 1 : 0,
+                'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
+            );
+            if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $checkDraftStatus) {
                 $inputs['updated_by'] = Auth::user()->id;
-                $order->delete();
-                $checkOrder->update($inputs);
-                $order = $checkOrder;
+                $order->update($inputs);
                 addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
             } else {
-                $inputs['customer_id'] = $request->customer_id;
-                $inputs['area_id'] = $request->area_id;
-                $inputs['invoice_number'] = getNewInvoiceNumber('', 'new');
-                $order = Order::create($inputs);
-                addToLog($request, 'Order', 'Create', $order);
+                $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $checkDraftStatus])->first();
+                if ($checkOrder) {
+                    $shippingAmount = (float)str_replace(',', '', $request->shipping_amount) ?? 0.00;
+                    $totalAmount = round((float)str_replace(',', '', $request->total_amount));
+                    $inputs['shipping_amount'] = $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null;
+                    $inputs['total_amount']   = $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount);
+                    $inputs['updated_by'] = Auth::user()->id;
+                    $order->delete();
+                    $checkOrder->update($inputs);
+                    $order = $checkOrder;
+                    addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
+                } else {
+                    $inputs['customer_id'] = $request->customer_id;
+                    $inputs['area_id'] = $request->area_id;
+                    $inputs['invoice_number'] = getNewInvoiceNumber('', 'new');
+                    $order = Order::create($inputs);
+                    addToLog($request, 'Order', 'Create', $order);
+                }
             }
-        }
 
 
-        $orderProducts = $request->products;
-        $allProducts = array();
-        $existedOrderProductId = array();
-        $couter = 0;
-        if (count($orderProducts) > 0) {
-            foreach ($orderProducts as $key => $oProduct) {
-                // dd($orderProducts);
-                $updateOrCreateOrderProduct = [
-                    'product_id' => $oProduct['product_id'],
-                    'quantity'   => $oProduct['quantity'],
-                    'price'      => (float)str_replace(',', '', $oProduct['price']) ?? null,
-                    'height'     => $oProduct['height'] ?? null,
-                    'width'      => $oProduct['width'] ?? null,
-                    'length'     => $oProduct['length'] ?? null,
-                    'is_draft'   => $oProduct['is_draft'] ?? 0,
-                    'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] : null,
-                    'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
-                    'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
-                    'total_price'   => round((float)str_replace(',', '', $oProduct['total_price'])) ?? 0.00,
-                ];
-                //dd($updateOrCreateOrderProduct);
-                if (isset($oProduct['opid']) && !empty($oProduct['opid'])) {
-                    if ($id != $order->id) {
-                        $updateOrCreateOrderProduct['order_id'] = $order->id;
+            $orderProducts = $request->products;
+            $allProducts = array();
+            $existedOrderProductId = array();
+            $couter = 0;
+            if (count($orderProducts) > 0) {
+                foreach ($orderProducts as $key => $oProduct) {
+                    // dd($orderProducts);
+                    $updateOrCreateOrderProduct = [
+                        'product_id' => $oProduct['product_id'],
+                        'quantity'   => $oProduct['quantity'],
+                        'price'      => (float)str_replace(',', '', $oProduct['price']) ?? null,
+                        'height'     => $oProduct['height'] ?? null,
+                        'width'      => $oProduct['width'] ?? null,
+                        'length'     => $oProduct['length'] ?? null,
+                        'is_draft'   => $oProduct['is_draft'] ?? 0,
+                        'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] : null,
+                        'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
+                        'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
+                        'total_price'   => round((float)str_replace(',', '', $oProduct['total_price'])) ?? 0.00,
+                    ];
+                    //dd($updateOrCreateOrderProduct);
+                    if (isset($oProduct['opid']) && !empty($oProduct['opid'])) {
+                        if ($id != $order->id) {
+                            $updateOrCreateOrderProduct['order_id'] = $order->id;
+                        }
+                        $existedOrderProductId[] = $oProduct['opid'];
+                        OrderProduct::where('id', $oProduct['opid'])->update($updateOrCreateOrderProduct);
+                    } else {
+                        $allProducts[] = $updateOrCreateOrderProduct;
                     }
-                    $existedOrderProductId[] = $oProduct['opid'];
-                    OrderProduct::where('id', $oProduct['opid'])->update($updateOrCreateOrderProduct);
+                }
+            }
+
+            $delproids = explode(",", $request->deleted_opids);
+
+            if (count($delproids) > 0) {
+                $orderProductsToDelete = OrderProduct::whereIn('id', $delproids)->get();
+                $this->recordOrderHistory($order, $orderProductsToDelete, 'delete'); // Check History
+                foreach ($orderProductsToDelete as $orderProduct) {
+                    $orderProduct->delete();
+                }
+            }
+
+
+            if (count($allProducts) > 0) {
+                foreach ($allProducts as $oproduct) {
+                    $order->orderProduct()->create($oproduct);
+                }
+            }
+            $transaction = [
+                'customer_id'    => $order->customer_id,
+                'voucher_number' => $order->invoice_number,
+                'amount'         => round((float)str_replace(',', '', $order->total_amount)),
+                'extra_details'  => 'order update with total_amount ' . $order->total_amount . ' updated_by=' . Auth::user()->id,
+                'entry_date'    => $request->invoice_date,
+                'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+            ];
+
+            if (!$isDraft) {
+                if ($id != $order->id) {
+                    $lastPaymentTransaction = PaymentTransaction::where(['order_id' => $id, 'entry_date' => $checkProductOrder->invoice_date])->first();
+                    if ($lastPaymentTransaction) {
+                        $lastPaymentTransaction->delete();
+                    }
+                    $checkNewOrderPaymentTransaction = $oldPaymentTransaction = PaymentTransaction::where(['order_id' => $order->id, 'entry_date' => $order->invoice_date])->first();
+
+                    if ($checkNewOrderPaymentTransaction) {
+                        $checkNewOrderPaymentTransaction->update([
+                            'amount'        => round((float)str_replace(',', '', $lastPaymentTransaction->amount ?? 0.00)) + (float)$checkNewOrderPaymentTransaction->amount ?? 0.00
+                        ]);
+                        addToLog($request, 'Order', 'Edit', $checkNewOrderPaymentTransaction, $oldPaymentTransaction);
+                    } else {
+                        $transaction['order_id'] = $order->id;
+                        PaymentTransaction::create($transaction);
+                        addToLog($request, 'Estimate', 'Create', $transaction);
+                    }
                 } else {
-                    $allProducts[] = $updateOrCreateOrderProduct;
+                    PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);
                 }
             }
-        }
 
-        $delproids = explode(",", $request->deleted_opids);
+            $order->update(['is_modified' => 1]);
+            $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
+            DB::commit();
 
-        if (count($delproids) > 0) {
-            $orderProductsToDelete = OrderProduct::whereIn('id', $delproids)->get();
-            $this->recordOrderHistory($order, $orderProductsToDelete, 'delete'); // Check History
-            foreach ($orderProductsToDelete as $orderProduct) {
-                $orderProduct->delete();
+            if ($type == 'draft') {
+                return response()->json([
+                    'success' => true,
+                    'message'     => 'Successfully Updated!',
+                    'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
+                    'redirectUrl' => route('admin.orders.draftInvoice'),
+                ]);
             }
-        }
 
 
-        if (count($allProducts) > 0) {
-            foreach ($allProducts as $oproduct) {
-                $order->orderProduct()->create($oproduct);
-            }
-        }
-        $transaction = [
-            'customer_id'    => $order->customer_id,
-            'voucher_number' => $order->invoice_number,
-            'amount'         => round((float)str_replace(',', '', $order->total_amount)),
-            'extra_details'  => 'order update with total_amount ' . $order->total_amount . ' updated_by=' . Auth::user()->id,
-            'entry_date'    => $request->invoice_date,
-            'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
-        ];
-
-        if (!$isDraft) {
-            if ($id != $order->id) {
-                $lastPaymentTransaction = PaymentTransaction::where(['order_id' => $id, 'entry_date' => $checkProductOrder->invoice_date])->first();
-                if ($lastPaymentTransaction) {
-                    $lastPaymentTransaction->delete();
-                }
-                $checkNewOrderPaymentTransaction = $oldPaymentTransaction = PaymentTransaction::where(['order_id' => $order->id, 'entry_date' => $order->invoice_date])->first();
-
-                if ($checkNewOrderPaymentTransaction) {
-                    $checkNewOrderPaymentTransaction->update([
-                        'amount'        => round((float)str_replace(',', '', $lastPaymentTransaction->amount ?? 0.00)) + (float)$checkNewOrderPaymentTransaction->amount ?? 0.00
-                    ]);
-                    addToLog($request, 'Order', 'Edit', $checkNewOrderPaymentTransaction, $oldPaymentTransaction);
-                } else {
-                    $transaction['order_id'] = $order->id;
-                    PaymentTransaction::create($transaction);
-                    addToLog($request, 'Estimate', 'Create', $transaction);
-                }
-            } else {
-                PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);
-            }
-        }
-
-        $order->update(['is_modified' => 1]);
-        $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
-
-        if ($type == 'draft') {
             return response()->json([
                 'success' => true,
                 'message'     => 'Successfully Updated!',
                 'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
-                'redirectUrl' => route('admin.orders.draftInvoice'),
+                'redirectUrl' => route('admin.transactions.type', $type),
             ]);
+
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            \Log::error("Error in OrdersController::update (".$e->getCode(). ")" . $e->getMessage() . " at line " . $e->getLine());
+            return response()->json(['success' => false , 'message'=>'error'],500);
         }
 
 
-        return response()->json([
-            'success' => true,
-            'message'     => 'Successfully Updated!',
-            'invoiceNumber'     => 'Invoice No. '.$invoiceNumberIs,
-            'redirectUrl' => route('admin.transactions.type', $type),
-        ]);
     }
 
     /**
