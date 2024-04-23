@@ -81,7 +81,8 @@ class CustomerListDataTable extends DataTable
                     $query->select('id')
                         ->from('payment_transactions')
                         ->whereColumn('payment_transactions.customer_id', 'customers.id')
-                        ->where('payment_transactions.remark', '<>', 'Opening balance');
+                        ->where('payment_transactions.remark', '<>', 'Opening balance')
+                        ->whereNull('payment_transactions.deleted_at');
                 });
                 break;
 
