@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_products', function (Blueprint $table) {
-            $table->integer('deleted_by')->unsigned()->default(null)->nullable();  
+            $table->integer('deleted_by')->nullable();
         });
     }
 

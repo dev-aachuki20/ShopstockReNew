@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('remark')->nullable();
             $table->decimal('amount', 15, 2);
             $table->date('entry_date')->nullable();
-            $table->integer('created_by')->unsigned()->default(0);
-            $table->integer('updated_by')->default(0)->unsigned();
-            $table->integer('deleted_by')->unsigned()->default(null)->nullable();
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
             $table->tinyInteger('is_split')->default(0);
             $table->timestamps();
             $table->softDeletes();

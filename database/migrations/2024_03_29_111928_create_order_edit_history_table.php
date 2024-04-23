@@ -29,8 +29,8 @@ return new class extends Migration
             $table->datetime('order_update_time');
             $table->enum('update_status', ['add', 'update', 'delete', 'other'])->default('other');
             $table->json('order_data')->default(null)->nullable();
-            $table->integer('created_by')->unsigned();
-            $table->integer('deleted_by')->unsigned();
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('deleted_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
             $table->softDeletes();

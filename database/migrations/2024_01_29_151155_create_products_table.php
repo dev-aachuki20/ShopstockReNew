@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->bigIncrements('id');           
+            $table->bigIncrements('id');
             $table->string('name');
 			$table->integer('group_id')->unsigned();
 			$table->integer('sub_group_id')->unsigned();
@@ -23,14 +23,14 @@ return new class extends Migration
 			$table->decimal('wholesaler_price',10,2);
 			$table->decimal('retailer_price',10,2);
             $table->string('image')->nullable();
-			$table->tinyInteger('is_height')->default(0);  
-			$table->tinyInteger('is_width')->default(0);  
-			$table->tinyInteger('is_length')->default(0); 
-            $table->tinyInteger('is_sub_product')->default(0); 
-			$table->tinyInteger('is_active')->default(0); 
+			$table->tinyInteger('is_height')->default(0);
+			$table->tinyInteger('is_width')->default(0);
+			$table->tinyInteger('is_length')->default(0);
+            $table->tinyInteger('is_sub_product')->default(0);
+			$table->tinyInteger('is_active')->default(0);
             $table->string('extra_option_hint',50)->nullable();
-            $table->integer('created_by')->unsigned()->default(0);
-            $table->integer('updated_by')->unsigned()->default(0); 
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

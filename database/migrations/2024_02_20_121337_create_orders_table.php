@@ -26,8 +26,8 @@ return new class extends Migration
 			$table->string('remark')->nullable();
 			$table->string('sold_by')->nullable();
             $table->tinyInteger('is_modified')->default(0)->comment('1=> modified, 0=>not_modified');
-            $table->integer('created_by')->unsigned();
-            $table->integer('deleted_by')->unsigned();
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('deleted_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
 			$table->softDeletes();

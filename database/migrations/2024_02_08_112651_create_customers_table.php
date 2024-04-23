@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('alternate_phone_number')->nullable();
             $table->integer('area_id');
 			$table->string('is_type',50);
-            $table->decimal('credit_limit',15,2)->default(null)->nullable();            
-            $table->integer('created_by')->unsigned()->default(0);
-            $table->integer('updated_by')->unsigned()->default(0);
+            $table->decimal('credit_limit',15,2)->default(null)->nullable();
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
