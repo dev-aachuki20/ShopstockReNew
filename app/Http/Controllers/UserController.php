@@ -40,7 +40,7 @@ class UserController extends Controller
     }
 
     public function create(){
-        $roles = Role::orderBy('id','asc')->get();
+        $roles = Role::whereNotIn('id',[config('app.roleid.super_admin')])->orderBy('id','asc')->get();
         //dd($roles);
         //return view('admin.staff.create',compact('roles'));
         $htmlView = view('admin.staff.create', compact('roles'))->render();
@@ -78,7 +78,7 @@ class UserController extends Controller
     {
         //dd($id);
         $user = User::findOrFail($id);
-        $roles = Role::where('id','!=','1')->orderBy('id','asc')->get();
+        $roles = Role::whereNotIn('id',[config('app.roleid.super_admin')])->orderBy('id','asc')->get();
         $htmlView = view('admin.staff.edit', compact('roles','user'))->render();
         return response()->json(['success' => true, 'htmlView' => $htmlView]);
     }
