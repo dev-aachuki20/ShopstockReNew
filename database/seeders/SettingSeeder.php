@@ -85,17 +85,17 @@ class SettingSeeder extends Seeder
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'created_by' => 1,
             ],
-            [
-                'key'    => 'db_backup_email',
-                'value'  =>  "ramkumawat.his@gmail.com",
-                'type'   => 'text',
-                'details' => null,
-                'display_name'=>'DB Backup Email',
-                'group'  => 'web',
-                'status' => 1,
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'created_by' => 1,
-            ],
+            // [
+            //     'key'    => 'db_backup_email',
+            //     'value'  =>  "ramkumawat.his@gmail.com",
+            //     'type'   => 'text',
+            //     'details' => null,
+            //     'display_name'=>'DB Backup Email',
+            //     'group'  => 'web',
+            //     'status' => 1,
+            //     'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            //     'created_by' => 1,
+            // ],
 
             [
                 'key'    => 'report_customer_password',

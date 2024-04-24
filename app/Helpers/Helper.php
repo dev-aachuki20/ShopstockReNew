@@ -441,9 +441,6 @@ if (!function_exists('GetYearOpeningBalance')) {
         }
         else
         {
-            //dd($firstopeningBalance);
-
-            //dd($customerCreatedAtYear);
             // SELECT customer_id, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) AS total_debit_amount, SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_credit_amount, SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) - SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS new_opening_balance FROM payment_transactions WHERE entry_date <= '2024-01-01' AND customer_id = 1;
             $getAllAmount = PaymentTransaction::selectRaw('customer_id')
             ->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")

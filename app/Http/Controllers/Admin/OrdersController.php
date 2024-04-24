@@ -29,10 +29,6 @@ class OrdersController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // dd('yes');
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -95,8 +91,6 @@ class OrdersController extends Controller
                 ]);
                 $order = $checkOrder;
             }
-
-            // dd($inputs,$order);
 
             $orderProducts = $request->get('products');
             $allOrderProducts = array();
