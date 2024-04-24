@@ -112,7 +112,7 @@ class CustomerListDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom('lBfrtip')
-                    ->orderBy(1)
+                    ->orderBy(1 ,'asc')
                     // ->selectStyleSingle()
                     ->buttons([
                         // Button::make('excel'),
