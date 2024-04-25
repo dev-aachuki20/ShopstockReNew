@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -75,15 +76,21 @@ class CustomerListDataTable extends DataTable
         $listtype = isset(request()->listtype) && request()->listtype ? $this->listtype  : 'ledger';
         switch ($listtype) {
             case 'ledger':
+
                 $query = $model->newQuery()
                 ->select('customers.*')
                 ->whereExists(function ($query) {
-                    $query->select('id')
+                    $query->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
+                        ->selectRaw("SUM(CASE WHEN payment_type='credit' THEN amount ELSE 0 END) AS total_credit_amount")
+                        ->selectRaw("SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) - SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_balance")
                         ->from('payment_transactions')
                         ->whereColumn('payment_transactions.customer_id', 'customers.id')
-                        ->where('payment_transactions.remark', '<>', 'Opening balance')
-                        ->whereNull('payment_transactions.deleted_at');
+                        // ->where('payment_transactions.remark', '<>', 'Opening balance')
+                        ->whereNull('payment_transactions.deleted_at')
+                        ->groupBy('payment_transactions.customer_id')
+                        ->havingRaw('total_balance != 0');
                 });
+
                 break;
 
             case 'all':
