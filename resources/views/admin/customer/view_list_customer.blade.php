@@ -49,14 +49,11 @@
                                             <form id="estimate-delete-form" method="post" action=" {{route('admin.customers.deleteEstimates')}} ">
                                                 <div class="row deletedate_box cart_filter_box pb-0">
                                                     @can('estimate_delete')
-                                                    <div class="col-xl7 col-sm-6 pl-md-0 pr-sm-0 mb-sm-0 mb-2">
+                                                    <div class="col-xl-3 col-md-4 col-sm-5 pl-md-0 pr-sm-0 mb-sm-0 mb-2">
                                                         <div class="mx-0 datapikergroup custom-select2">
                                                             <div class="form-control-inner">
-                                                                <label for="estimatedelrange">Select Estimate Delete Date </label>
-                                                                <div id="estimatedelrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%; max-height: 32px;">
-                                                                    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-                                                                    <span></span> <b class="caret"></b>
-                                                                </div>
+                                                                <label for="estimatedelrange">Delete To Date </label>
+                                                                <input type="text" name="endDate" id="estimatedelrange" class="form-control" placeholder="DD/MM/YYYY" value="" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -169,34 +166,21 @@
 <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
 <script type="text/javascript">
+
     $(function() {
-        var year = parseInt('{{$year}}');
-        var startDate = new Date(year, 0, 1);
-        var start = moment(startDate, 'YYYY-MM-DD'); /*.moment().startOf('month')*/
-        var end = moment();
-        function cb(start, end) {
-            $('#estimatedelrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('input[name="endDate"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply:true,
+            minYear: 2000,
+            maxYear: parseInt(moment().format('YYYY'),10),
+            locale: {
+            format: 'DD/MM/YYYY' // Set the date format to 'DD/MM/YYYY'
         }
-
-        $('#estimatedelrange').daterangepicker({
-            startDate: start,
-            endDate: end,
-            ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, cb);
-
-        cb(start, end);
-
+        }, function(start, end, label) {
+            var chosenDate = start.format('YYYY-MM-DD');
+        });
     });
-    var defaultStartDate = moment('{{ config("app.start_date") }}', 'YYYY-MM-DD');
-    var defaultEndDate = moment();
-
 </script>
 
 <script>
@@ -224,26 +208,18 @@ $(document).ready(function () {
         var picker = $('#estimatedelrange').data('daterangepicker');
         // Retrieve the selected start and end dates
         if (picker && picker.startDate && picker.endDate) {
-            var from_date = picker.startDate.format('YYYY-MM-DD');
-            var to_date = picker.endDate.format('YYYY-MM-DD');
+            var to_date = picker.startDate.format('YYYY-MM-DD');
 
-            // delete
             var formAction = $(this).attr('action');
-
-            if(from_date == undefined || from_date == 'Invalid date'){
-                from_date = '';
-            }
-
             if(to_date == undefined || to_date == 'Invalid date'){
                 to_date = '';
             }
 
             var formData = {
                 customer_id      : {{$customer->id}},
-                from_date        : from_date,
                 to_date          : to_date,
             };
-
+            // delete
             swal({
                 title: "Are you sure?",
                 text: "are you sure want to delete these Estimates?",
@@ -284,11 +260,8 @@ $(document).ready(function () {
         e.preventDefault();
         //Reset the Daterangepicker
         if ($('#estimatedelrange').data('daterangepicker')) {
-            var start = defaultStartDate ?? null;
-            var end = defaultEndDate ?? null;
-            $('#estimatedelrange').data('daterangepicker').setStartDate(start);
-            $('#estimatedelrange').data('daterangepicker').setEndDate(end);
-            $('#estimatedelrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            var today = moment();
+            $('#estimatedelrange').data('daterangepicker').setStartDate(today);
         }
     });
 

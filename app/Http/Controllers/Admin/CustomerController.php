@@ -429,20 +429,19 @@ class CustomerController extends Controller
     public function deleteCustomerDateEstimates(Request $request)
     {
         $customer = Customer::findOrFail($request->customer_id);
-        $from_date = $request->from_date;
         $to_date = $request->to_date;
 
         try{
             DB::beginTransaction();
             Order::where('customer_id', $customer->id)
-            ->whereBetween('invoice_date', [$from_date, $to_date])
+            ->whereDate('invoice_date', '<=', $to_date)
             ->get()
             ->each(function($order) {
             $order->delete();
             });
 
             PaymentTransaction::where('customer_id', $customer->id)
-            ->whereBetween('entry_date', [$from_date, $to_date])
+            ->whereDate('entry_date', '<=', $to_date)
             ->get()
             ->each(function($transaction) {
                 $transaction->delete();
@@ -456,7 +455,7 @@ class CustomerController extends Controller
 
         }catch(\Exception $e){
             DB::rollBack();
-            //dd($e->getMessage());
+            dd($e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' =>"Something Went Wrong !",

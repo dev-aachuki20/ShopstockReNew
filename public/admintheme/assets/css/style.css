@@ -14549,6 +14549,9 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
     align-items: end !important;
     padding-bottom: 0px !important;
 }
+#estimate-delete-form #estimatedelrange{
+    height: 32px;
+}
 
 
 @media (max-width: 1550px) {
