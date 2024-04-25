@@ -75,8 +75,8 @@ class CustomerListDataTable extends DataTable
     {
         $listtype = isset(request()->listtype) && request()->listtype ? $this->listtype  : 'ledger';
         switch ($listtype) {
-            case 'ledger':
 
+            case 'ledger':
                 $query = $model->newQuery()
                 ->select('customers.*')
                 ->whereExists(function ($query) {

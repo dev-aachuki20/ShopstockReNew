@@ -31,7 +31,7 @@
                 </div>
                 <div class="card-body">
                   <div class="table-responsive fixed_Search">
-                    {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable partyListTable', 'style' => 'width:100%;'])}}
+                    {{$dataTable->table(['class' => 'table dt-responsive dropdownBtnTable partyListTable', 'style' => 'width:100%;' , 'id'=>'customer-table'])}}
                   </div>
                 </div>
               </div>
@@ -50,10 +50,10 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function(){
-    var DataaTable = $('#customer-table').DataTable();
+
     $("#customer-table_filter.dataTables_filter").append($("#listfilter"));
     $("#listfilter").show();
-
+    var DataaTable = $('#customer-table').DataTable();
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -102,6 +102,7 @@
         e.preventDefault();
         var listtype = $(this).val();
         var hrefUrl = "{{ route('admin.customer_list') }}"+ '?listtype=' + listtype;
+        //window.location.href = hrefUrl;
         DataaTable.ajax.url(hrefUrl).load();
     });
 })
