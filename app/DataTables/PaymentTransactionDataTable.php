@@ -27,11 +27,12 @@ class PaymentTransactionDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            ->addIndexColumn()
-            // ->editColumn('list_checkbox', function ($row) {
-            //     $listcheckbox = '<input type="checkbox" id="select-checkbox-'.$row->id.'" class="select-checkbox" data-transaction="'.$row->id.'" data-order="'.$row->order_id.'"/>';
-            //     return $listcheckbox;
+            // ->addColumn('checkbox', function ($row) {
+            //     $checkbox = "";
+            //     $checkbox = '<input type="checkbox" class="dt_checkbox" name="orders_ids[]" value="'.$row->order_id.'">';
+            //     return $checkbox;
             // })
+            ->addIndexColumn()
             ->editColumn('entry_date', function ($row) {
                 return date('d-m-Y', strtotime($row->entry_date)) ?? "";
             })
@@ -144,7 +145,7 @@ class PaymentTransactionDataTable extends DataTable
                     $q->where('customers.name', 'like', "%$keyword%");
                 });
             })
-            ->rawColumns(['action','list_checkbox']);
+        ->rawColumns(['action'/*,'checkbox'*/]);
     }
 
     /**
@@ -243,8 +244,8 @@ class PaymentTransactionDataTable extends DataTable
         $type = $this->type;
 
         $columns = [
-            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            //Column::make('list_checkbox')->title('<input type="checkbox" id="select-all"  class="select-checkbox" />')->orderable(false)->searchable(false),
+            // Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
+            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)/*->visible(false)*/,
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),

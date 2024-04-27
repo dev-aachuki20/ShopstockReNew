@@ -386,15 +386,6 @@ class CustomerController extends Controller
                 $pdfData['openingBalance']   = $openingBalance;
                 if($type == 'print-product-ledger')
                 {
-                    // $pdfHtml = view('admin.exports.pdf.ledger_print', $pdfData)->render();
-                    // $mpdf = new Mpdf();
-                    // $mpdf->SetHTMLHeader(view('admin.exports.pdf.ledger_pdf_header',$pdfData)->render());
-                    // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
-                    // $mpdf->WriteHTML($pdfHtml);
-                    // $mpdf->Output('Print_Ledeger_'.$yearmonth.'.pdf', 'I');
-                    //return view('admin.exports.pdf.ledger_print', $pdfData);
-
-
                     $pdfFileName = 'Print_Ledeger_'.$yearmonth.'.pdf';
                     $pdf = PDF::loadView('admin.exports.pdf.ledger_print',$pdfData);
                     $pdf->setPaper('A5', 'portrait');
@@ -403,12 +394,6 @@ class CustomerController extends Controller
 
                 }else if($type == 'print-statement')
                 {
-                    // $pdfHtml = view('admin.exports.pdf.statement_print',$pdfData)->render();
-                    // $mpdf = new Mpdf();
-                    // $mpdf->SetHTMLHeader(view('admin.exports.pdf.statement_pdf_header',$pdfData)->render());
-                    // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
-                    // $mpdf->WriteHTML($pdfHtml);
-                    // $mpdf->Output('Print_Statement_'.$yearmonth.'.pdf', 'I');
 
                     $pdfFileName = 'Print_Statement_'.$yearmonth.'.pdf';
                     $pdf = PDF::loadView('admin.exports.pdf.statement_print',$pdfData);
@@ -421,7 +406,7 @@ class CustomerController extends Controller
             }
 
         }catch(\Exception $e){
-            dd($e->getMessage());
+           // dd($e->getMessage());
             return abort(404);
         }
     }
@@ -455,7 +440,7 @@ class CustomerController extends Controller
 
         }catch(\Exception $e){
             DB::rollBack();
-            dd($e->getMessage());
+           // dd($e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' =>"Something Went Wrong !",

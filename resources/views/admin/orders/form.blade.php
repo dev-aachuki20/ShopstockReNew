@@ -75,6 +75,7 @@
 
             <p class="product_information-block" style="display:none">
                 {{-- <label>Product Price:<span class="purchase-price"> 777</span></label> --}}
+                <label>RSP:<span class="retail-sale-price"> 555</span></label>
                 <label>MSP:<span class="min-sale-price"> 555</span></label>
                 <label><span class="price-name">WSP</span>:<span class="whole-sale-price"> 333</span></label>
                 <label><a href="javascript:void(0)" class="price_per_fee" id="prevOrderLink" data-order="">Pre. Price:<span class="min-pre-price"> 555</span></a></label>
@@ -502,8 +503,9 @@ $('#productForm').on('keyup keypress', function(e) {
 
                             $('.purchase-price').text(response.rowData.purchase_price);
                             $('.min-sale-price').text(response.rowData.min_sale_price);
-                            $('.whole-sale-price').text(response.rowData.price);
-                            $('.price-name').text(response.rowData.priceName);
+                            $('.whole-sale-price').text(response.rowData.wholesaler_price);
+                            $('.retail-sale-price').text(response.rowData.retailer_price);
+                            // $('.price-name').text(response.rowData.priceName);
 
                             // $('.min-pre-price').parent('#prevOrderLink').attr('data-order',response.rowData.order);
                             // $('.min-pre-price').text(minPrePrice);
@@ -1480,7 +1482,9 @@ $('#productForm').on('keyup keypress', function(e) {
 
         if (!isNaN(sub_total)) {
             // products_table_block.find('.sub_total').text(sub_total.toFixed(2));
-            products_table_block.find('#product_amount').val(sub_total.toFixed(2));
+            // products_table_block.find('#product_amount').val(sub_total.toFixed(2));
+            products_table_block.find('#product_amount').val(Math.round(sub_total));
+
 
             // calculateGrandTotal();
         }

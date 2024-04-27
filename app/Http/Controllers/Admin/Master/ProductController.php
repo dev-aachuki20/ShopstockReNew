@@ -53,7 +53,7 @@ class ProductController extends Controller
         }else{
             return view('admin.master.product.create', compact('groups', 'product_unit','isOrderFrom'));
         }
-        
+
     }
 
     /**
@@ -65,7 +65,7 @@ class ProductController extends Controller
         $rules = [
             'name' => 'required|string|max:250',
             'group_id' => 'required|numeric',
-            'sub_group_id' => 'required|numeric',
+            'sub_group_id' => 'nullable|numeric',
             'calculation_type' => 'required|numeric',
             'price' => 'required|numeric|min:0',
             'min_sale_price' => 'required|numeric|min:0',
@@ -152,7 +152,7 @@ class ProductController extends Controller
         $rules = [
             'name' => 'required|string|max:250',
             'group_id' => 'required|numeric',
-            'sub_group_id' => 'required|numeric',
+            'sub_group_id' => 'nullable|numeric',
             'calculation_type' => 'required|numeric',
             'price' => 'required|numeric|min:0',
             'min_sale_price' => 'required|numeric|min:0',

@@ -22,7 +22,7 @@
 </div>
 <div class="col-md-3">
     <div class="form-group">
-        <label>@lang('admin_master.product.sub_group_type_name') <span class="text-danger">*</span></label>
+        <label>@lang('admin_master.product.sub_group_type_name')</label>
         <div class="sub_group_list">
             <div class="input-group">
                 {!! Form::select('sub_group_id', [], $product->sub_group_id??'', ['class' => 'form-control select2', 'id'=>'sub_group_list']) !!}
@@ -353,7 +353,7 @@
             $(".save_add_new").removeClass('add_sub_group_btn');
             $(".save_add_new").addClass('add_group_btn');
         });
-        
+
         $(document).on('click','.add_group_btn', function(e) {
             e.preventDefault();
             var name = $("#add_new_name").val();

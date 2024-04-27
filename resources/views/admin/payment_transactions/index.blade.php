@@ -11,26 +11,29 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>
-              @lang('quickadmin.transaction.'.$type.'_title')
-            </h4>
-          @if($type != 'modified_sales' && $type != 'current_estimate' && $type!='sales_return' && $type!='cancelled')
-          <div class="col-md-8">
-              <form class="row">
-                <div class="col-md-4 form-group date_main_show">
-                    <input type="date" class="form-control dateshow" name="start_date" id="start_date" value="{{$_GET['start_date']??''}}" autocomplete="false">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>
+                @lang('quickadmin.transaction.'.$type.'_title')
+                </h4>
+                @if($type != 'modified_sales' && $type != 'current_estimate' && $type!='sales_return' && $type!='cancelled')
+                <div class="col-md-8">
+                    <form class="row">
+                        <div class="col-md-4 form-group date_main_show">
+                            <input type="date" class="form-control dateshow" name="start_date" id="start_date" value="{{$_GET['start_date']??''}}" autocomplete="false">
+                        </div>
+                        <div class="col-md-4 form-group date_main_show">
+                            <input type="date" class="form-control dateshow" name="end_date" id="end_date"   value="{{$_GET['end_date']??''}}" autocomplete="false">
+                        </div>
+                        <div class="col-md-2">
+                        <input type="submit" class="btn btn-sm btn-success" value="Submit">
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-4 form-group date_main_show">
-                    <input type="date" class="form-control dateshow" name="end_date" id="end_date"   value="{{$_GET['end_date']??''}}" autocomplete="false">
-                </div>
-                <div class="col-md-2">
-                  <input type="submit" class="btn btn-sm btn-success" value="Submit">
-                </div>
-              </form>
-          </div>
-          @endif
-          </div>
+                @endif
+                {{-- <div class="col-auto px-md-1 pr-1">
+                    <a  role="button" class="btn printbtn h-10 col circlebtn"  id="order-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
+                </div> --}}
+            </div>
 
         <div class="card-body">
           <div class="table-responsive fixed_Search">
@@ -75,8 +78,9 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script type="text/javascript">
-  $(document).ready(function() {
+$(document).ready(function() {
     var DataaTable = $('#payment_transaction-table').DataTable();
+    var order_selectedIds = [];
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -173,12 +177,48 @@
       });
     });
 
-      $(document).on('click',"#select-all",function (e) {
-				var rows = DataaTable.rows({ 'search': 'applied' }).nodes();
-				$('input[type="checkbox"]', rows).prop('checked', this.checked);
-			});
+    // Checkbox & Print Functionality
+    $(document).on('change', '#dt_cb_all', function(e)
+    {
+        e.preventDefault();
+        var isChecked = $(this).prop('checked');
+        $('.dt_checkbox').prop('checked', isChecked).trigger('change');
+    });
 
-  });
+    $(document).on('change', '.dt_checkbox', function(e)
+    {
+        e.preventDefault();
+        order_selectedIds = [];
+        $('.dt_checkbox:checked').each(function() {
+            order_selectedIds.push($(this).val());
+        });
+    });
+
+    $(document).on('click', '#order-print',function(e)
+    {
+        if (order_selectedIds.length > 0) {
+            var printUrl = "{{ route('admin.order.allprint') }}?order_ids=" + encodeURIComponent(order_selectedIds.join(','));
+            console.log(order_selectedIds);
+            $.ajax({
+                url: printUrl,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (xhr) {
+                    swal("Print", 'Something Went Wrong !', 'error');
+                }
+                });
+        }else{
+            console.log('error');
+            swal("Print", 'Please Select Some Record', 'error');
+        }
+    });
+
+});
 
 </script>
 @endsection

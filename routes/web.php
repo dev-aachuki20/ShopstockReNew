@@ -98,10 +98,12 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::post('orders/edit-product', [OrdersController::class, 'EditProduct'])->name('orders.editProduct');
 
     Route::get('order/print-pdf/{orderid}',[OrdersController::class, 'printPdf'])->name('order.printPdf');
+    Route::get('order/allprint',[OrdersController::class,'allSelectedOrderPrint'])->name('order.allprint');
 
     Route::resource('/transactions', PaymentTransactionsController::class);
     Route::get('transaction/{type}', [PaymentTransactionsController::class, 'typeFilter'])->name('transactions.type');
     Route::get('transactions/{type?}/{id}', [PaymentTransactionsController::class, 'showHistory'])->name('transactions.history.show');
+
 
 
     Route::post('checkInvoiceNumber', [OrdersController::class, 'checkInvoiceNumber'])->name('orders.checkInvoiceNumber');

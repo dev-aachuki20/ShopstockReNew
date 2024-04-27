@@ -833,15 +833,6 @@ class OrdersController extends Controller
             $pdfData['title'] = $title = time().'_estimate';
             $pdfData['order'] = $order;
 
-            //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
-
-            // $pdfHtml = view('admin.exports.pdf.order-pdf', compact("pdfData","order","title"))->render();
-            // $mpdf = new Mpdf();
-            // $mpdf->SetHTMLHeader(view('admin.exports.pdf.order_pdf_header', compact("pdfData","order","title"))->render());
-            // $mpdf->SetHTMLFooter('<div style="text-align: center; font-size: 10px;">Page {PAGENO} of {nbpg}</div>');
-            // $mpdf->WriteHTML($pdfHtml);
-            // $mpdf->Output('order_invoice_'.$id.'.pdf', 'I');
-
             $pdfFileName = 'order_invoice_'.$id.'.pdf';
             $pdf = PDF::loadView('admin.exports.pdf.order-pdf', compact("pdfData","order","title"));
             $pdf->setPaper('A5', 'portrait');
@@ -851,6 +842,32 @@ class OrdersController extends Controller
             //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
         }catch(\Exception $e){
+            return abort(404);
+        }
+    }
+
+    public function allSelectedOrderPrint(Request $request)
+    {
+        ini_set('max_execution_time', 300);
+        try{
+            $order_ids  = explode(',',$request->order_ids);
+            $orders = Order::with(['orderPayTransaction' => function ($query) {
+                $query->withTrashed();
+            }])->withTrashed()->whereIn('id', $order_ids)->get();
+
+            $pdfData['title'] = $title = time().'_estimate';
+            $pdfData['orders'] = $orders;
+            dd( $pdfData['orders']);
+            $pdfFileName = 'order_invoice_all.pdf';
+            $pdf = PDF::loadView('admin.exports.pdf.all-print', compact("pdfData","title"));
+            $pdf->setPaper('A5', 'portrait');
+            $pdf->setOption('charset', 'UTF-8');
+            //return $pdf->stream($pdfFileName, ['Attachment' => false]);
+
+            return view('admin.exports.pdf.all-print',compact("pdfData","title"));
+
+        }catch(\Exception $e){
+            dd($e->getMessage());
             return abort(404);
         }
     }
