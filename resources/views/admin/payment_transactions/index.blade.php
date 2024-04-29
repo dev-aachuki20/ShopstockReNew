@@ -30,9 +30,12 @@
                     </form>
                 </div>
                 @endif
+
+                @if ($type !=='cash_reciept' && $type !== 'cancelled')
                 <div class="col-auto px-md-1 pr-1">
                     <a  role="button" class="btn printbtn h-10 col circlebtn"  id="order-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
                 </div>
+                @endif
             </div>
 
         <div class="card-body">

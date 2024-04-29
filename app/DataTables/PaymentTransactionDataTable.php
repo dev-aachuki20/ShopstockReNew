@@ -235,9 +235,9 @@ class PaymentTransactionDataTable extends DataTable
     public function getColumns(): array
     {
         $type = $this->type;
-
+        $checkboxvisisbility = ($type ==='cash_reciept' || $type === 'cancelled') ? false : true ;
         $columns = [
-            Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
+            Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false)->visible($checkboxvisisbility),
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)/*->visible(false)*/,
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
