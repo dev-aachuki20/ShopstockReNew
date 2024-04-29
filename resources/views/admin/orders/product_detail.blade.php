@@ -9,7 +9,7 @@
                 @if((is_array($orders) && count($orders)>0) || ($orders->count() > 0))
                 <a href="javascript: void(0);" id="addNewSubProduct" class="add-inline-btn" style="float: right;"><i class="fa fa-plus {{(is_array($orders) && count($orders)>0) || ($orders->count() > 0) ? 'selectBox':'textBox'}}"></i></a>
                 {{-- <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select mb-5" required> --}}
-                <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select">
+                <select name="is_sub_product" class="form-control select2 sub_product is_sub_product_select" id="is_sub_product">
                     <option value="" data-order_id="" data-price="0">{{ trans('quickadmin.qa_please_select') }}</option>
                     @foreach($orders as $value)
                     <option value="{{ $value->is_sub_product }}" data-order_id="{{ $value->id }}" data-price="{{ $value->price }}" {{$value->is_sub_product == $product->is_sub_product ? 'selected' : ''}}>{{ $value->is_sub_product }}</option>
@@ -189,7 +189,7 @@
 
         {{-- <div class="{{ $productAtr != 0 ? 'col-lg-2' : 'col-lg-5'}} form-group add-product mt-10"> --}}
         <div class="{{ ($isSubProductCheck == "Yes")? 'col-lg-2' : 'col-lg-5'}} form-group add-product mt-10">
-            {{-- @if(isset($product) && (in_array($product->product_category_id,config('constant.product_category_id')) || in_array($product->product->product_category_id,config('constant.product_category_id')))) 
+            {{-- @if(isset($product) && (in_array($product->product_category_id,config('constant.product_category_id')) || in_array($product->product->product_category_id,config('constant.product_category_id'))))
             @if(isset($product) && in_array($product->calculation_type,config('constant.product_category_id')))--}}
 
             @if(isset($product) && ((isset($product->calculation_type) && in_array($product->calculation_type,config('constant.product_category_id'))) || (isset($product->product->calculation_type) && in_array($product->product->calculation_type,config('constant.product_category_id')))))
@@ -197,7 +197,7 @@
             @endif
             <button title="Add Description" type="button" id='addDesBtn' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addDes pull-right btn btn-primary"><i class="fa fa-commenting"></i></button>
             <button title="Add Product" type="button" id='add_row' data-product-exists="{{$orderProductId}}" data-edit-row-num="{{ isset($dataRowIndex) ? $dataRowIndex : '' }}" class="addRow pull-right btn btn-success"><i class="fa fa-plus"></i></button>
-            
+
         </div>
     </div>
 </div>

@@ -94,6 +94,7 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
 
     Route::get('/get_customer_detail', [OrdersController::class, 'get_customer_detail'])->name('customer_detail');
     Route::post('/get_product_detail', [OrdersController::class, 'get_product_detail'])->name('get_product_detail');
+    Route::post('/pre_price_subgroup_select', [OrdersController::class, 'pre_price_subgroup_select'])->name('pre_price_subgroup_select');
     Route::post('/add_product_row', [OrdersController::class, 'add_product_row'])->name('add_product_row');
     Route::post('orders/edit-product', [OrdersController::class, 'EditProduct'])->name('orders.editProduct');
 

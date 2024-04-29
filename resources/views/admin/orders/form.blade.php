@@ -542,6 +542,67 @@ $('#productForm').on('keyup keypress', function(e) {
 
         });
 
+        // When Select Subgroup the get-Prev-Price
+        $(document).on('change', '#is_sub_product', function(e) {
+            e.preventDefault();
+            $('#prevOrderLink').attr('data-order', '');
+            var customer_id = $('select.customers').select2().val();
+            var product_id = $(".products option:selected").val();
+            var is_sub_product = $(this).val();
+            if (product_id != '' && customer_id != '') {
+                productCost['product_id'] = product_id;
+                productCost['customer_id'] = customer_id;
+                productCost['is_sub_product'] = is_sub_product;
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('admin.pre_price_subgroup_select') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        product_id: product_id,
+                        customer_id: customer_id,
+                        is_sub_product:is_sub_product,
+                    },
+                    success: function(response) {
+                        productCost['response'] = response;
+                        if (response.status) {
+                            $('.product-detail').html(response.data);
+                            var products_table = $('#products_table');
+
+                            var minPrePrice = 0;
+                            if (response.rowData.last_order_price != 0) {
+                                minPrePrice = response.rowData.last_order_price;
+                                $('.min-pre-price').parent('#prevOrderLink').css('display', 'block');
+                                var orderId= response.rowData.order;
+                                var routeUrl = "{{ route('admin.orders.show', ':orderId') }}";
+                                routeUrl = routeUrl.replace(':orderId', orderId);
+                                $('#prevOrderLink').attr('data-order', routeUrl);
+                                $('.min-pre-price').text(minPrePrice);
+                            } else {
+                                $('.min-pre-price').html('');
+                                $('.min-pre-price').parent('#prevOrderLink').css('display', 'none');
+
+                            }
+                            $('.product_information-block').show();
+                            calculateProducts();
+                        }
+                    },
+                    error: function(reject) {
+                        if (reject.status === 400) {
+                            var rejectResponse = $.parseJSON(reject.responseText);
+                            var error = rejectResponse.errors;
+                            $.each(error, function(key, val) {
+                                // console.log("#" + key + "_error = "+val[0])
+                                $("#" + key + "_error").text(val[0]);
+                            });
+                        }
+                    }
+                });
+            }
+
+        });
+
         // Start glass product details
         $(document).on('click', '#glassProductBtn', function(e) {
             $('select.products').siblings('p#products_error').remove();

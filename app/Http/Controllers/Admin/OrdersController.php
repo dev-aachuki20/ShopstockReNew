@@ -239,6 +239,7 @@ class OrdersController extends Controller
             $unit = $product->product_unit ? $product->product_unit->name : '';
             $purchase_price = $product->product->purchase_price_encode;
             $last_order_price = $order->price ?? '';
+
             // dd($product->product->product_category_id);
             $rowData['order']            = !is_null($order) ? encrypt($order->id) : '';
             $rowData['customer_type']    = $customer->is_type ?? '';
@@ -653,6 +654,43 @@ class OrdersController extends Controller
 
             $productDetail =  view('admin.orders.product_detail', compact('product', 'orders', 'customer', 'last_order_price' /* ,'unit' */))->render();
             return response()->json(array('status' => true, 'data' => $productDetail, 'rowData' => $rowData, 'is_sub_product' => $product->is_sub_product), 200);
+        }
+        return response()->json(array('status' => false, 'data' => ''), 200);
+    }
+
+    public function pre_price_subgroup_select(Request $request)
+    {
+        if ($request->ajax()) {
+            $request->validate([
+                'customer_id' => 'required|exists:customers,id',
+                'product_id'  => 'required|exists:products,id',
+                'is_sub_product'  => 'required|exists:order_products,is_sub_product'
+            ]);
+
+            $product = Product::findOrFail($request->product_id);
+            $customer = Customer::findOrFail($request->customer_id);
+
+            if ($product->is_sub_product == 1) {
+                $order = Order::select(
+                    'orders.id',
+                    'order_products.product_id',
+                    'order_products.id as order_product_id',
+                    'order_products.price',
+                    'order_products.is_sub_product'
+                )
+                ->leftJoin('order_products', 'orders.id', '=', 'order_products.order_id')
+                ->where('orders.customer_id', $request->customer_id)
+                ->where('order_products.product_id', $request->product_id)
+                ->where('order_products.is_sub_product',$request->is_sub_product)
+                ->whereNull('orders.deleted_at')
+                ->orderByDesc('order_products.id')->first();
+
+                $rowData['order'] = !is_null($order) ? encrypt($order->id) : '';
+            }
+
+            $rowData['last_order_price'] = $order->price ?? 0.00;
+            
+            return response()->json(array('status' => true, 'rowData' => $rowData), 200);
         }
         return response()->json(array('status' => false, 'data' => ''), 200);
     }
