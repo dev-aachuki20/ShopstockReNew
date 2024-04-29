@@ -67,7 +67,7 @@ class PaymentTransactionDataTable extends DataTable
                 $date_created = ($row->created_at) ? $row->created_at->format('Y-m-d') : null;
 
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-                if ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'cancelled' || $this->type == 'current_estimate') {
+                if ($this->type == 'sales_return' || $this->type == 'sales'|| $this->type == 'current_estimate') {
                     if (Gate::check('estimate_edit') && $this->type != 'cancelled') {
                        // sales me only edit and delete show only when order is created at today
                         if($typeAction == "sales"){
@@ -106,6 +106,11 @@ class PaymentTransactionDataTable extends DataTable
                 else if ($typeAction == 'modified_sales'){
                     if (Gate::check('estimate_history')) {
                         $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$customer_name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $viewIcon . '</a>';
+                    }
+                }
+                else if($this->type == 'cancelled'){
+                    if (Gate::check('estimate_show') && Gate::check('estimate_cancelled_show')) {
+                        $action .= '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-customerName="'.$customer_name.' ( #' .$row->voucher_number . ')" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
                     }
                 }
 
