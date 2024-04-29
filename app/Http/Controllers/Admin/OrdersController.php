@@ -832,13 +832,11 @@ class OrdersController extends Controller
 
             $pdfData['title'] = $title = time().'_estimate';
             $pdfData['order'] = $order;
-
             $pdfFileName = 'order_invoice_'.$id.'.pdf';
             $pdf = PDF::loadView('admin.exports.pdf.order-pdf', compact("pdfData","order","title"));
             $pdf->setPaper('A5', 'portrait');
             $pdf->setOption('charset', 'UTF-8');
             return $pdf->stream($pdfFileName, ['Attachment' => false]);
-
             //return view('admin.exports.pdf.order-pdf',compact("pdfData","order","title"));
 
         }catch(\Exception $e){
@@ -857,18 +855,17 @@ class OrdersController extends Controller
 
             $pdfData['title'] = $title = time().'_estimate';
             $pdfData['orders'] = $orders;
-            dd( $pdfData['orders']);
             $pdfFileName = 'order_invoice_all.pdf';
             $pdf = PDF::loadView('admin.exports.pdf.all-print', compact("pdfData","title"));
             $pdf->setPaper('A5', 'portrait');
             $pdf->setOption('charset', 'UTF-8');
-            //return $pdf->stream($pdfFileName, ['Attachment' => false]);
-
-            return view('admin.exports.pdf.all-print',compact("pdfData","title"));
+            return $pdf->stream($pdfFileName, ['Attachment' => false]);
+            //return view('admin.exports.pdf.all-print',compact("pdfData","title"));
 
         }catch(\Exception $e){
-            dd($e->getMessage());
+            //dd($e->getMessage());
             return abort(404);
         }
     }
+
 }

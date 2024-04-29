@@ -30,9 +30,9 @@
                     </form>
                 </div>
                 @endif
-                {{-- <div class="col-auto px-md-1 pr-1">
+                <div class="col-auto px-md-1 pr-1">
                     <a  role="button" class="btn printbtn h-10 col circlebtn"  id="order-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
-                </div> --}}
+                </div>
             </div>
 
         <div class="card-body">
@@ -198,20 +198,7 @@ $(document).ready(function() {
     {
         if (order_selectedIds.length > 0) {
             var printUrl = "{{ route('admin.order.allprint') }}?order_ids=" + encodeURIComponent(order_selectedIds.join(','));
-            console.log(order_selectedIds);
-            $.ajax({
-                url: printUrl,
-                type: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    console.log(response);
-                },
-                error: function (xhr) {
-                    swal("Print", 'Something Went Wrong !', 'error');
-                }
-                });
+            window.open(printUrl, '_blank');
         }else{
             console.log('error');
             swal("Print", 'Please Select Some Record', 'error');

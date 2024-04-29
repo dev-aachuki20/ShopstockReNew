@@ -1,5 +1,5 @@
 @extends('admin.exports.pdf.layout.pdf')
-@section('title', 'Estimate #'.$order->invoice_number)
+@section('title', 'Estimate')
 @section('styles')
 
     <style>
@@ -137,15 +137,18 @@
         }
 
         header{
-        position: fixed;
-        left: 0px;
-        right: 0px;
-        height: 200px;
-        margin-top: -60px;
-        margin-bottom:100px !important;
-        padding-bottom: 20px !important;
-        z-index: 1000;
+            /* position: fixed; */
+            left: 0px;
+            right: 0px;
+            height: 100px;
+            margin-top: -60px;
+            margin-bottom:20px !important;
+            padding-bottom: 20px !important;
+            z-index: 1000;
         }
+        /* body{
+            padding-top: 50px;
+        } */
 
         footer{
         position: fixed;
@@ -175,10 +178,172 @@
     </style>
 @stop
 @section('content')
-@dd($pdfData['orders'])
+    @foreach($pdfData['orders'] as $index => $order)
+    <header>
+        <table class="header">
+            <tr>
+                <!-- <td style="padding: 40px 0 30px;vertical-align: top;"> -->
+                <td style="vertical-align: top;">
+
+                    <table class="table_head" style="width: 100%;">
+                        <tr>
+                            <td class="text-center">
+                                    <h2 class="title_hd">Estimate</h2>
+                            </td>
+                        </tr>
+
+                        <table style="width: 100%; padding-bottom:10px">
+                            <tr>
+                                <td colspan="2">
+                                    <table style="width: 100%;">
+                                        <tr>
+                                            <td>
+                                                <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Bill To:</strong></div>
+                                            </td>
+
+                                            <td style="width: 150px; float:right;backgound:red; text-align:right" >
+                                                <div style="margin: 0; padding-top:10px" class="font-bold"><strong>Estimate #:</strong> {{ $order->invoice_number }}</div>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-italic">
+                                                <address>
+                                                    {{ $order->customer ? $order->customer->name : '' }}
+                                                    {{-- {{ $order->customer->phone_number ?? '' }} <br> --}}
+                                                    <br>  {{ $order->customer->area ? $order->customer->area->address : '' }}
+                                                </address>
+                                            </td>
+
+                                            <td style="vertical-align: top;">
+                                                @php
+
+                                                $orderType = $order->order_type;
+                                                if($orderType == 'create'){
+                                                    $orderType = 'Estimate' ;
+                                                }else if($orderType == 'return'){
+                                                    $orderType = 'Estimate Return';
+                                                }
+                                                @endphp
+                                                <address style="text-align: right;vertical-align: top;">
+                                                <strong>Type:</strong>  {{ $orderType }}<br>
+                                                <strong>Date:</strong>{{ date('d-m-Y', strtotime($order->invoice_date)) }}<br>
+                                                </address>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </header>
+
+        <main>
+            <table id="ItemTable" class="table ">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="padding-left:5px; padding-right:5px">@lang('quickadmin.order.fields.sno')</th>
+                        <th class="text-left">@lang('quickadmin.order.fields.product_name')</th>
+                        <th class="text-left">@lang('quickadmin.order.fields.quantity')</th>
+                        <th  class="text-center">@lang('quickadmin.order.fields.price')</th>
+                        <th class="text-center" style="padding-left:1px">@lang('quickadmin.order.fields.sub_total')</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @php
+                        $sno = 0;
+                    @endphp
+                    @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_by')->get() as $item)
+                    <tr>
+                        <td class="text-align-center" style="padding-left:1px; padding-left:5px;">{{ ++$sno }}</td>
+                        <td class="HI">
+                            {{ ucfirst($item->product->name) }}
+                            @if(!is_null($item->is_sub_product))
+                                ({{ $item->is_sub_product ?? '' }})
+                            @endif
+
+                            @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
+                                <p style="margin-top:0px; margin-bottom:0px;">{!! glassProductMeasurement($item->other_details,'one_line') !!}</p>
+                            @endif
+
+                            @if(!is_null($item->description))
+                            <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
+                            @endif
+                        </td>
+                        <td>
+                            @php
+                                $quantityString = '';
+                                if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
+                                    if(!is_null($item->height)){
+                                        $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
+                                    }
+
+                                    if(!is_null($item->height) && !is_null($item->width)){
+                                        $quantityString .= ' x ';
+                                    }else if(!is_null($item->height) && !is_null($item->length)){
+                                        $quantityString .= ' x ';
+                                    }
+
+                                    if(!is_null($item->width)){
+                                        $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
+                                    }
+
+                                    if(!is_null($item->length) && !is_null($item->width)){
+                                        $quantityString .= ' x ';
+                                    }else if(!is_null($item->height) && !is_null($item->length)){
+                                        $quantityString .= ' x ';
+                                    }
+
+                                    if(!is_null($item->length)){
+                                        $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
+                                    }
+
+                                    if($quantityString !=''){
+                                        $quantityString .= ' - ';
+                                    }
+                                }
+                                if(!is_null($item->quantity)){
+                                    $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
+                                }
+                            @endphp
 
 
+                            {{ $quantityString }}
+                        </td>
+                        <td class="text-center">{{ removeTrailingZeros($item->price) }}</td>
+                        <td class="text-center">{{ number_format(round($item->total_price),0) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot style="border-top: 1px solid #000000;">
+                    @if($order->is_add_shipping)
+                        <tr style="border: 1px solid #000000;">
+                            <td colspan="3" style="text-align:right; "></td>
+                            <td  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Shipping Amount</b></td>
+                            <td class="text-right" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($order->shipping_amount,0) ?? 0}}</td>
+                        </tr>
+                    @endif
+                    <tr style="border: 1px solid #000000;">
+                        <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Grand Total</b></td>
+                        <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
+                    </tr>
 
+                </tfoot>
+            </table>
+
+            <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
+            <h6 style="margin-left:6px;">THANK YOU</h6>
+            @if(!$loop->last)
+            <div class='breakpdf' style='page-break-before: always'></div>
+            @endif
+        </main>
+
+    @endforeach
 @stop
 
 

@@ -27,11 +27,11 @@ class PaymentTransactionDataTable extends DataTable
     {
         return datatables()
             ->eloquent($query)
-            // ->addColumn('checkbox', function ($row) {
-            //     $checkbox = "";
-            //     $checkbox = '<input type="checkbox" class="dt_checkbox" name="orders_ids[]" value="'.$row->order_id.'">';
-            //     return $checkbox;
-            // })
+            ->addColumn('checkbox', function ($row) {
+                $checkbox = "";
+                $checkbox = '<input type="checkbox" class="dt_checkbox" name="orders_ids[]" value="'.$row->order_id.'">';
+                return $checkbox;
+            })
             ->addIndexColumn()
             ->editColumn('entry_date', function ($row) {
                 return date('d-m-Y', strtotime($row->entry_date)) ?? "";
@@ -145,7 +145,7 @@ class PaymentTransactionDataTable extends DataTable
                     $q->where('customers.name', 'like', "%$keyword%");
                 });
             })
-        ->rawColumns(['action'/*,'checkbox'*/]);
+        ->rawColumns(['action','checkbox']);
     }
 
     /**
@@ -225,15 +225,8 @@ class PaymentTransactionDataTable extends DataTable
             ])
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('lBfrtip')
-            ->orderBy(1)
-            // ->selectStyleSingle()
-            ->buttons([
-                // Button::make('excel'),
-                // Button::make('csv'),
-                // Button::make('pdf'),
-                // Button::make('print'),
-            ]);
+            ->dom('lfrtip')
+            ->orderBy(2);
     }
 
     /**
@@ -244,7 +237,7 @@ class PaymentTransactionDataTable extends DataTable
         $type = $this->type;
 
         $columns = [
-            // Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
+            Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)/*->visible(false)*/,
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
