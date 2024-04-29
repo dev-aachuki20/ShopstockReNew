@@ -37,7 +37,7 @@ class PaymentTransactionDataTable extends DataTable
                 return date('d-m-Y', strtotime($row->entry_date)) ?? "";
             })
             ->addColumn('customer.name', function ($row) {
-                return $row->customer->name ?? "";
+                return $row->customer ? $row->customer->name : "";
             })
             ->editColumn('voucher_number', function ($row) {
                 return $row->voucher_number ?? "";
@@ -56,6 +56,7 @@ class PaymentTransactionDataTable extends DataTable
             })
             ->addColumn('action', function ($row) {
                 $action = '<div class="estimate-action-icons">';
+                $customer_name= $row->customer ? $row->customer->name : "";
                 // if (Gate::check('product_access')) {
                 $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
                 $historyIcon = view('components.svg-icon', ['icon' => 'staff-rejoin'])->render();
@@ -77,14 +78,14 @@ class PaymentTransactionDataTable extends DataTable
                             $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
                         }
                     }
-                    if (Gate::check('estimate_access')) {
+                    if (Gate::check('estimate_show')) {
+                        $action .= (($this->type == 'cancelled') && ($row->payment_way == "by_cash")) ? '' : '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-customerName="'.$customer_name.' ( #' .$row->voucher_number . ')" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
 
-                        $action .= ($this->type == 'cancelled' && $row->payment_way == "by_cash")? '':'<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
 
                         if ($typeAction == 'sales'){
                             if (Gate::check('estimate_history')) {
                                 if(OrderEditHistory::where('order_id', $row->order_id)->where('update_status', '!=', 'add')->exists()){
-                                    $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                                    $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$customer_name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
                                 }
                             }
                         }
@@ -94,17 +95,17 @@ class PaymentTransactionDataTable extends DataTable
                         $action .= '<a href="' . route("admin.transactions.edit", encrypt($row->id)) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
                     }
                     if (Gate::check('transaction_access')) {
-                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
+                        $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.show', encrypt($row->id)) . '" data-customerName="'.$customer_name.' ( #' . $row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_detail" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
                         if (Gate::check('estimate_history')) {
                             if(PaymentTransactionHistory::where('payment_transaction_id', $row->id)->count() > 1){
-                                $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$row->customer->name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
+                                $action .= '<a href="javascript:void(0)" data-url="' . route('admin.transactions.history.show',  ['type' => $typeAction, 'id' => encrypt($row->id)]) . '" data-customerName="'.$customer_name.' ( #' .$row->voucher_number . ')" class="btn btn-icon btn-info m-1 view_history_detail" title="'.trans('quickadmin.qa_history').'" >' . $historyIcon . '</a>';
                             }
                         }
                     }
                 }
                 else if ($typeAction == 'modified_sales'){
                     if (Gate::check('estimate_history')) {
-                        $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$row->customer->name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $viewIcon . '</a>';
+                        $action .= '<a data-url="' . route('admin.orders.history.show',  ['type' => $typeAction, 'id' => encrypt($row->order_id)]) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_history_detail" data-customerName="'.$customer_name.' ( #' . $row->voucher_number . ')" title="'.trans('quickadmin.qa_history').'" >' . $viewIcon . '</a>';
                     }
                 }
 
@@ -182,7 +183,10 @@ class PaymentTransactionDataTable extends DataTable
                 break;
 
             case 'cancelled':
-                $model = $model->where('is_split', 0)->onlyTrashed();
+                // $model = $model->where('is_split', 0)->onlyTrashed();
+                $model = $model->where('is_split', 0)->whereHas('customer', function ($query) {
+                    $query->whereNull('deleted_at');
+                })->onlyTrashed();
                 break;
 
             case 'current_estimate':
@@ -235,10 +239,11 @@ class PaymentTransactionDataTable extends DataTable
     public function getColumns(): array
     {
         $type = $this->type;
-        $checkboxvisisbility = ($type ==='cash_reciept' || $type === 'cancelled') ? false : true ;
+        $checkboxvisisbility = ($type ==='cash_reciept' || $type == 'cancelled') ? false : true ;
+        $snvisibility = ($type ==='cash_reciept' || $type == 'cancelled') ? true : false ;
         $columns = [
             Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false)->visible($checkboxvisisbility),
-            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)/*->visible(false)*/,
+            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)->visible($snvisibility),
             Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
             Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),

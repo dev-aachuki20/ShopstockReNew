@@ -15,9 +15,13 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>@lang('quickadmin.qa_payment_history')</h4>
                   <div class="dbl-btns d-flex">
-
+                    @can('estimate_ledger_print')
                     <button class="printbtn btn btn-primary" id="print-ledger-btn" data-value="print-product-ledger"><i class="fa fa-print"></i> Print Product Ledger</button>
+                    @endcan
+
+                    @can('estimate_statement_print')
                     <button class="printbtn btn btn-primary" id="print-statement-btn" data-value="print-statement"><i class="fa fa-print"></i> Print Statement</button>
+                    @endcan
                   </div>
                 </div>
                 <div class="col-md-12">

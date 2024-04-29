@@ -32,16 +32,16 @@
     </li>
     @endcan
 
-    @if (Gate::check('product_access'))
+    @can('product_access')
     <li class="{{ Request::is('admin/master/products*') || Request::is('admin/master/product-group*') || Request::is('admin/master/product-price*') || Request::is('admin/master/product-recycle*') || Request::is('admin/master/product-price*' || Request::is('admin/master/product-group/*')) ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.master.products.index') }}">
             <x-side-bar-svg-icon icon="device" />
             <span>@lang('admin_master.product.seo_title_product_master')</span>
         </a>
     </li>
-    @endif
+    @endcan
 
-
+    @can('estimate_management_access')
     <li class="dropdown {{ ((Request::is('admin/orders*') && !Request::is('admin/orders/draft-invoice')) || Request::is('admin/transactions/create') || Request::is('admin/orders-return')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="backup" />
@@ -71,6 +71,9 @@
             @endcan
         </ul>
     </li>
+    @endcan
+
+    @can('transaction_management_access')
     <li class="dropdown {{ (Request::is('admin/transaction/current_estimate') || Request::is('admin/transaction/sales') || Request::is('admin/transaction/modified_sales') || Request::is('admin/transaction/sales_return') || Request::is('admin/transaction/cash_reciept') || Request::is('admin/orders/draft-invoice') || Request::is('admin/transaction/cancelled')) ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="invoice" />
@@ -107,11 +110,11 @@
             </li>
             @endcan
             @can('estimate_access')
-            <li class="{{ Request::is('admin/orders/draft-invoice') ? 'active' : '' }}">
+            {{-- <li class="{{ Request::is('admin/orders/draft-invoice') ? 'active' : '' }}">
                 <a href="{{ route('admin.orders.draftInvoice') }}">
                     <span>@lang('quickadmin.transaction-management.fields.draft_invoice')</span>
                 </a>
-            </li>
+            </li> --}}
             <li class="{{ Request::is('admin/transaction/cancelled') ? 'active' : '' }}">
                 <a href="{{ route('admin.transactions.type',['cancelled']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.cancelled')</span>
@@ -120,8 +123,9 @@
             @endcan
         </ul>
     </li>
+    @endcan
 
-
+    @can('customer_management_access')
     <li class="dropdown {{ Request::is('admin/customer*') ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="user" />
@@ -135,7 +139,7 @@
                 </a>
             </li>
             @endif
-            @if (Gate::check('customer_access'))
+            @can('customer_access')
             {{-- <li class="{{ Request::is('admin/customers') ||  Request::is('admin/customers/*/edit') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.customers.index') }}">
                     @lang('quickadmin.customer-management.fields.alter_list')
@@ -146,11 +150,12 @@
                     @lang('quickadmin.customer-management.fields.list')
                 </a>
             </li>
-            @endif
+            @endcan
         </ul>
     </li>
+    @endcan
 
-
+    @can('master_access')
     <li class="dropdown {{ (Request::is('admin/master*') && !(Request::is('admin/master/products*')) && !(Request::is('admin/master/product-recycle*')) && !(Request::is('admin/master/product-price*')) && !(Request::is('admin/master/product-group/*')))  ? 'active' : '' }}">
         <a href="#" class="nav-link has-dropdown">
             <x-side-bar-svg-icon icon="customer" />
@@ -175,93 +180,87 @@
             <a class="nav-link" href="{{ route('admin.master.categories.index') }}">
                 @lang('quickadmin.category_master.title')
             </a>
-    </li>
-    @endif --}}
-    @if (Gate::check('unit_access'))
-    <li class="{{ Request::is('admin/master/product-unit*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.master.product-unit.index') }}">
-            @lang('quickadmin.product_unint_master.title')
-        </a>
-    </li>
-    @endif
+            </li>
+            @endif --}}
 
-
-
-    @if (Gate::check('area_access'))
-    <li class="{{ Request::is('admin/master/areas*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.master.areas.index') }}">
-            @lang('quickadmin.area_master.title')
-        </a>
-    </li>
-    @endif
-
-    {{-- @if (Gate::check('split_access'))
-                    <li class="{{ Request::is('admin/master/split*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ route('admin.master.split.index') }}">
-        @lang('quickadmin.split.title')
-    </a>
-    </li>
-    @endif --}}
-    @if (Gate::check('log_access'))
-    <li class="{{ Request::is('admin/master/log-activity*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.master.log-activity.index') }}">
-            @lang('quickadmin.logActivities.title')
-        </a>
-    </li>
-    @endif
-
-    @if (Gate::check('ip_access'))
-    <li class="{{ Request::is('admin/master/role_ip*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.master.role_ip.index') }}">
-            @lang('quickadmin.ip.title')
-        </a>
-    </li>
-    @endif
-
-</ul>
-</li>
-
-@can('report_access')
-    <li class="dropdown {{ Request::is('admin/reports*') ? 'active' : '' }}">
-        <a href="#" class="nav-link has-dropdown">
-            <x-side-bar-svg-icon icon="user" />
-            <span>@lang('quickadmin.reports.report_management')</span>
-        </a>
-        <ul class="dropdown-menu">
-            @if (Gate::check('report_customer_access'))
-            <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.reports.customer.index') }}">
-                    @lang('quickadmin.reports.customer_report')
+            @if (Gate::check('unit_access'))
+            <li class="{{ Request::is('admin/master/product-unit*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.master.product-unit.index') }}">
+                    @lang('quickadmin.product_unint_master.title')
                 </a>
             </li>
-            {{-- <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.protected.page') }}">
-                    @lang('quickadmin.reports.customer_report')
-                </a>
-            </li> --}}
             @endif
+
+
+
+            @if (Gate::check('area_access'))
+            <li class="{{ Request::is('admin/master/areas*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.master.areas.index') }}">
+                    @lang('quickadmin.area_master.title')
+                </a>
+            </li>
+            @endif
+
+            {{-- @if (Gate::check('split_access'))
+                            <li class="{{ Request::is('admin/master/split*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.master.split.index') }}">
+                @lang('quickadmin.split.title')
+            </a>
+            </li>
+            @endif --}}
+            @if (Gate::check('log_access'))
+            <li class="{{ Request::is('admin/master/log-activity*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.master.log-activity.index') }}">
+                    @lang('quickadmin.logActivities.title')
+                </a>
+            </li>
+            @endif
+
+            @if (Gate::check('ip_access'))
+            <li class="{{ Request::is('admin/master/role_ip*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.master.role_ip.index') }}">
+                    @lang('quickadmin.ip.title')
+                </a>
+            </li>
+            @endif
+
         </ul>
     </li>
-@endcan
+    @endcan
 
-@can('setting_access')
-<li class="{{ Request::is('settings*') ? 'active' : '' }}">
-    <a href="{{ route('settings') }}" class="nav-link">
-        <x-side-bar-svg-icon icon="setting" />
-        <span>@lang('quickadmin.settings.title')</span>
-    </a>
-</li>
-@endcan
+    @can('report_access')
+        <li class="dropdown {{ Request::is('admin/reports*') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown">
+                <x-side-bar-svg-icon icon="user" />
+                <span>@lang('quickadmin.reports.report_management')</span>
+            </a>
+            <ul class="dropdown-menu">
+                @if (Gate::check('report_customer_access'))
+                <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin.reports.customer.index') }}">
+                        @lang('quickadmin.reports.customer_report')
+                    </a>
+                </li>
+                @endif
+            </ul>
+        </li>
+    @endcan
 
+    @can('setting_access')
+    <li class="{{ Request::is('settings*') ? 'active' : '' }}">
+        <a href="{{ route('settings') }}" class="nav-link">
+            <x-side-bar-svg-icon icon="setting" />
+            <span>@lang('quickadmin.settings.title')</span>
+        </a>
+    </li>
+    @endcan
 
-
-
-<li class="{{ Request::is('logout*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ route('logout') }}">
-        <x-side-bar-svg-icon icon="logout" />
-        <span>@lang('quickadmin.qa_logout')</span>
-    </a>
-</li>
+    <li class="{{ Request::is('logout*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('logout') }}">
+            <x-side-bar-svg-icon icon="logout" />
+            <span>@lang('quickadmin.qa_logout')</span>
+        </a>
+    </li>
 </ul>
 
 </aside>

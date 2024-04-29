@@ -34,16 +34,12 @@ class LoginController extends Controller
             $user = User::where('username',$request->username)->first();
             if($user){
                 if (Auth::attempt($credentialsOnly, $remember_me)) {
-                   $check_ip = checkRoleIpPermission($request->ip(), $user->roles->first()->id);
-                   if($check_ip == "No" && $user->roles->first()->id != 1){
-                        Auth::guard('web')->logout();
-                        return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.iperror')])->withInput($request->only('username', 'password'));
-                   }
-                    // Staff Cannot Login Into Web
-                    if ((auth()->user()->hasRole(config('app.roleid.staff')))) {
-                        Auth::guard('web')->logout();
-                        return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.unauthorize')])->withInput($request->only('username', 'password'));
-                    }
+                //    $check_ip = checkRoleIpPermission($request->ip(), $user->roles->first()->id);
+                //    if($check_ip == "No" && $user->roles->first()->id != 1){
+                //         Auth::guard('web')->logout();
+                //         return redirect()->route('login')->withErrors(['wrongcrendials' => trans('auth.iperror')])->withInput($request->only('username', 'password'));
+                //    }
+
                     addToLog($request,'User','Login successfully');
                     return redirect()->route('admin.orders.create')->with(['success' => true,
                     'message' => trans('quickadmin.qa_login_success'),

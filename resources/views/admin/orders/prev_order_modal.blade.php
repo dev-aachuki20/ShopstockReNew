@@ -75,9 +75,12 @@
         }
     }
 </style>
-<a href="{{ route('admin.order.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;padding: 6px 30px;">
-<i class="fa fa-print"></i> Print
-</a>
+@can('estimate_print')
+    <a href="{{ route('admin.order.printPdf',encrypt($order->id))}}" id="download-btn" class="btn btn-primary" target="_blank" style="float:right;padding: 6px 30px;">
+    <i class="fa fa-print"></i> Print
+    </a>
+@endcan
+
 @php
 $isSplit = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->is_split : null;
 $paytdeleted_at = $order->orderPayTransaction->isNotEmpty() ? $order->orderPayTransaction->first()->deleted_at : null;
