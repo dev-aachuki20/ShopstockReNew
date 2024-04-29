@@ -200,7 +200,6 @@ $(document).ready(function() {
             var printUrl = "{{ route('admin.order.allprint') }}?order_ids=" + encodeURIComponent(order_selectedIds.join(','));
             window.open(printUrl, '_blank');
         }else{
-            console.log('error');
             swal("Print", 'Please Select Some Record', 'error');
         }
     });

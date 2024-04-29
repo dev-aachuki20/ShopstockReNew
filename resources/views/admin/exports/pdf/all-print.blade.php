@@ -336,7 +336,10 @@
                 </tfoot>
             </table>
 
+            @if (getSetting('custom_invoice_print_message'))
             <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
+            @endif
+
             <h6 style="margin-left:6px;">THANK YOU</h6>
             @if(!$loop->last)
             <div class='breakpdf' style='page-break-before: always'></div>
