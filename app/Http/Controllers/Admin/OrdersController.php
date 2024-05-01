@@ -53,7 +53,7 @@ class OrdersController extends Controller
     public function store(StoreOrdersRequest $request)
     {
         abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+        // dd($request->all());
         try{
             DB::beginTransaction();
             $isDraft = $request->submit == 'draft' ? true : false;
@@ -61,7 +61,7 @@ class OrdersController extends Controller
             $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
 
             if (!$checkOrder) {
-                $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return') : getNewInvoiceNumber('', 'new');
+                $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return',$request->invoice_date) : getNewInvoiceNumber('', 'new',$request->invoice_date);
                 $inputs = array(
                     'customer_id'    => $request->customer_id,
                     'order_type'     => $request->order_type,
@@ -364,16 +364,17 @@ class OrdersController extends Controller
         try{
 
             DB::beginTransaction();
-
+            // dd($request->all());
             $type = $request->type; //sales
             $isDraft = $request->submit == 'draft' ? true : false;
-            $checkDraftStatus = $isDraft == true ? 0 : 1;
+            // $checkDraftStatus = $isDraft == true ? 1 : 0;
             $order = $checkProductOrder = Order::findOrFail($id);
+            $beforIs_draft = $order['is_draft'];
+            $checkDraftStatus = $isDraft == $beforIs_draft ? 1 : 0;
             if (!$isDraft) {
                 $this->recordOrderHistory($order, $request->all());  //Check History
             }
 
-            $beforIs_draft = $order['is_draft'];
             $inputs = array(
                 'invoice_date'   => $request->invoice_date,
                 'shipping_amount' => isset($request->shipping_amount) ? (float)str_replace(',', '', $request->shipping_amount) : null,
@@ -384,10 +385,13 @@ class OrdersController extends Controller
                 'is_draft'       => $isDraft ? 1 : 0,
                 'is_add_shipping' => (isset($request->is_add_shipping) && $request->is_add_shipping == 'on') ? 1 : 0
             );
-            if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date && $order->is_draft = $checkDraftStatus) {
+
+            if ($order->customer_id == $request->customer_id && $order->invoice_date == $request->invoice_date)
+            {
                 $inputs['updated_by'] = Auth::user()->id;
                 $order->update($inputs);
                 addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
+
             } else {
                 $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $checkDraftStatus])->first();
                 if ($checkOrder) {
@@ -397,8 +401,7 @@ class OrdersController extends Controller
                     $inputs['total_amount']   = $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount);
                     $inputs['updated_by'] = Auth::user()->id;
                     $order->delete();
-                    $checkOrder->update($inputs);
-                    $order = $checkOrder;
+                    $order = $checkOrder->update($inputs);
                     addToLog($request, 'Order', 'Edit', $order, $checkProductOrder);
                 } else {
                     $inputs['customer_id'] = $request->customer_id;
@@ -408,7 +411,6 @@ class OrdersController extends Controller
                     addToLog($request, 'Order', 'Create', $order);
                 }
             }
-
 
             $orderProducts = $request->products;
             $allProducts = array();
@@ -482,12 +484,28 @@ class OrdersController extends Controller
                         ]);
                         addToLog($request, 'Order', 'Edit', $checkNewOrderPaymentTransaction, $oldPaymentTransaction);
                     } else {
+
                         $transaction['order_id'] = $order->id;
                         PaymentTransaction::create($transaction);
                         addToLog($request, 'Estimate', 'Create', $transaction);
                     }
                 } else {
-                    PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);
+                    $transaction = [
+                        'order_id'      => $order->id,
+                        'customer_id'   => $order->customer_id,
+                        'payment_type'  => ($order->order_type == 'return')?'credit':'debit',
+                        'payment_way'   => 'order_'.$order->order_type,
+                        'voucher_number' => $order->invoice_number,
+                        'amount'         => round((float)str_replace(',', '', $order->total_amount)),
+                        'created_by'    => Auth::user()->id,
+                        'entry_date'    => $request->invoice_date, //date('Y-m-d',strtotime($request->get('invoice_date'))),
+                        'remark'        => $order->order_type == 'return' ? 'Sales return' : 'Sales',
+                    ];
+                    //dd($transaction);
+                    // PaymentTransaction::updateOrInsert(['voucher_number' => $order->invoice_number], $transaction);
+                    PaymentTransaction::updateOrCreate(
+                        ['voucher_number' => $order->invoice_number],$transaction // Data to update or insert
+                    );
                 }
             }
 
@@ -515,6 +533,7 @@ class OrdersController extends Controller
 
         }catch(\Exception $e){
             DB::rollBack();
+            dd($e->getMessage());
             \Log::error("Error in OrdersController::update (".$e->getCode(). ")" . $e->getMessage() . " at line " . $e->getLine());
             return response()->json(['success' => false , 'message'=>'error'],500);
         }
@@ -689,7 +708,7 @@ class OrdersController extends Controller
             }
 
             $rowData['last_order_price'] = $order->price ?? 0.00;
-            
+
             return response()->json(array('status' => true, 'rowData' => $rowData), 200);
         }
         return response()->json(array('status' => false, 'data' => ''), 200);

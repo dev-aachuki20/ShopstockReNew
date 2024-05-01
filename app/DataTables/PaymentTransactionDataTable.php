@@ -52,7 +52,7 @@ class PaymentTransactionDataTable extends DataTable
                 return ($row->payment_type == 'credit' ? number_format(abs($row->amount), 2) : '');
             })
             ->editColumn('created_at', function ($row) {
-                return $row->created_at->format('d-m-Y h:i A');
+                return $row->created_at ? $row->created_at->format('d-m-Y h:i A') : '';
             })
             ->addColumn('action', function ($row) {
                 $action = '<div class="estimate-action-icons">';

@@ -283,15 +283,18 @@ if (!function_exists('getNewInvoiceNumber')) {
      *
      * @return string
      */
-    function getNewInvoiceNumber($orderId = '', $reqRouteName = 'new', $checkInvoiceNumber = '')
+    function getNewInvoiceNumber($orderId = '', $reqRouteName = 'new',$InvoiceDate=null, $checkInvoiceNumber = '')
     {
+
         $invoiceNumber = '';
         if ((!empty($orderId) && !empty($checkInvoiceNumber)) || $reqRouteName == 'new_edit') {
             $invoiceNumber = Order::where('id', '!=', $orderId)->where('invoice_number', $checkInvoiceNumber)->exists();
         } else {
 
             // Find the latest invoice number in the database
-            $currentMonth = strtoupper(date('M')) . date('y');
+            // $currentMonth = strtoupper(date('M')) . date('y');
+            $currentMonth = strtoupper(date('M', strtotime($InvoiceDate))) . date('y', strtotime($InvoiceDate));
+
             if ($reqRouteName == 'return') {
                 $currentMonth = $currentMonth . '-R';
             } else if ($reqRouteName == 'new_cash_receipt') {

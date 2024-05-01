@@ -25,20 +25,23 @@ class DraftInvoiceDataTable extends DataTable
         return datatables()
             ->eloquent($query)
             ->addIndexColumn()
-            ->editColumn('customer_id', function ($row) {
-                return $row->customer->name ?? "";
+            ->addColumn('customer.name', function ($row) {
+                return $row->customer ? $row->customer->name : "";
             })
-            ->editColumn('total_products', function ($row) {
+            ->editColumn('invoice_number', function ($row) {
+                return $row->invoice_number ?? "";
+            })
+            ->addColumn('total_products', function ($row) {
                 return $row->orderProduct->count() ?? 0;
             })
             ->editColumn('total_amount', function ($row) {
-                return $row->total_amount;
+                return $row->total_amount ?? '';
             })
             ->editColumn('remark', function ($row) {
-                return  $row->remark;
+                return  $row->remark ?? '';
             })
             ->editColumn('created_at', function ($row) {
-                return $row->created_at;
+                return $row->created_at? $row->created_at->format('d-m-Y h:i A') : '';
             })
             ->addColumn('action', function ($row) {
                 $action = '';
@@ -49,12 +52,17 @@ class DraftInvoiceDataTable extends DataTable
                 if(Gate::check('estimate_edit')){
                     $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                     $action .= '<a href="' .route("admin.orders.edit", ['draft', encrypt($row->id)]). '" class="btn btn-icon btn-info m-1 edit_product">' . $editIcon . '</a>';
-                } 
+                }
                 if (Gate::check('estimate_delete')) {
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                     $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="'.encrypt($row->id).'">  '.$deleteIcon.'</a>';
                 }
                 return $action;
+            })
+            ->filterColumn('customer.name', function ($query, $keyword) {
+                $query->whereHas('customer', function ($q) use ($keyword) {
+                    $q->where('customers.name', 'like', "%$keyword%");
+                });
             })->rawColumns(['action']);
     }
 
@@ -101,7 +109,8 @@ class DraftInvoiceDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
-            Column::make('customer_id')->title(trans('quickadmin.transaction.fields.customer')),
+            Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
+            Column::make('invoice_number')->title(trans('quickadmin.estimate_number')),
             Column::make('total_products')->title(trans('quickadmin.order.fields.total_products')),
             Column::make('total_amount')->title(trans('quickadmin.order.fields.total_amount')),
             Column::make('remark')->title(trans('quickadmin.transaction.fields.remark')),

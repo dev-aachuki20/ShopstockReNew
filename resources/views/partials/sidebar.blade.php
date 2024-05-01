@@ -110,11 +110,11 @@
             </li>
             @endcan
             @can('estimate_access')
-            {{-- <li class="{{ Request::is('admin/orders/draft-invoice') ? 'active' : '' }}">
+            <li class="{{ Request::is('admin/orders/draft-invoice') ? 'active' : '' }}">
                 <a href="{{ route('admin.orders.draftInvoice') }}">
                     <span>@lang('quickadmin.transaction-management.fields.draft_invoice')</span>
                 </a>
-            </li> --}}
+            </li>
             <li class="{{ Request::is('admin/transaction/cancelled') ? 'active' : '' }}">
                 <a href="{{ route('admin.transactions.type',['cancelled']) }}">
                     <span>@lang('quickadmin.transaction-management.fields.cancelled')</span>
