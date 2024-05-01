@@ -287,13 +287,15 @@
     <div class="text-right order_create order_create_btnarea">
         <input type="hidden" name="submit" value="">
         @if($orderType=='create')
-            <button class="btn btn-info btn-lg w-150 order_form_submit save_as_draft_btn" data-checktype_is="save_as_draft_btn" type="button" name="submit" value="draft" disabled="">Save as Draft</button>
+            <button class="btn btn-info btn-lg w-150 order_form_submit save_as_draft_btn" data-checktype_is="save_as_draft_btn" type="button" name="submit" value="draft" disabled>Save as Draft</button>
         @endif
+
         @if($orderType=='edit')
         <button class="btn btn-info btn-lg w-150 order_form_submit save_draft_btn" data-checktype_is="save_draft_btn" type="button" name="submit" value="draft">
             {{ trans('quickadmin.qa_update_as_draft_invoice') }}</button>
         @endif
-        <button class="btn btn-success btn-lg order_form_submit save_estimate_btn" data-checktype_is="save_estimate_btn" type="button" name="submit" value="save">
+
+        <button class="btn btn-success btn-lg order_form_submit save_estimate_btn" data-checktype_is="save_estimate_btn" type="button" name="submit" value="save" disabled>
             @if($orderType=='create')
             {{ trans('quickadmin.qa_save_estimate') }}
             @elseif($orderType == 'return')
@@ -1639,15 +1641,30 @@ $('#productForm').on('keyup keypress', function(e) {
             serialNo++;
         });
 
+        $checkOrderSet = '{{ isset($order) ? true : false }}'
         //Start to disable save button
-        if (allPrices.includes('0')) {
-            $('.order_create').find('button[value=draft]').removeAttr('disabled');
-            $('.order_create').find('button[value=save]').attr('disabled', true);
+        if (allPrices.includes('0.00') || allPrices.includes('0')) {
+            console.log('t1');
+            if($checkOrderSet){
+                $('.order_create').find('button[value=draft]').removeAttr('disabled');
+                $('.order_create').find('button[value=save]').attr('disabled', true);
+            }
+            else{
+                $('.order_create').find('button[value=draft]').removeAttr('disabled');
+                $('.order_create').find('button[value=save]').attr('disabled', true);
+            }
+
         } else {
-            $('.order_create').find('button[value=draft]').attr('disabled', true);
-            $('.order_create').find('button[value=save]').removeAttr('disabled');
+
+                $('.order_create').find('button[value=draft]').attr('disabled', true);
+                $('.order_create').find('button[value=save]').removeAttr('disabled');
+
+
         }
         //End to disable save button
+
+
+
 
         var grand_total = 0;
         var totalPriceTd = document.querySelectorAll('.total_price input');

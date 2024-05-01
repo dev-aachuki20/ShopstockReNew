@@ -14553,6 +14553,14 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
     height: 32px;
 }
 
+.btn-info.order_form_submit{
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #fff;
+}
+.order_form_submit:disabled{
+    cursor: not-allowed;
+}
 
 @media (max-width: 1550px) {
     #invoice-filter-form > .row {
