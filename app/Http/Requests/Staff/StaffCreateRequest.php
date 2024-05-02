@@ -31,8 +31,8 @@ class StaffCreateRequest extends FormRequest
             'email' => ['required','regex:/^.+@.+\..+$/i','unique:users,email'],
             'phone' => ['nullable','digits:10','numeric'],
             'role_id'=>['required','numeric'],
-            'password'   => ['required', 'string', 'min:4','confirmed'],
-            'password_confirmation' => ['required','min:4','same:password'],
+            'password'   => ['required', 'string', 'min:8','confirmed'],
+            'password_confirmation' => ['required','min:8','same:password'],
         ];
     }
 

@@ -24,8 +24,8 @@ class ResetPasswordController extends Controller
         $validated = $request->validate([
             'token' => 'required',
             'email' => 'required|string',
-            'password' => 'required|string|min:4|confirmed',
-            'password_confirmation' => 'required|string|min:4',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8',
 
         ], getCommonValidationRuleMsgs());
 

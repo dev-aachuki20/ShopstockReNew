@@ -8,15 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Rules\IsActive;
-use Illuminate\Validation\ValidationException;
+
 
 
 class LoginController extends Controller
 {
-    //
     public function index()
     {
-        //
         return view('auth.login');
     }
 
@@ -24,7 +22,7 @@ class LoginController extends Controller
     {
         $credentialsOnly = $request->validate([
             'username'    => ['required','string',new IsActive],
-            'password' => ['required','string','min:4'],
+            'password' => ['required','string','min:8'],
         ]);
 
         $remember_me = !is_null($request->remember_me) ? true : false;
@@ -53,8 +51,8 @@ class LoginController extends Controller
                 return redirect()->route('login')->withErrors(['username' => trans('quickadmin.qa_invalid_username')])->withInput($request->only('username'));
             }
 
-        } catch (ValidationException $e) {
-            return redirect()->route('login')->withErrors($validated)->withInput($request->only('username', 'password'));
+        } catch (\Exception $e) {
+            return redirect()->route('login')->withErrors($e->getMessage())->withInput($request->only('username', 'password'));
         }
 
     }
