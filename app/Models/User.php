@@ -67,9 +67,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-
-
-
     public function uploads()
     {
         return $this->morphMany(Uploads::class, 'uploadsable');
@@ -86,11 +83,6 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->profileImage->file_url;
         }
         return "";
-    }
-
-    public function device()
-    {
-        return $this->hasOne(Device::class,'staff_id','id');
     }
 
     public function sendPasswordResetOtpNotification($request, $user)

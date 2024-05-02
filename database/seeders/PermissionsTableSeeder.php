@@ -712,6 +712,14 @@ class PermissionsTableSeeder extends Seeder
                 'created_at' => $createDate,
                 'updated_at' => $updateDate,
             ],
+            [
+                'name'      => 'estimate_date_filter_access',
+                'title'      => 'Estimate Date Filter Access',
+                'guard_name'=>'web',
+                'route_name'=>'estimate-management',
+                'created_at' => $createDate,
+                'updated_at' => $updateDate,
+            ],
         ];
 
         Permission::insert($permissions);

@@ -211,10 +211,14 @@ class PaymentTransactionDataTable extends DataTable
         // }
         // $this->start_date
         if($this->startDate !=''){
-            $model->whereDate('created_at','>=',$this->startDate);
+            $model->whereDate('entry_date','>=',$this->startDate);
         }
         if($this->endDate !=''){
-            $model->whereDate('created_at','<=',$this->endDate);
+            $model->whereDate('entry_date','<=',$this->endDate);
+        }
+
+        if (auth()->user()->hasRole([config('app.roleid.admin'), config('app.roleid.staff')])) {
+            $model = $model->whereDate('entry_date', '=', now()->toDateString());
         }
 
         return $model;

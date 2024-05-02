@@ -25,8 +25,7 @@ return [
     'roleid' => [
         'super_admin' => 1 ,
         'admin' => 2 ,
-        'accountant' => 3 ,
-        'staff' => 4 ,
+        'staff' => 3 ,
     ],
 
 

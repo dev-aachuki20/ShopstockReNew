@@ -71,9 +71,12 @@ class DraftInvoiceDataTable extends DataTable
      */
     public function query(Order $model): QueryBuilder
     {
-        $query = $model->whereIsDraft(1)->orderBy('id', 'desc');
-        // dd($query);
-        return $this->applyScopes($query);
+        $model = $model->whereIsDraft(1)->orderBy('id', 'desc');
+        if (auth()->user()->hasRole([config('app.roleid.admin'), config('app.roleid.staff')])) {
+            $model = $model->whereDate('invoice_date', '=', now()->toDateString());
+        }
+        // return $this->applyScopes($model);
+        return $model->newQuery();
     }
 
     /**
