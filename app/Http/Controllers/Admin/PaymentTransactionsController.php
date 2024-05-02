@@ -44,7 +44,7 @@ class PaymentTransactionsController extends Controller
         abort_if(Gate::denies('transaction_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
-        $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt');
+        $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt',$request->entry_date);
 
         $payment = PaymentTransaction::create($inputs);
         addToLog($request,'Cash receipt','Create', $payment);
