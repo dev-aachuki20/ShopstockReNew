@@ -162,11 +162,15 @@ class PaymentTransactionDataTable extends DataTable
         $type = $this->type;
         switch ($type) {
             case 'sales_return':
-                $model = $model->where('payment_way', 'order_return');
+                $model = $model->where('payment_way', 'order_return')->whereHas('customer', function ($query) {
+                    $query->whereNull('deleted_at');
+                });
                 break;
 
             case 'sales':
-                $model = $model->where('payment_way', 'order_create');
+                $model = $model->where('payment_way', 'order_create')->whereHas('customer', function ($query) {
+                    $query->whereNull('deleted_at');
+                });
                 break;
 
             case 'modified_sales':
@@ -184,7 +188,9 @@ class PaymentTransactionDataTable extends DataTable
                 break;
 
             case 'cash_reciept':
-                $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance');
+                $model = $model->whereIn('payment_way', ['by_cash', 'by_check', 'by_account'])->whereNotNull('voucher_number')->where('remark', '!=', 'Opening balance')->whereHas('customer', function ($query) {
+                    $query->whereNull('deleted_at');
+                });
                 break;
 
             case 'cancelled':

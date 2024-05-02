@@ -399,6 +399,7 @@ class OrdersController extends Controller
                     $totalAmount = round((float)str_replace(',', '', $request->total_amount));
                     $inputs['shipping_amount'] = $checkOrder->shipping_amount ? ((float)$checkOrder->shipping_amount + $shippingAmount) : null;
                     $inputs['total_amount']   = $isDraft ? 0.00 : ((float)$checkOrder->total_amount + $totalAmount);
+                    $inputs['invoice_number'] = getNewInvoiceNumber('', 'new',$request->invoice_date);
                     $inputs['updated_by'] = Auth::user()->id;
                     $order->delete();
                     $order = $checkOrder->update($inputs);
@@ -406,7 +407,7 @@ class OrdersController extends Controller
                 } else {
                     $inputs['customer_id'] = $request->customer_id;
                     $inputs['area_id'] = $request->area_id;
-                    $inputs['invoice_number'] = getNewInvoiceNumber('', 'new');
+                    $inputs['invoice_number'] = getNewInvoiceNumber('', 'new',$request->invoice_date);
                     $order = Order::create($inputs);
                     addToLog($request, 'Order', 'Create', $order);
                 }
