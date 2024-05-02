@@ -58,7 +58,7 @@ class OrdersController extends Controller
             DB::beginTransaction();
             $isDraft = $request->submit == 'draft' ? true : false;
 
-            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
+            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'created_at' =>  now()->toDateString(), 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
 
             if (!$checkOrder) {
                 $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return',$request->invoice_date) : getNewInvoiceNumber('', 'new',$request->invoice_date);
