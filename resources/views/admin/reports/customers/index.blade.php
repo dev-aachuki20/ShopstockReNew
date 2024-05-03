@@ -73,38 +73,41 @@
                     <div class="card pt-2">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4>@lang('quickadmin.reports.customer_report')</h4>
+                            <div class="form-group mb-0 d-flex justify-content-md-end filegroip m-0">
+                                @can('customer_print')
+                                <div class="col-auto px-md-1 pr-1">
+                                    <a href="{{ route('admin.reports.customer.allprint')}}" class="btn printbtn h-10 col circlebtn"  id="customer-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
+                                </div>
+                                @endcan
+                            </div>
                         </div>
                         <div class="card-body">
                             <form id="area-filter-form">
-                                <div class="row align-items-center pb-3 mb-4 cart_filter_box">
-                                    <div class="col-md-6 col-lg-6 col-xl-4 pr-xl-0 mb-md-0 mb-4">
+                                <div class="row align-items-center mb-4 cart_filter_box">
+                                    <div class="col-md-12 mb-md-0 mb-4">
                                         <div class="custom-select2 fullselect2">
-                                            <div class="form-control-inner">
-                                                <label for="area_id">Select Area</label>
+                                            <div class="form-control-inner customer-report-top">
+                                                <label for="area_id">Select Area <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">All</button></label>
                                                 <select class="form-control filter-area-select areas" name="area_id" id="area_id" multiple>
                                                     @foreach($areas as $id=>$name)
                                                         <option value="{{ $id }}" data-icon="fa fa-inr" data-balance="{{ number_format(abs(getTotalBlanceAreaWise($id)),0) }}">{{ $name }}</option>
                                                     @endforeach
                                                 </select>
-                                                {{-- <button class="closebtn">X</button> --}}
+                                                <button class="closebtn reset-filter">X</button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-auto">
+                                    {{-- <div class="col-auto">
                                         <div class="form-group mb-0 d-flex">
-                                            <button type="reset" class="btn btn-primary mr-1 col" id="reset-filter">@lang('quickadmin.qa_reset')</button>
+                                            <button type="reset" class="btn btn-primary mr-1 col reset-filter" id="reset-filter">@lang('quickadmin.qa_reset')</button>
                                         </div>
-                                    </div>
-                                    <div class="col-auto ml-auto text-end">
-                                        <div class="form-group mb-0 d-flex justify-content-md-end filegroip m-0">
-                                            @can('customer_print')
-                                            <div class="col-auto px-md-1 pr-1">
-                                                <a href="{{ route('admin.reports.customer.allprint')}}" class="btn printbtn h-10 col circlebtn"  id="customer-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
-                                            </div>
-                                            @endcan
+                                    </div> --}}
+                                    {{-- <div class="col-auto">
+                                        <div class="form-group mb-0 d-flex">
+                                            <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">Select All</button>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </form>
 
@@ -168,7 +171,9 @@
         $(document).on('change','#area-filter-form #area_id', function(e)
         {
             e.preventDefault();
-            selectedFilterAreaValues = [];
+            // selectedFilterAreaValues = [];
+            var selectedAreas = $(this).val();
+            selectedFilterAreaValues = selectedAreas ? selectedAreas : [];
             // Clear all checkboxes
             $('.dt_checkbox').prop('checked', false);
             $('#dt_cb_all').prop('checked', false);
@@ -177,7 +182,10 @@
                 selectedFilterAreaValues.push($(this).val());
             });
 
+            // console.log(selectedFilterAreaValues);
             var area_ids = selectedFilterAreaValues.join(',');
+            // console.log(area_ids);
+
             var hrefurl = "{{ route('admin.reports.customer.index') }}?area_id=" + encodeURIComponent(area_ids);
             var printUrl = "{{ route('admin.reports.customer.allprint') }}?area_id=" + encodeURIComponent(area_ids);
             //Update the DataTable URL and print link
@@ -186,7 +194,31 @@
 
         });
 
-        $(document).on('click','#reset-filter', function(e)
+        // Select All Area
+        $(document).on('click','#area-filter-form .select-all-area', function(e)
+        {
+            e.preventDefault();
+            selectedFilterAreaValues = [];
+            // Clear all checkboxes
+            $('.dt_checkbox').prop('checked', false);
+            $('#dt_cb_all').prop('checked', false);
+            $('#area_id option').each(function() {
+                selectedFilterAreaValues.push($(this).val());
+            });
+
+            // Select all options in the select box
+            $('#area-filter-form #area_id').val(selectedFilterAreaValues).trigger('change');
+            // var area_ids = selectedFilterAreaValues.join(',');
+            // var hrefurl = "{{ route('admin.reports.customer.index') }}?area_id=" + encodeURIComponent(area_ids);
+            // var printUrl = "{{ route('admin.reports.customer.allprint') }}?area_id=" + encodeURIComponent(area_ids);
+            // //Update the DataTable URL and print link
+            // DataaTable.ajax.url(hrefurl).load();
+            // $('#customer-print').attr('href', printUrl);
+
+        });
+
+
+        $(document).on('click','.reset-filter', function(e)
         {
             e.preventDefault();
             $('#area-filter-form')[0].reset();

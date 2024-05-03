@@ -35,11 +35,12 @@ class CustomerController extends Controller
         return $dataTable->render('admin.customer.index');
     }
 
-    public function customerList(Request $request,CustomerListDataTable $dataTable)
+    public function customerList(Request $request, CustomerListDataTable $dataTable)
     {
         $listtype = $request->listtype ?? 'ledger';
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return $dataTable->with(['listtype'=>$listtype])->render('admin.customer.list',compact('listtype'));
+        $areas = Area::pluck('address','id');
+        return $dataTable->with(['listtype'=>$listtype])->render('admin.customer.list',compact('listtype','areas'));
     }
 
 
@@ -237,6 +238,59 @@ class CustomerController extends Controller
         return response()->json(['success' => 'Delete successfully.']);
     }
 
+    // print customers
+
+    public function allCustomerPrintView(Request $request)
+    {
+        abort_if(Gate::denies('customer_print'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $query = Customer::query();
+        $areaNames = [];
+
+        if(request()->has('area_id') && !empty(request()->area_id))
+        {
+            $area_ids = explode(',', request()->area_id);
+            $area_ids = array_map('intval', $area_ids);
+            $query->whereIn('area_id', $area_ids);
+            $areaNames = Area::whereIn('id', $area_ids)->pluck('address')->toArray();
+        }
+
+        if(request()->has('customer_id') && !empty(request()->customer_id))
+        {
+            $customer_ids = explode(',', request()->customer_id);
+            $customer_ids = array_map('intval', $customer_ids);
+            $query->whereIn('id', $customer_ids);
+        }
+
+        $listtype = isset(request()->listtype) && request()->listtype ? $request->listtype  : 'ledger';
+        switch ($listtype) {
+            case 'ledger':
+                $query = $query->newQuery()
+                ->select('customers.*')
+                ->whereExists(function ($query) {
+                    $query->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
+                        ->selectRaw("SUM(CASE WHEN payment_type='credit' THEN amount ELSE 0 END) AS total_credit_amount")
+                        ->selectRaw("SUM(CASE WHEN payment_type = 'debit' THEN amount ELSE 0 END) - SUM(CASE WHEN payment_type = 'credit' THEN amount ELSE 0 END) AS total_balance")
+                        ->from('payment_transactions')
+                        ->whereColumn('payment_transactions.customer_id', 'customers.id')
+                        // ->where('payment_transactions.remark', '<>', 'Opening balance')
+                        ->whereNull('payment_transactions.deleted_at')
+                        ->groupBy('payment_transactions.customer_id')
+                        ->havingRaw('total_balance != 0');
+                });
+
+                break;
+
+            case 'all':
+                $query = $query->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
+                break;
+            default:
+            return abort(404);
+            break;
+        }
+        $allcustomers = $query->with('area')->get();
+        return view('admin.customer.print-customer-list',compact('allcustomers','areaNames'))->render();
+    }
 
     public function historyFilter(Request $request)
     {

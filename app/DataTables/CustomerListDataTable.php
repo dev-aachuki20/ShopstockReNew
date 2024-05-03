@@ -24,6 +24,11 @@ class CustomerListDataTable extends DataTable
     {
         return datatables()
         ->eloquent($query)
+            ->addColumn('checkbox', function ($row) {
+                $checkbox = "";
+                $checkbox = '<input type="checkbox" class="dt_checkbox" name="customer_ids[]" value="' . $row->id . '">';
+                return $checkbox;
+            })
             ->addIndexColumn()
             ->editColumn('name',function($row){
                 return $row->name ?? "";
@@ -65,7 +70,7 @@ class CustomerListDataTable extends DataTable
                 // }
                 return $action;
             })
-            ->rawColumns(['action','debit','credit']);
+            ->rawColumns(['action','debit','credit','checkbox']);
     }
 
     /**
@@ -77,7 +82,7 @@ class CustomerListDataTable extends DataTable
         switch ($listtype) {
 
             case 'ledger':
-                $query = $model->newQuery()
+                $model = $model->newQuery()
                 ->select('customers.*')
                 ->whereExists(function ($query) {
                     $query->selectRaw("SUM(CASE WHEN payment_type='debit' THEN amount ELSE 0 END) AS total_debit_amount")
@@ -94,14 +99,21 @@ class CustomerListDataTable extends DataTable
                 break;
 
             case 'all':
-                $query = $model->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
+                $model = $model->newQuery()->select(['customers.*'])/* ->orderBy('Name','ASC') */;
                 break;
             default:
             return abort(404);
             break;
         }
 
-        return $this->applyScopes($query);
+        if(request()->has('area_id') && !empty(request()->area_id))
+        {
+            $area_ids = explode(',', request()->area_id);
+            $area_ids = array_map('intval', $area_ids);
+            $model = $model->whereIn('area_id', $area_ids);
+        }
+
+        return $this->applyScopes($model);
     }
 
     /**
@@ -118,15 +130,8 @@ class CustomerListDataTable extends DataTable
                     ])
                     ->columns($this->getColumns())
                     ->minifiedAjax()
-                    ->dom('lBfrtip')
-                    ->orderBy(1 ,'asc')
-                    // ->selectStyleSingle()
-                    ->buttons([
-                        // Button::make('excel'),
-                        // Button::make('csv'),
-                        // Button::make('pdf'),
-                        // Button::make('print'),
-                    ]);
+                    ->dom('lfrtip')
+                    ->orderBy(1 ,'asc');
     }
 
     /**
@@ -136,7 +141,8 @@ class CustomerListDataTable extends DataTable
     {
         return [
 
-            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
+            Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
+            Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)->visible(false),
             Column::make('name')->title(trans('quickadmin.customers.fields.name')),
             Column::make('phone_number')->title(trans('quickadmin.customers.fields.phone_number')),
             Column::make('debit')->title(trans('quickadmin.transaction.fields.debit_amount')),

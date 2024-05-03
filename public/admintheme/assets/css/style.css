@@ -14111,7 +14111,7 @@ button#addProductBtn {
     right: 0;
 }
 .fixed_Search .dataTables_wrapper .dataTables_length {
-    margin-bottom: 20px;
+    margin-bottom: 6px;
 }
 
 .deleteBtn {
@@ -14560,6 +14560,14 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 }
 .order_form_submit:disabled{
     cursor: not-allowed;
+}
+.customer-report-top .select-all-area{
+    height: auto;
+    padding: 1px 10px !important;
+    line-height: normal;
+    transform: translateY(-2px);
+    margin-left: 8px;
+    border-radius: 5px;
 }
 
 @media (max-width: 1550px) {
