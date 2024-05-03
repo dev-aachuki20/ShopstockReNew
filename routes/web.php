@@ -20,9 +20,10 @@ use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\PaymentTransactionsController;
 use App\Http\Controllers\PasswordProtectionController;
 use App\Http\Controllers\ReportsCustomerController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
-
+use Illuminate\Support\Facades\Session;
 
 // Authentication Routes
 Route::group(['middleware' => 'guest'], function () {
@@ -100,6 +101,12 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
 
     Route::get('order/print-pdf/{orderid}',[OrdersController::class, 'printPdf'])->name('order.printPdf');
     Route::get('order/allprint',[OrdersController::class,'allSelectedOrderPrint'])->name('order.allprint');
+    Route::post('order/store-session-data', function(Request $request) {
+        $key = $request->key;
+        $data = $request->data;
+        Session::put($key, $data);
+        return response()->json(['message' => 'Session data stored successfully']);
+    })->name('order.storeSessionData');
 
     Route::resource('/transactions', PaymentTransactionsController::class);
     Route::get('transaction/{type}', [PaymentTransactionsController::class, 'typeFilter'])->name('transactions.type');

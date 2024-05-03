@@ -241,110 +241,110 @@
         </table>
     </header>
 
-        <main>
-            <table id="ItemTable" class="table ">
-                <thead>
-                    <tr>
-                        <th class="text-center" style="padding-left:5px; padding-right:5px">@lang('quickadmin.order.fields.sno')</th>
-                        <th class="text-left">@lang('quickadmin.order.fields.product_name')</th>
-                        <th class="text-left">@lang('quickadmin.order.fields.quantity')</th>
-                        <th  class="text-center">@lang('quickadmin.order.fields.price')</th>
-                        <th class="text-center" style="padding-left:1px">@lang('quickadmin.order.fields.sub_total')</th>
-                    </tr>
+    <main>
+        <table id="ItemTable" class="table ">
+            <thead>
+                <tr>
+                    <th class="text-center" style="padding-left:5px; padding-right:5px">@lang('quickadmin.order.fields.sno')</th>
+                    <th class="text-left">@lang('quickadmin.order.fields.product_name')</th>
+                    <th class="text-left">@lang('quickadmin.order.fields.quantity')</th>
+                    <th  class="text-center">@lang('quickadmin.order.fields.price')</th>
+                    <th class="text-center" style="padding-left:1px">@lang('quickadmin.order.fields.sub_total')</th>
+                </tr>
 
-                </thead>
+            </thead>
 
-                <tbody>
-                    @php
-                        $sno = 0;
-                    @endphp
-                    @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_by')->get() as $item)
-                    <tr>
-                        <td class="text-align-center" style="padding-left:1px; padding-left:5px;">{{ ++$sno }}</td>
-                        <td class="HI">
-                            {{ ucfirst($item->product->name) }}
-                            @if(!is_null($item->is_sub_product))
-                                ({{ $item->is_sub_product ?? '' }})
-                            @endif
+            <tbody>
+                @php
+                    $sno = 0;
+                @endphp
+                @foreach($order->orderProduct()->withTrashed()->whereNull('deleted_by')->get() as $item)
+                <tr>
+                    <td class="text-align-center" style="padding-left:1px; padding-left:5px;">{{ ++$sno }}</td>
+                    <td class="HI">
+                        {{ $item->product ? ucfirst($item->product->name) : '' }}
+                        @if(!is_null($item->is_sub_product))
+                            ({{ $item->is_sub_product ?? '' }})
+                        @endif
 
-                            @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
-                                <p style="margin-top:0px; margin-bottom:0px;">{!! glassProductMeasurement($item->other_details,'one_line') !!}</p>
-                            @endif
+                        @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
+                            <p style="margin-top:0px; margin-bottom:0px;">{!! glassProductMeasurement($item->other_details,'one_line') !!}</p>
+                        @endif
 
-                            @if(!is_null($item->description))
-                            <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
-                            @endif
-                        </td>
-                        <td>
-                            @php
-                                $quantityString = '';
-                                if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
-                                    if(!is_null($item->height)){
-                                        $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
-                                    }
-
-                                    if(!is_null($item->height) && !is_null($item->width)){
-                                        $quantityString .= ' x ';
-                                    }else if(!is_null($item->height) && !is_null($item->length)){
-                                        $quantityString .= ' x ';
-                                    }
-
-                                    if(!is_null($item->width)){
-                                        $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
-                                    }
-
-                                    if(!is_null($item->length) && !is_null($item->width)){
-                                        $quantityString .= ' x ';
-                                    }else if(!is_null($item->height) && !is_null($item->length)){
-                                        $quantityString .= ' x ';
-                                    }
-
-                                    if(!is_null($item->length)){
-                                        $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
-                                    }
-
-                                    if($quantityString !=''){
-                                        $quantityString .= ' - ';
-                                    }
+                        @if(!is_null($item->description))
+                        <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
+                        @endif
+                    </td>
+                    <td>
+                        @php
+                            $quantityString = '';
+                            if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
+                                if(!is_null($item->height)){
+                                    $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
                                 }
-                                if(!is_null($item->quantity)){
-                                    $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
+
+                                if(!is_null($item->height) && !is_null($item->width)){
+                                    $quantityString .= ' x ';
+                                }else if(!is_null($item->height) && !is_null($item->length)){
+                                    $quantityString .= ' x ';
                                 }
-                            @endphp
+
+                                if(!is_null($item->width)){
+                                    $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
+                                }
+
+                                if(!is_null($item->length) && !is_null($item->width)){
+                                    $quantityString .= ' x ';
+                                }else if(!is_null($item->height) && !is_null($item->length)){
+                                    $quantityString .= ' x ';
+                                }
+
+                                if(!is_null($item->length)){
+                                    $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
+                                }
+
+                                if($quantityString !=''){
+                                    $quantityString .= ' - ';
+                                }
+                            }
+                            if(!is_null($item->quantity)){
+                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
+                            }
+                        @endphp
 
 
-                            {{ $quantityString }}
-                        </td>
-                        <td class="text-center">{{ removeTrailingZeros($item->price) }}</td>
-                        <td class="text-center">{{ number_format(round($item->total_price),0) }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-                <tfoot style="border-top: 1px solid #000000;">
-                    @if($order->is_add_shipping)
-                        <tr style="border: 1px solid #000000;">
-                            <td colspan="3" style="text-align:right; "></td>
-                            <td  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Shipping Amount</b></td>
-                            <td class="text-right" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($order->shipping_amount,0) ?? 0}}</td>
-                        </tr>
-                    @endif
+                        {{ $quantityString }}
+                    </td>
+                    <td class="text-center">{{ removeTrailingZeros($item->price) }}</td>
+                    <td class="text-center">{{ number_format(round($item->total_price),0) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot style="border-top: 1px solid #000000;">
+                @if($order->is_add_shipping)
                     <tr style="border: 1px solid #000000;">
-                        <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Grand Total</b></td>
-                        <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
+                        <td colspan="3" style="text-align:right; "></td>
+                        <td  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Shipping Amount</b></td>
+                        <td class="text-right" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($order->shipping_amount,0) ?? 0}}</td>
                     </tr>
+                @endif
+                <tr style="border: 1px solid #000000;">
+                    <td colspan="4"  style="text-align:right;font-size:12px; border: 1px solid #000000;"><b>Grand Total</b></td>
+                    <td class="text-align-center" style="padding-right:5px; font-style:normal; font-weight: bold; border: 1px solid #000000;"><span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($order->total_amount),0) ?? 0}}</td>
+                </tr>
 
-                </tfoot>
-            </table>
+            </tfoot>
+        </table>
 
-            @if (getSetting('custom_invoice_print_message'))
-            <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
-            @endif
+        @if (getSetting('custom_invoice_print_message'))
+        <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
+        @endif
 
-            <h6 style="margin-left:6px;">THANK YOU</h6>
-            @if(!$loop->last)
-            <div class='breakpdf' style='page-break-before: always'></div>
-            @endif
-        </main>
+        <h6 style="margin-left:6px;">THANK YOU</h6>
+        @if(!$loop->last)
+        <div class='breakpdf' style='page-break-before: always'></div>
+        @endif
+    </main>
 
     @endforeach
 @stop

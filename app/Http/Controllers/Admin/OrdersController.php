@@ -906,11 +906,10 @@ class OrdersController extends Controller
     {
         ini_set('max_execution_time', 300);
         try{
-            $order_ids  = explode(',',$request->order_ids);
-            $orders = Order::with(['orderPayTransaction' => function ($query) {
-                $query->withTrashed();
-            }])->withTrashed()->whereIn('id', $order_ids)->get();
-
+            $key = $request->query('key');
+            $order_ids = session()->get($key);
+            $orders = Order::with(['orderPayTransaction'])->whereIn('id', $order_ids)->get();
+            session()->forget($key);
             $pdfData['title'] = $title = time().'_estimate';
             $pdfData['orders'] = $orders;
             $pdfFileName = 'order_invoice_all.pdf';
@@ -921,7 +920,7 @@ class OrdersController extends Controller
             //return view('admin.exports.pdf.all-print',compact("pdfData","title"));
 
         }catch(\Exception $e){
-            //dd($e->getMessage());
+            dd($e->getMessage());
             return abort(404);
         }
     }
