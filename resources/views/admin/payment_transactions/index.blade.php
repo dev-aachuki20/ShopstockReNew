@@ -202,44 +202,43 @@ $(document).ready(function() {
         });
     });
 
-    // $(document).on('click', '#order-print',function(e)
-    // {
-    //     if (order_selectedIds.length > 0) {
-    //         var printUrl = "{{ route('admin.order.allprint') }}?order_ids=" + encodeURIComponent(order_selectedIds.join(','));
-    //         window.open(printUrl, '_blank');
-    //     }else{
-    //         swal("Print", 'Please Select Some Record', 'error');
-    //     }
-    // });
-
-    $(document).on('click', '#order-print', function(e) {
-        e.preventDefault();
-        var key = 'order_selectedIds';
-
+    $(document).on('click', '#order-print',function(e)
+    {
         if (order_selectedIds.length > 0) {
-            $.ajax({
-                url: "{{ route('admin.order.storeSessionData') }}",
-                type: "POST",
-                data: { key: key, data: order_selectedIds },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    var printUrl = "{{ route('admin.order.allprint') }}?key=" + encodeURIComponent(key);
-                    window.open(printUrl, '_blank');
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error storing session data:", error);
-                }
-            });
-
-            console.log("Session value after setting:", sessionStorage.getItem(key));
-            var printUrl = "{{ route('admin.order.allprint') }}?key=" + encodeURIComponent(key);
+            var printUrl = "{{ route('admin.order.allprint') }}?order_ids=" + encodeURIComponent(order_selectedIds.join(','));
             window.open(printUrl, '_blank');
-        } else {
+        }else{
             swal("Print", 'Please Select Some Record', 'error');
         }
     });
+
+    // orderids using session
+    // $(document).on('click', '#order-prinnnt', function(e) {
+    //     e.preventDefault();
+    //     var key = 'order_selectedIds';
+    //     if (order_selectedIds.length > 0) {
+    //         $.ajax({
+    //             url: "{{ route('admin.order.storeSessionData') }}",
+    //             type: "POST",
+    //             data: { key: key, data: order_selectedIds },
+    //             headers: {
+    //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //             },
+    //             success: function(response) {
+    //                 var printUrl = "{{ route('admin.order.allprint') }}?key=" + encodeURIComponent(key);
+    //                 window.open(printUrl, '_blank');
+    //             },
+    //             error: function(xhr, status, error) {
+    //                 console.error("Error storing session data:", error);
+    //             }
+    //         });
+    //         console.log("Session value after setting:", sessionStorage.getItem(key));
+    //         var printUrl = "{{ route('admin.order.allprint') }}?key=" + encodeURIComponent(key);
+    //         window.open(printUrl, '_blank');
+    //     } else {
+    //         swal("Print", 'Please Select Some Record', 'error');
+    //     }
+    // });
 
 
 });

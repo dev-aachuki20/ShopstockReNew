@@ -907,9 +907,12 @@ class OrdersController extends Controller
         ini_set('max_execution_time', 300);
         try{
             $key = $request->query('key');
-            $order_ids = session()->get($key);
+            //  session()->forget($key);
+            // Retrieve the selected IDs from the session using the key
+            // $order_ids = session()->get($key);
+            $order_ids  = explode(',',$request->order_ids);
             $orders = Order::with(['orderPayTransaction'])->whereIn('id', $order_ids)->get();
-            session()->forget($key);
+            // session()->forget($key);
             $pdfData['title'] = $title = time().'_estimate';
             $pdfData['orders'] = $orders;
             $pdfFileName = 'order_invoice_all.pdf';
