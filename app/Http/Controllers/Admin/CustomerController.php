@@ -37,8 +37,8 @@ class CustomerController extends Controller
 
     public function customerList(Request $request, CustomerListDataTable $dataTable)
     {
-        $listtype = $request->listtype ?? 'ledger';
         abort_if(Gate::denies('customer_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $listtype = $request->listtype ?? 'ledger';
         $areas = Area::pluck('address','id');
         return $dataTable->with(['listtype'=>$listtype])->render('admin.customer.list',compact('listtype','areas'));
     }

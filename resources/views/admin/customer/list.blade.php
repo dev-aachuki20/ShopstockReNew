@@ -101,7 +101,7 @@
                             <div class="col-md-12 mb-md-0 mb-4">
                                 <div class="custom-select2 fullselect2">
                                     <div class="form-control-inner customer-report-top">
-                                        <label for="area_id">Select Area <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">All</button></label>
+                                        <label for="area_id">Select Area <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">All</button> <button type="button" class="btn btn-primary mr-1 col select-all-area" id="total-area-amount">Total Amount : <i class="fa fa-inr"></i> <span class="area-wise-total-amount">0</span></button></label>
                                         <select class="form-control filter-area-select areas" name="area_id" id="area_id" multiple>
                                             @foreach($areas as $id=>$name)
                                                 <option value="{{ $id }}" data-icon="fa fa-inr" data-balance="{{ number_format(abs(getTotalBlanceAreaWise($id)),0) }}">{{ $name }}</option>
@@ -239,14 +239,22 @@
             e.preventDefault();
             var selectedAreas = $(this).val();
             selectedFilterAreaValues = selectedAreas ? selectedAreas : [];
-
             // Clear all checkboxes
             $('.dt_checkbox').prop('checked', false);
             $('#dt_cb_all').prop('checked', false);
+            var totalAmount = 0;
 
             $('#area_id option:selected').each(function() {
-                selectedFilterAreaValues.push($(this).val());
+                // selectedFilterAreaValues.push($(this).val());
+                var value = $(this).val();
+                if (selectedFilterAreaValues.indexOf(value) === -1) {
+                    selectedFilterAreaValues.push(value);
+                }
+                var balance = $(this).attr('data-balance');
+                totalAmount += parseInt(balance.replace(/,/g, ''));
             });
+
+            $('.area-wise-total-amount').html(totalAmount);
 
             var area_ids = selectedFilterAreaValues.join(',');
             var hrefurl = "{{ route('admin.customer_list') }}?area_id=" + encodeURIComponent(area_ids)+ '&listtype=' + globallisttype;
