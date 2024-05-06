@@ -294,6 +294,7 @@
             // Clear all checkboxes
             $('.dt_checkbox').prop('checked', false);
             $('#dt_cb_all').prop('checked', false);
+            $('.area-wise-total-amount').html('0');
         });
 
         $(document).on('change', '#dt_cb_all', function(e)
