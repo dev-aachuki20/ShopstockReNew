@@ -69,14 +69,7 @@ class PaymentTransactionDataTable extends DataTable
                 $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
                 if ($this->type == 'sales_return' || $this->type == 'sales'|| $this->type == 'current_estimate') {
                     if (Gate::check('estimate_edit') && $this->type != 'cancelled') {
-                       // sales me only edit and delete show only when order is created at today
-                        if($typeAction == "sales"){
-                            if($today == $date_created){
-                                 $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'">' . $editIcon . '</a>';
-                            }
-                        }else{
-                            $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
-                        }
+                        $action .= '<a href="' . route("admin.orders.edit", [$this->type, encrypt($row->order_id)]) . '" class="btn btn-icon btn-info m-1 edit_product" title="'.trans('quickadmin.qa_update').'" >' . $editIcon . '</a>';
                     }
                     if (Gate::check('estimate_show')) {
                         $action .= (($this->type == 'cancelled') && ($row->payment_way == "by_cash")) ? '' : '<a data-url="' . route('admin.orders.show', encrypt($row->order_id)) . '" href="javascript:void(0)" class="btn btn-icon btn-info m-1 view_detail" data-customerName="'.$customer_name.' ( #' .$row->voucher_number . ')" title="'.trans('quickadmin.qa_view').'" >' . $viewIcon . '</a>';
@@ -117,13 +110,7 @@ class PaymentTransactionDataTable extends DataTable
                 if($typeAction != 'modified_sales'){
                     $deleteIcon = view('components.svg-icon', ['icon' => 'delete'])->render();
                     if ((Gate::check('estimate_delete') && ($this->type == 'sales_return' || $this->type == 'sales' || $this->type == 'modified_sales' || $this->type == 'current_estimate')) || (Gate::check('transaction_delete') && $this->type == 'cash_reciept')) {
-                        if($typeAction == "sales"){
-                            if($today == $date_created){
-                                $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '" title="'.trans('quickadmin.qa_delete').'" >  ' . $deleteIcon . '</a>';
-                            }
-                        }else{
-                            $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '" title="'.trans('quickadmin.qa_delete').'" >  ' . $deleteIcon . '</a>';
-                        }
+                        $action .= '<a href="javascript:void(0)" class="btn btn-icon btn-danger m-1 delete_transaction" data-id="' . encrypt($row->id) . '" title="'.trans('quickadmin.qa_delete').'" >  ' . $deleteIcon . '</a>';
                     }
                 }
 
