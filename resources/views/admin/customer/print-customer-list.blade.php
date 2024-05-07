@@ -35,12 +35,12 @@
                     $getTotalBlance = getTotalBlance($customer->id,1);
                     $debit_blance = "";
                     if($getTotalBlance < 0){
-                        $debit_blance =  number_format(abs($getTotalBlance),2);
+                        $debit_blance =  number_format(abs($getTotalBlance/100),2);
                     }
 
                     $credit_blance = "";
                     if($getTotalBlance > 0){
-                        $credit_blance = number_format(abs($getTotalBlance),2);
+                        $credit_blance = number_format(abs($getTotalBlance/100),2);
                     }
                 @endphp
 
