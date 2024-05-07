@@ -39,7 +39,7 @@ class LoginController extends Controller
                    }
 
                     addToLog($request,'User','Login successfully');
-                    return redirect()->route('admin.orders.create')->with(['success' => true,
+                    return redirect()->route('admin.transactions.type',['sales'])->with(['success' => true,
                     'message' => trans('quickadmin.qa_login_success'),
                     'title'=> trans('quickadmin.qa_login'),
                     'alert-type'=> trans('quickadmin.alert-type.success')]);
