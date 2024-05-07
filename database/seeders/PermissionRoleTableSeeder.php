@@ -19,7 +19,7 @@ class PermissionRoleTableSeeder extends Seeder
         $roles = Role::all();
         $superadminpermissionid = Permission::all();
 
-        $adminpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit', 'user_change_password' , 'customer_management_access', 'customer_access', 'transaction_management_access','estimate_access', 'estimate_create','estimate_show'])->pluck('id')->toArray();
+        $adminpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit', 'user_change_password' , 'customer_management_access', 'customer_access', 'transaction_management_access','estimate_access','estimate_show','estimate_ledger_print','estimate_statement_print'])->pluck('id')->toArray();
 
         $staffpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit' , 'user_change_password' , 'product_access', 'product_create', 'product_edit', 'product_delete', 'product_undo', 'product_print', 'product_export', 'estimate_management_access' ,'estimate_access' , 'estimate_create' ,'estimate_show' , 'estimate_cancelled_show', 'estimate_edit', 'estimate_history', 'estimate_delete','estimate_print','transaction_management_access', 'transaction_access', 'transaction_create','transaction_edit' ,'transaction_delete'])->pluck('id')->toArray();
 

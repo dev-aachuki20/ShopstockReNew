@@ -15,13 +15,13 @@
         </a>
     </li>
 
-    @can('role_access')
+    {{-- @can('role_access')
     <li class="{{ Request::is('roles*') ? 'active' : '' }}">
         <a href="{{route('roles.index')}}" class="nav-link">
             <x-side-bar-svg-icon icon="user" />
             <span>@lang('quickadmin.roles.title')</span></a>
     </li>
-    @endcan
+    @endcan --}}
 
     @can('staff_access')
     <li class="{{ Request::is('staff*') ? 'active' : '' }}">
