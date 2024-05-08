@@ -53,12 +53,18 @@ class OrdersController extends Controller
     public function store(StoreOrdersRequest $request)
     {
         abort_if(Gate::denies('estimate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        // dd($request->all());
+
         try{
             DB::beginTransaction();
             $isDraft = $request->submit == 'draft' ? true : false;
-
-            $checkOrder = Order::where(['customer_id' => $request->customer_id, 'created_at' =>  now()->toDateString(), 'invoice_date' => $request->invoice_date, 'is_draft' => $isDraft, 'order_type' => $request->order_type])->first();
+            $checkOrder = Order::where([
+                'customer_id' => $request->customer_id,
+                'is_draft' => $isDraft,
+                'order_type' => $request->order_type
+            ])
+            ->where('invoice_date', 'like', '%' . $request->invoice_date . '%')
+            ->whereRaw("DATE(created_at) = CURDATE()") // comparing with current date
+            ->first();
 
             if (!$checkOrder) {
                 $invoiceNumber = $request->order_type == 'return' ? getNewInvoiceNumber('', 'return',$request->invoice_date) : getNewInvoiceNumber('', 'new',$request->invoice_date);

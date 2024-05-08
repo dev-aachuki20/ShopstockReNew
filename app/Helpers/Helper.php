@@ -8,6 +8,7 @@ use App\Models\LogActivity;
 use Carbon\Carbon;
 use App\Models\RoleIp;
 use App\Models\RoleIpPermission;
+use App\Models\User;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str as Str;
@@ -514,3 +515,68 @@ if (!function_exists('getTotalBlanceAreaWise')) {
         return $totalBalance;
     }
 }
+
+// Firebase Send Notification
+
+/* Send Notification to Users */
+if (!function_exists('sendNotification')) {
+    function sendNotification($user_id, $subject, $message, $section, $notification_type = null, $data = null)
+    {
+        try {
+			$firebaseToken = User::where('is_active', 1)->where('id', $user_id)->whereNotNull('device_token')->pluck('device_token')->all();
+
+			\Log::info(['firebaseToken' => $firebaseToken]);
+			$response = null;
+			if($firebaseToken){
+				$SERVER_API_KEY = env('FIREBASE_SECRET_KEY');
+
+				\Log::info(['SERVER_API_KEY' => $SERVER_API_KEY]);
+
+				$notification = [
+					"title" => $subject,
+					"body" 	=> $message,
+					"sound" => "default",
+					"alert" => "New"
+				];
+
+				$bodydata = [
+					"title"=> $subject,
+					"body" => $message,
+					"data" => $data,
+					"type" => $section,
+				];
+
+				$data = [
+					"registration_ids"	=> $firebaseToken,
+					"notification" 		=> $notification,
+					"priority"			=> "high",
+					"contentAvailable" 	=> true,
+					"data" 				=> $bodydata
+				];
+				$encodedData = json_encode($data);
+				$headers = [
+					'Authorization: key=' . $SERVER_API_KEY,
+					'Content-Type: application/json',
+				];
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+				$response = curl_exec($ch);
+                if ($response === FALSE) {
+                    die('Curl failed: ' . curl_error($ch));
+                }
+                // Close connection
+                curl_close($ch);
+			}
+			\Log::info('Response ' . $response);
+			return $response;
+		} catch (\Exception $e) {
+			\Log::info($e->getMessage().' '.$e->getFile().' '.$e->getCode());
+		}
+    }
+}
+
