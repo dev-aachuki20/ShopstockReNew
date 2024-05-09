@@ -19,16 +19,20 @@
                 @can('estimate_date_filter_access')
                     @if($type != 'modified_sales' && $type != 'current_estimate' && $type!='sales_return' && $type!='cancelled')
                     <div class="col-md-8">
-                        <form class="row">
+                        <form class="row estimate-trans-topform">
                             <div class="col-md-4 form-group date_main_show">
-
                                 <input type="date" class="form-control dateshow" name="start_date" id="start_date" value="{{$_GET['start_date']??''}}" autocomplete="false">
                             </div>
                             <div class="col-md-4 form-group date_main_show">
                                 <input type="date" class="form-control dateshow" name="end_date" id="end_date"   value="{{$_GET['end_date']??''}}" autocomplete="false">
                             </div>
-                            <div class="col-md-2">
-                            <input type="submit" class="btn btn-sm btn-success" value="Submit">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-start estimate-trans-top">
+                                    <input type="submit" class="btn btn-sm btn-success" value="Submit">
+                                    <div class="form-group">
+                                        <button type="reset" class="btn btn-primary mr-1 col reset-filter" id="reset-filter">@lang('quickadmin.qa_reset')</button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -210,6 +214,16 @@ $(document).ready(function() {
         }else{
             swal("Print", 'Please Select Some Record', 'error');
         }
+    });
+
+
+    $(document).on('click','.reset-filter', function(e)
+    {
+        e.preventDefault();
+        var currentUrl = window.location.href;
+        // Remove the query parameters
+        var urlWithoutParams = currentUrl.split('?')[0];
+        window.location.href = urlWithoutParams;
     });
 
     // orderids using session

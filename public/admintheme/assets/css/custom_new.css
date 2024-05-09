@@ -875,6 +875,25 @@ table.dataTable tbody>tr:nth-child(even){
     align-items: end !important;
     padding-bottom: 0px !important;
 }
+.estimate-trans-top>.form-group{
+    margin-bottom: 0;
+    margin-left: 6px;
+}
+.estimate-trans-top>.form-group .reset-filter{
+    padding: 2px 15px !important;
+    font-size: 12px !important;
+    height: auto;
+}
+.estimate-trans-topform .form-group>input{
+    height: auto !important;
+}
+.estimate-trans-top>.btn-success{
+    margin: 0;
+}
+.estimate-trans-topform>.form-group{
+    margin-bottom: 0;
+}
+
 
 
 /* ------------Responsive Css------------ */
@@ -960,6 +979,15 @@ table.dataTable tbody>tr:nth-child(even){
         max-width: 14%;
     }
 }*/
+
+@media screen and (max-width: 767px){
+    .estimate-trans-topform{
+        margin-top: 10px;
+    }
+    .estimate-trans-topform .form-group{
+        margin-bottom: 12px;
+    }
+}
 
 @media screen and (max-width: 575px){
     #addGlassProductDetailModal .glass-product-item>.row .form-group,
