@@ -90,13 +90,21 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script type="text/javascript">
+var order_selectedIds = [];
 $(document).ready(function() {
     var DataaTable = $('#payment_transaction-table').DataTable();
-    var order_selectedIds = [];
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
+    });
+
+    $(document).on('draw.dt','#payment_transaction-table', function (e) {
+        e.preventDefault();
+        $('html, body').animate({
+            scrollTop: 0
+        }, 'fast');
     });
 
     $(document).on('click', '.view_detail', function() {
@@ -200,10 +208,12 @@ $(document).ready(function() {
     $(document).on('change', '.dt_checkbox', function(e)
     {
         e.preventDefault();
-        order_selectedIds = [];
+        // order_selectedIds = [];
         $('.dt_checkbox:checked').each(function() {
             order_selectedIds.push($(this).val());
         });
+
+        order_selectedIds = Array.from(new Set(order_selectedIds));
     });
 
     $(document).on('click', '#order-print',function(e)
