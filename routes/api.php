@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\NotificationSendController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 
@@ -24,13 +25,7 @@ use App\Http\Controllers\Api\ProductController;
 // });
 
 
-Route::group(['middleware' => 'checkDevice'], function () {
+Route::post('/store-token', [NotificationSendController::class, 'updateDeviceToken']);
 
-    Route::middleware(['auth:sanctum'])->group(function () {
-
-
-    });
-
-});
-
+Route::get('/get-notifications', [NotificationSendController::class, 'getAllNotification']);
 

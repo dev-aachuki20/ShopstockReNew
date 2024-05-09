@@ -1,6 +1,17 @@
 
 <div class="panel panel-default col-md-12">
     <div class="panel-body row">
+
+        <div class="col-md-4 form-group">
+            <label for="voucher_number" class="control-label">{{ trans("quickadmin.transaction.fields.voucher_number")}}</label>
+            <input type="text" value="{{ isset($invoice_number) ? $invoice_number : old('voucher_number') }}" class="form-control" autocomplete="off" id="voucher_number" name="voucher_number">
+            @if($errors->has('voucher_number'))
+            <p class="help-block red text-danger">
+                {{ $errors->first('voucher_number') }}
+            </p>
+            @endif
+        </div>
+
         <div class="col-md-4 form-group formValidate">
             {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
             <select class="form-control select2" name="customer_id" id="customer_id" required>

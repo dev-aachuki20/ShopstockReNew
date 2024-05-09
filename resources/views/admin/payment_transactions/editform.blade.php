@@ -1,18 +1,24 @@
 <div class="panel panel-default col-md-12">
     <div class="panel-body row col-md-12">
+        <input type="hidden" name="id" value="{{ $transaction->id ?? old('id') }}">
+        <div class="col-md-4 form-group">
+            <label for="voucher_number" class="control-label">{{ trans("quickadmin.transaction.fields.voucher_number")}}</label>
+            <input type="text" value="{{ $transaction->voucher_number ?? old('voucher_number') }}" class="form-control" autocomplete="off" id="voucher_number" name="voucher_number">
+            <div class="error_voucher_number text-danger error"></div>
+        </div>
 
-            <div class="col-md-4 form-group">
-                {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
-                {!! Form::select('customer_id', $customers, $transaction->customer_id??'', ['class' => 'form-control select2', 'required' => '' , 'readonly'=>'readonly']) !!}
-                <div class="error_customer_id text-danger error"></div>
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('customer_id', trans('quickadmin.transaction.fields.customer').'*', ['class' => 'control-label']) !!}
+            {!! Form::select('customer_id', $customers, $transaction->customer_id??'', ['class' => 'form-control select2', 'required' => '' , 'readonly'=>'readonly']) !!}
+            <div class="error_customer_id text-danger error"></div>
+        </div>
 
-            <div class="col-md-4 form-group">
-                {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
-                {!! Form::hidden('payment_type','credit') !!}
-                {!! Form::select('payment_way', $paymentWays, $transaction->payment_way??'', ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
-                <div class="error_payment_way text-danger error"></div>
-            </div>
+        <div class="col-md-4 form-group">
+            {!! Form::label('payment_mode', trans('quickadmin.transaction.fields.payment_mode').'*', ['class' => 'control-label']) !!}
+            {!! Form::hidden('payment_type','credit') !!}
+            {!! Form::select('payment_way', $paymentWays, $transaction->payment_way??'', ['class' => 'payment_mode form-control select2', 'required' => '']) !!}
+            <div class="error_payment_way text-danger error"></div>
+        </div>
 
 
         <div class="col-md-4 extra_detail_row" style="display: {{ (($transaction->payment_way??'') != '' && ($transaction->payment_way??'') !='by_cash') ?'block':'none' }}">

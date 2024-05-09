@@ -781,5 +781,39 @@ return [
 	'thaila' => 'थैला',
 	'qa_payment_history' => 'Payment History',
 
+    'notify_subject' => [
+        'order_create'          => 'New Estimate Added!',
+        'order_edit'            => 'Estimate Updated!',
+        'order_delete'          => 'Estimate Deleted!',
+        'order_return_create'   => 'New Estimate Return Added!',
+        'order_return_edit'     => 'Estimate Return Updated!',
+        'order_return_delete'   => 'Estimate Return Deleted!',
+        'cash_receipt_create'   => 'New Cash Receipt Added!',
+        'cash_receipt_edit'     => 'Cash Receipt Updated!',
+        'cash_receipt_delete'   => 'Cash Receipt Deleted!',
+    ],
 
+    'notify_message' => [
+        'order_create'          => 'New Estimate of :party_name [:invoice_number] Created by :created_by!',
+        'order_edit'            => 'Estimate of :party_name [:invoice_number] Updated by :created_by!',
+        'order_delete'          => 'Estimate of :party_name [:invoice_number] Deleted by :created_by!',
+        'order_return_create'   => 'New Estimate Return of :party_name [:invoice_number] Created by :created_by!',
+        'order_return_edit'     => 'Estimate Return of :party_name [:invoice_number] Updated by :created_by!',
+        'order_return_delete'   => 'Estimate Return of :party_name [:invoice_number] Deleted by :created_by!',
+        'cash_receipt_create'   => 'New Cash Receipt of :party_name [:invoice_number] Created by :created_by!',
+        'cash_receipt_edit'     => 'Cash Receipt of :party_name [:invoice_number] Updated by :created_by!',
+        'cash_receipt_delete'   => 'Cash Receipt of :party_name [:invoice_number] Deleted by :created_by!',
+    ],
+
+    'notification_type' => [
+        'order_create'          => 'order_create',
+        'order_edit'            => 'order_edit',
+        'order_delete'          => 'order_delete',
+        'order_return_create'   => 'order_return_create',
+        'order_return_edit'     => 'order_return_edit',
+        'order_return_delete'   => 'order_return_delete',
+        'cash_receipt_create'   => 'cash_receipt_create',
+        'cash_receipt_edit'     => 'cash_receipt_edit',
+        'cash_receipt_delete'   => 'cash_receipt_delete',
+    ],
 ];

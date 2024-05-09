@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\DataTables\PaymentTransactionDataTable;
 use App\Models\Customer;
 use App\Http\Requests\PaymentTransactions\StoreUpdatePaymentTransactionsRequest;
+use App\Models\Notification;
 use App\Models\PaymentTransaction;
 use App\Models\PaymentTransactionHistory;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -30,10 +32,13 @@ class PaymentTransactionsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('transaction_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-         $customers = Customer::select('id', 'name', 'credit_limit', 'is_type')->orderBy('id', 'desc')->get();
+        $customers = Customer::select('id', 'name', 'credit_limit', 'is_type')->orderBy('id', 'desc')->get();
         $paymentTypes = array('' => trans('quickadmin.qa_please_select_customer'), 'credit' => 'Credit', 'debit' => 'Debit');
         $paymentWays = array('by_cash' => 'By Cash', 'by_check' => 'By Check', 'by_account' => 'By Account');
-        return view('admin.payment_transactions.create', compact('customers', 'paymentTypes', 'paymentWays'));
+
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $invoice_number = getNewInvoiceNumber('','new_cash_receipt',$currentDate);
+        return view('admin.payment_transactions.create', compact('customers', 'paymentTypes', 'paymentWays','invoice_number'));
     }
 
     /**
@@ -44,11 +49,20 @@ class PaymentTransactionsController extends Controller
         abort_if(Gate::denies('transaction_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $inputs = $request->all();
         $inputs['remark'] = is_null($inputs['remark']) ? 'Cash reciept' : $inputs['remark'];
-        $inputs['voucher_number'] = getNewInvoiceNumber('','new_cash_receipt',$request->entry_date);
+        $inputs['voucher_number'] = $request->voucher_number ? $request->voucher_number : getNewInvoiceNumber('','new_cash_receipt',$request->entry_date);
 
         $payment = PaymentTransaction::create($inputs);
         addToLog($request,'Cash receipt','Create', $payment);
         $this->recordCashReceiptHistory($payment, $request->all());
+
+        $message = trans('quickadmin.notify_message.cash_receipt_create',['party_name' => $payment->customer->name,'invoice_number'=>$payment->voucher_number,'created_by'=>auth()->user()->name]);
+        $notify_data = [
+            'subject'           => trans('quickadmin.notify_subject.cash_receipt_create'),
+            'message'           => $message,
+            'notification_type' => trans('quickadmin.notification_type.cash_receipt_create')
+        ];
+        storeNotification($notify_data);
+
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
 
@@ -106,6 +120,15 @@ class PaymentTransactionsController extends Controller
         addToLog($request,'Cash receipt','Edit', $newValue ,$oldvalue);
         // Record history
         $this->recordCashReceiptHistory($transaction, $request->all());
+
+        $message = trans('quickadmin.notify_message.cash_receipt_edit',['party_name' => $transaction->customer->name,'invoice_number'=>$transaction->voucher_number,'created_by'=>auth()->user()->name]);
+        $notify_data = [
+            'subject'           => trans('quickadmin.notify_subject.cash_receipt_edit'),
+            'message'           => $message,
+            'notification_type' => trans('quickadmin.notification_type.cash_receipt_edit')
+        ];
+        storeNotification($notify_data);
+
         return response()->json(['success' => 'Update successfully.']);
     }
 
@@ -122,12 +145,34 @@ class PaymentTransactionsController extends Controller
     public function destroy(string $id)
     {
         // abort_if(Gate::denies('transaction_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // dd($id);
         $id = decrypt($id);
         $transaction  = PaymentTransaction::findOrFail($id);
-        if(!is_null($transaction->order)){
+        if(!is_null($transaction->order))
+        {
+            $message = trans('quickadmin.notify_message.order_' . ($transaction->order->order_type == 'create' ? 'delete' : 'return_delete'), [
+                'party_name' => $transaction->order->customer->name,
+                'invoice_number' =>$transaction->order->invoice_number,
+                'created_by' => auth()->user()->name
+            ]);
+            $notify_data = [
+                'subject' => trans('quickadmin.notify_subject.order_' . ($transaction->order->order_type == 'create' ? 'delete' : 'return_delete')),
+                'message'           => $message,
+                'notification_type' => trans('quickadmin.notification_type.order_' . ($transaction->order->order_type == 'create' ? 'delete' : 'return_delete')),
+            ];
+            storeNotification($notify_data);
             $transaction->order->orderProduct()->delete();
             $transaction->order->delete();
+        }else{
+            $message = trans('quickadmin.notify_message.cash_receipt_delete',['party_name' => $transaction->customer->name,'invoice_number'=>$transaction->voucher_number,'created_by'=>auth()->user()->name]);
+            $notify_data = [
+                'subject'           => trans('quickadmin.notify_subject.cash_receipt_delete'),
+                'message'           => $message,
+                'notification_type' => trans('quickadmin.notification_type.cash_receipt_delete')
+            ];
+            storeNotification($notify_data);
         }
+
         $transaction->delete();
         return response()->json([
             'message' => 'Successfully deleted!',

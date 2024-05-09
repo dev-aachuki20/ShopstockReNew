@@ -22,13 +22,18 @@ class StoreUpdatePaymentTransactionsRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        // dd($this->all());
+        $data =  [
             'customer_id'   => 'required|exists:customers,id',
             'payment_way'   => 'required|in:by_cash,by_check,by_account',
            // 'extra_details' => 'required_unless:payment_way,by_cash',
             'amount'        => 'required|regex:/^\d+(\.\d{1,4})?$/',
             'entry_date'    => 'required',
         ];
+
+        $data['voucher_number'] = $this->id ? 'nullable|unique:payment_transactions,voucher_number,'.$this->id : 'nullable|unique:payment_transactions,voucher_number' ;
+
+        return $data;
     }
 
     /**

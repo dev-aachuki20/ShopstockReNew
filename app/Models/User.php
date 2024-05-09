@@ -45,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'otp',
         'subject',
         'expiretime',
+        'device_token',
     ];
 
     /**
@@ -97,5 +98,15 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function userLogs(){
         return $this->hasMany(LogActivity::class, 'user_id');
+    }
+
+    // public function notification()
+    // {
+    //     return $this->hasMany(Notification::class, 'notifiable_id');
+    // }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 }

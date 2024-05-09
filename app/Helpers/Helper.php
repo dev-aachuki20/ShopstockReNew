@@ -5,6 +5,7 @@ use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Uploads;
 use App\Models\LogActivity;
+use App\Models\Notification;
 use Carbon\Carbon;
 use App\Models\RoleIp;
 use App\Models\RoleIpPermission;
@@ -218,6 +219,7 @@ if (!function_exists('CategoryAmountPercent')) {
         return number_format($percentShare, 2) . '%';
     }
 }
+
 if (!function_exists('checkRoleIpPermission')) {
     function checkRoleIpPermission($ip, $roleid)
     {
@@ -519,40 +521,29 @@ if (!function_exists('getTotalBlanceAreaWise')) {
 // Firebase Send Notification
 
 /* Send Notification to Users */
-if (!function_exists('sendNotification')) {
-    function sendNotification($user_id, $subject, $message, $section, $notification_type = null, $data = null)
+if (!function_exists('storeAndSendNotification')) {
+    function storeAndSendNotification($notify_data)
     {
+        // dd($notify_data);
         try {
-			$firebaseToken = User::where('is_active', 1)->where('id', $user_id)->whereNotNull('device_token')->pluck('device_token')->all();
+            // storeNotification($notify_data);
+            $userID = config('app.roleid.super_admin');
+			$firebaseToken = User::where('id', $userID)->whereNotNull('device_token')->pluck('device_token');
 
 			\Log::info(['firebaseToken' => $firebaseToken]);
 			$response = null;
 			if($firebaseToken){
 				$SERVER_API_KEY = env('FIREBASE_SECRET_KEY');
-
 				\Log::info(['SERVER_API_KEY' => $SERVER_API_KEY]);
-
-				$notification = [
-					"title" => $subject,
-					"body" 	=> $message,
-					"sound" => "default",
-					"alert" => "New"
-				];
-
-				$bodydata = [
-					"title"=> $subject,
-					"body" => $message,
-					"data" => $data,
-					"type" => $section,
-				];
-
-				$data = [
-					"registration_ids"	=> $firebaseToken,
-					"notification" 		=> $notification,
-					"priority"			=> "high",
-					"contentAvailable" 	=> true,
-					"data" 				=> $bodydata
-				];
+                $data = [
+                    "registration_ids" => $firebaseToken,
+                    "notification" => [
+                        "title" => $notify_data['subject'],
+                        "body" => $notify_data['message'],
+                    ],
+                    "priority"			=> "high",
+                    "contentAvailable" 	=> true,
+                ];
 				$encodedData = json_encode($data);
 				$headers = [
 					'Authorization: key=' . $SERVER_API_KEY,
@@ -580,3 +571,25 @@ if (!function_exists('sendNotification')) {
     }
 }
 
+if (!function_exists('storeNotification')) {
+
+    function storeNotification($data){
+
+        $notification   = new Notification;
+        $notification->subject          = $data['subject'];
+        $notification->message          = $data['message'];
+        $notification->notification_type = $data['notification_type'];
+        $notification->save();
+
+
+        // $notification = Notification::create([
+        //     'subject'           => $data['subject'],
+        //     'message'           => $data['message'],
+        //     'notification_type' => $data['notification_type'],
+        // ]);
+
+        return $notification;
+    }
+
+
+}
