@@ -720,6 +720,15 @@ class PermissionsTableSeeder extends Seeder
                 'created_at' => $createDate,
                 'updated_at' => $updateDate,
             ],
+
+            [
+                'name'      => 'customer_area_total_amount_access',
+                'title'      => 'Party Area-wise Total Amount',
+                'guard_name'=>'web',
+                'route_name'=>'parties',
+                'created_at' => $createDate,
+                'updated_at' => $updateDate,
+            ],
         ];
 
         Permission::insert($permissions);

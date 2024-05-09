@@ -101,7 +101,12 @@
                             <div class="col-md-12 mb-md-0 mb-4">
                                 <div class="custom-select2 fullselect2">
                                     <div class="form-control-inner customer-report-top">
-                                        <label for="area_id">Select Area <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">All</button> <button type="button" class="btn btn-primary mr-1 col select-all-area" id="total-area-amount">Total Amount : <i class="fa fa-inr"></i> <span class="area-wise-total-amount">0</span></button></label>
+                                        <label for="area_id">Select Area
+                                            <button type="button" class="btn btn-primary mr-1 col select-all-area" id="select-all-area">All</button>
+                                            @can('customer_area_total_amount_access')
+                                            <button type="button" class="btn btn-primary mr-1 col select-all-area" id="total-area-amount">Total Amount : <i class="fa fa-inr"></i> <span class="area-wise-total-amount">0</span></button>
+                                            @endcan
+                                        </label>
                                         <select class="form-control filter-area-select areas" name="area_id" id="area_id" multiple>
                                             @foreach($areas as $id=>$name)
                                                 <option value="{{ $id }}" data-icon="fa fa-inr" data-balance="{{ number_format(abs(getTotalBlanceAreaWise($id)),0) }}">{{ $name }}</option>
