@@ -118,6 +118,14 @@ class PaymentTransactionDataTable extends DataTable
 
                 return $action;
             })
+            ->filterColumn('customer.name', function ($query, $keyword) {
+                $query->whereHas('customer', function ($q) use ($keyword) {
+                    $q->where('customers.name', 'like', "%$keyword%");
+                });
+            })
+            ->filterColumn('created_at', function ($query, $keyword) {
+                $query->where('payment_transactions.created_at', 'like', '%' . $keyword . '%');
+            })
             ->setRowClass(function ($row) {
 
                 $typeAction = $this->type;
@@ -133,12 +141,7 @@ class PaymentTransactionDataTable extends DataTable
                 }
 
             })
-            ->filterColumn('customer.name', function ($query, $keyword) {
-                $query->whereHas('customer', function ($q) use ($keyword) {
-                    $q->where('customers.name', 'like', "%$keyword%");
-                });
-            })
-        ->rawColumns(['action','checkbox']);
+            ->rawColumns(['action','checkbox']);
     }
 
     /**
@@ -246,7 +249,7 @@ class PaymentTransactionDataTable extends DataTable
         $columns = [
             Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false)->visible($checkboxvisisbility),
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)->visible($snvisibility),
-            Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date')),
+            Column::make('entry_date')->title(trans('quickadmin.order.fields.estimate_date'))->searchable(false),
             Column::make('customer.name')->title(trans('quickadmin.transaction.fields.customer')),
             Column::make('voucher_number')->title(trans('quickadmin.estimate_number')),
             Column::make('payment_way')->title(trans('quickadmin.transaction.fields.payment_type'))
@@ -258,7 +261,7 @@ class PaymentTransactionDataTable extends DataTable
             $columns[] = Column::make('credit_amount')->title(trans('quickadmin.transaction.fields.credit_amount'))->name('amount');
         }
 
-        $columns[] =  Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at'));
+        $columns[] =  Column::make('created_at')->title(trans('quickadmin.transaction.fields.created_at'))->searchable(true);
         $columns[] =  Column::computed('action')
                         ->exportable(false)
                         ->printable(false)

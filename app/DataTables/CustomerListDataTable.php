@@ -143,10 +143,10 @@ class CustomerListDataTable extends DataTable
 
             Column::computed('checkbox')->title('<label class="custom-checkbox"><input type="checkbox" id="dt_cb_all" ><span></span></label>')->titleAttr('')->orderable(false)->searchable(false),
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false)->visible(false),
-            Column::make('name')->title(trans('quickadmin.customers.fields.name')),
-            Column::make('phone_number')->title(trans('quickadmin.customers.fields.phone_number')),
-            Column::make('debit')->title(trans('quickadmin.transaction.fields.debit_amount')),
-            Column::make('credit')->title(trans('quickadmin.transaction.fields.credit_amount')),
+            Column::make('name')->title(trans('quickadmin.customers.fields.name'))->orderable(false),
+            Column::make('phone_number')->title(trans('quickadmin.customers.fields.phone_number'))->orderable(false)->searchable(false),
+            Column::make('debit')->title(trans('quickadmin.transaction.fields.debit_amount'))->orderable(false)->searchable(false),
+            Column::make('credit')->title(trans('quickadmin.transaction.fields.credit_amount'))->orderable(false)->searchable(false),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)
