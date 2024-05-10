@@ -131,7 +131,7 @@ class CustomerListDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     ->dom('lfrtip')
-                    ->orderBy(1 ,'asc');
+                    ->orderBy(2 ,'asc');
     }
 
     /**

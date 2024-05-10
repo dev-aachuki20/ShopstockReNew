@@ -292,7 +292,7 @@ class CustomerController extends Controller
             return abort(404);
             break;
         }
-        $allcustomers = $query->with('area')->get();
+        $allcustomers = $query->orderBy('name')->with('area')->get();
         return view('admin.customer.print-customer-list',compact('allcustomers','areaNames'))->render();
     }
 
