@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class NotificationSendController extends Controller
@@ -22,7 +23,8 @@ class NotificationSendController extends Controller
 
     public function getAllNotification()
     {
-        $notifications = Notification::select('id','subject','message','notification_type','created_at')->orderByDesc('created_at')->get();
+        $notifications = Notification::select('id','subject','message','notification_type',DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y %h:%i %p') as date"))->orderByDesc('created_at')->get();
+
         $responseData = [
             'status'    => true,
             'message'   => 'success',

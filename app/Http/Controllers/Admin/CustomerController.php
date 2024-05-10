@@ -10,6 +10,7 @@ use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Group;
 use App\Models\CustomerGroup;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\PaymentTransaction;
 use Illuminate\Support\Facades\Validator;
