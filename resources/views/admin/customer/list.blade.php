@@ -148,13 +148,14 @@
 <script src="{{ asset('admintheme/assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 <script type="text/javascript">
+    var selectedFilterAreaValues = [];
+    var customer_selectedIds = [];
     $(document).ready(function(){
         var globallisttype = '{{ $listtype }}';
         $("#customer-table_filter.dataTables_filter").append($("#listfilter"));
         $("#listfilter").show();
         var DataaTable = $('#customer-table').DataTable();
-        var selectedFilterAreaValues = [];
-        var customer_selectedIds = [];
+
 
         $('#customer-print').printPage();
         // Page show from top when page changes
@@ -274,7 +275,7 @@
         $(document).on('click','#area-filter-form .select-all-area', function(e)
         {
             e.preventDefault();
-            selectedFilterAreaValues = [];
+            // selectedFilterAreaValues = [];
             // Clear all checkboxes
             $('.dt_checkbox').prop('checked', false);
             $('#dt_cb_all').prop('checked', false);
@@ -312,10 +313,13 @@
         $(document).on('change', '.dt_checkbox', function(e)
         {
             e.preventDefault();
-            customer_selectedIds = [];
+            // customer_selectedIds = [];
             $('.dt_checkbox:checked').each(function() {
                 customer_selectedIds.push($(this).val());
             });
+
+            customer_selectedIds = Array.from(new Set(customer_selectedIds));
+
             var printUrl = "{{ route('admin.customer.allprint') }}?customer_id=" + encodeURIComponent(customer_selectedIds.join(','))+ '&listtype=' + globallisttype;
             $('#customer-print').attr('href', printUrl);
         });
