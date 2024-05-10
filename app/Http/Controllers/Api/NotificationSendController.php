@@ -24,7 +24,7 @@ class NotificationSendController extends Controller
 
     public function getAllNotification()
     {
-        $notifications = Notification::select('id','subject','message','notification_type',DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y %h:%i %p') as date"))->orderByDesc('created_at')->get();
+        $notifications = Notification::select('id','subject','message','notification_type',DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y %h:%i:%s %p') as date"))->orderByDesc('created_at')->get();
 
         $responseData = [
             'status'    => true,
