@@ -159,12 +159,15 @@ class CustomerController extends Controller
     public function update(Request $request, string $id)
     {
         abort_if(Gate::denies('customer_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $isrequired =  !(auth()->user()->hasRole(config('app.roleid.admin'))) ? 'required' : 'nullable';
+
         $validator = Validator::make($request->all(), [
             'name' => ['required','string','max:250'],
             'phone_number' => ['required','numeric','digits_between:7,10'],
             'alternate_phone_number' => ['nullable','numeric','digits_between:7,10'],
-            'area_id' => ['required','numeric'],
-            'is_type' => ['required','string','max:50']
+            'area_id' => [$isrequired,'numeric'],
+            'is_type' => [$isrequired,'string','max:50']
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -192,12 +195,12 @@ class CustomerController extends Controller
 
         $customer = Customer::findOrFail($id);
         $oldvalue = $customer->getOriginal();
-        $customer->name = $request->name;
-        $customer->phone_number = $request->phone_number;
-        $customer->alternate_phone_number = $request->alternate_phone_number;
-        $customer->area_id = $request->area_id;
-        $customer->is_type = $request->is_type;
-        $customer->credit_limit = $request->credit_limit ?? 0;
+        $customer->name = $request->name ?? $customer->name;
+        $customer->phone_number = $request->phone_number ?? $customer->phone_number;
+        $customer->alternate_phone_number = $request->alternate_phone_number  ?? $customer->alternate_phone_number;
+        $customer->area_id = $request->area_id  ?? $customer->area_id;
+        $customer->is_type = $request->is_type  ?? $customer->is_type;
+        $customer->credit_limit = $request->credit_limit ?? ($customer->credit_limit ?? 0);
         $customer->updated_by = Auth::id();
         $customer->save();
         $newValue = $customer->refresh();
