@@ -483,12 +483,6 @@ $('#productForm').on('keyup keypress', function(e) {
                                 routeUrl = routeUrl.replace(':orderId', orderId);
                                 $('#prevOrderLink').attr('data-order', routeUrl);
                                 $('.min-pre-price').text(minPrePrice);
-                                if (response.rowData.customer_type == 'retailer') {
-                                    priceToShow = Math.max(response.rowData.retailer_price, minPrePrice);
-                                    console.log('priceToShow',priceToShow);
-                                } else if (response.rowData.customer_type == 'wholesaler') {
-                                    priceToShow = Math.max(response.rowData.wholesaler_price, minPrePrice);
-                                }
 
                             } else {
 
@@ -504,9 +498,10 @@ $('#productForm').on('keyup keypress', function(e) {
                                 $('.min-pre-price').parent('#prevOrderLink').css('display', 'none');
 
                             }
-                            var priceToDisplay = priceToShow !=0 ? priceToShow : response.rowData.price;
+
+                            var priceToDisplay = response.rowData.price;
                             if (response.rowData.last_order_price && response.rowData.last_order_price != 0) {
-                                priceToDisplay = priceToShow !=0 ? priceToShow : response.rowData.last_order_price;
+                                priceToDisplay = response.rowData.last_order_price;
                             }
                             products_table.find('.price').val(priceToDisplay);
                             // products_table.find('.sub_total').text(response.rowData.sub_total);
