@@ -214,7 +214,8 @@ class PaymentTransactionDataTable extends DataTable
         }
 
         if (auth()->user()->hasRole([config('app.roleid.admin'), config('app.roleid.staff')])) {
-            $model = $model->whereDate('entry_date', '=', now()->toDateString());
+            // $model = $model->whereDate('entry_date', '=', now()->toDateString()); // show only current day records
+            $model = $model->latest()->take(100); // show only last 100 records
         }
 
         return $model;
