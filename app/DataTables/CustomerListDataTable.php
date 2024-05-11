@@ -92,9 +92,10 @@ class CustomerListDataTable extends DataTable
                         ->whereColumn('payment_transactions.customer_id', 'customers.id')
                         // ->where('payment_transactions.remark', '<>', 'Opening balance')
                         ->whereNull('payment_transactions.deleted_at')
-                        ->groupBy('payment_transactions.customer_id')
+                        // ->groupBy('payment_transactions.customer_id')
                         ->havingRaw('total_balance != 0');
                 });
+
 
                 break;
 
@@ -113,6 +114,7 @@ class CustomerListDataTable extends DataTable
             $model = $model->whereIn('area_id', $area_ids);
         }
 
+        $model = $model->orderBy('name','asc');
         return $this->applyScopes($model);
     }
 
@@ -127,11 +129,11 @@ class CustomerListDataTable extends DataTable
                         'responsive' => true,
                         'pageLength' => 70,
                         'lengthMenu' => [[10, 25, 50, 70, 100, -1], [10, 25, 50, 70, 100, 'All']],
+                        'ordering'   => false
                     ])
                     ->columns($this->getColumns())
                     ->minifiedAjax()
-                    ->dom('lfrtip')
-                    ->orderBy(2 ,'asc');
+                    ->dom('lfrtip');
     }
 
     /**

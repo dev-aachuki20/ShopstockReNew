@@ -14,7 +14,7 @@
       </div>
 
 
-      @if (!(auth()->user()->hasRole(config('app.roleid.admin'))))
+      @if (!(auth()->user()->hasRole(config('app.roleid.admin'))) || !isset($customer))
 
         <div class="col-md-6 form-group">
             {!! Form::label('alternate_phone_number', trans('quickadmin.customers.fields.alternate_phone_number'), ['class' => 'control-label']) !!}

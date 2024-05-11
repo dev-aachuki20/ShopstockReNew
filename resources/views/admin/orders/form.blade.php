@@ -253,7 +253,7 @@
                 <tr>
                     <th colspan="4" class="text-right">Shipping Amount</th>
                     <td colspan="2">
-                        <input type="number" name="shipping_amount" class="form-control shipping_amount" min="0" max="999999" onkeydown="javascript: return [" backspace","delete","arrowleft","arrowright","tab","period","numpaddecimal"].includes(event.code)="" ?="" true="" :="" !isnan(number(event.key))="" &&="" event.code!="=&quot;Space&quot;" this.value.length="" <="10&quot;" required="" value="{{ $shipingAmount }}">
+                        <input type="number" name="shipping_amount" class="form-control shipping_amount" min="0" max="999999" onkeydown="javascript: return ["backspace","delete","arrowleft","arrowright","tab","period","numpaddecimal"].includes(event.code)="" ?="" true="" :="" !isnan(number(event.key))="" &&="" event.code!="=&quot;Space&quot;" this.value.length="" <="10&quot;" required="" value="{{ $shipingAmount }}">
                     </td>
                 </tr>
                 @endif
@@ -473,6 +473,7 @@ $('#productForm').on('keyup keypress', function(e) {
                                 }
                             }, 300);
                             var minPrePrice = 0;
+                            var priceToShow = 0;
                             if (response.rowData.last_order_price != 0) {
                                 minPrePrice = response.rowData.last_order_price;
                                 $('.min-pre-price').parent('#prevOrderLink').css('display', 'block');
@@ -482,6 +483,13 @@ $('#productForm').on('keyup keypress', function(e) {
                                 routeUrl = routeUrl.replace(':orderId', orderId);
                                 $('#prevOrderLink').attr('data-order', routeUrl);
                                 $('.min-pre-price').text(minPrePrice);
+                                if (response.rowData.customer_type == 'retailer') {
+                                    priceToShow = Math.max(response.rowData.retailer_price, minPrePrice);
+                                    console.log('priceToShow',priceToShow);
+                                } else if (response.rowData.customer_type == 'wholesaler') {
+                                    priceToShow = Math.max(response.rowData.wholesaler_price, minPrePrice);
+                                }
+
                             } else {
 
                                 if (response.rowData.customer_type == 'retailer') {
@@ -496,9 +504,9 @@ $('#productForm').on('keyup keypress', function(e) {
                                 $('.min-pre-price').parent('#prevOrderLink').css('display', 'none');
 
                             }
-                            var priceToDisplay = response.rowData.price;
+                            var priceToDisplay = priceToShow !=0 ? priceToShow : response.rowData.price;
                             if (response.rowData.last_order_price && response.rowData.last_order_price != 0) {
-                                priceToDisplay = response.rowData.last_order_price;
+                                priceToDisplay = priceToShow !=0 ? priceToShow : response.rowData.last_order_price;
                             }
                             products_table.find('.price').val(priceToDisplay);
                             // products_table.find('.sub_total').text(response.rowData.sub_total);
