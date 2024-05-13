@@ -521,8 +521,8 @@ if (!function_exists('getTotalBlanceAreaWise')) {
 // Firebase Send Notification
 
 /* Send Notification to Users */
-if (!function_exists('storeAndSendNotification')) {
-    function storeAndSendNotification($notify_data)
+if (!function_exists('sendNotification')) {
+    function sendNotification($notify_data)
     {
         // dd($notify_data);
         try {
@@ -566,6 +566,7 @@ if (!function_exists('storeAndSendNotification')) {
 			\Log::info('Response ' . $response);
 			return $response;
 		} catch (\Exception $e) {
+            dd($e->getMessage());
 			\Log::info($e->getMessage().' '.$e->getFile().' '.$e->getCode());
 		}
     }
@@ -575,6 +576,7 @@ if (!function_exists('storeNotification')) {
 
     function storeNotification($data){
 
+        sendNotification($data);
         $notification   = new Notification;
         $notification->subject          = $data['subject'];
         $notification->message          = $data['message'];
