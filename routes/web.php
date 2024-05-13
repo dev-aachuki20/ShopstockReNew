@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\PaymentTransactionsController;
 use App\Http\Controllers\PasswordProtectionController;
+use App\Http\Controllers\ReportFinanceController;
 use App\Http\Controllers\ReportsCustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,9 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
 
     Route::get('reports/customers/index',[ReportsCustomerController::class,'index'])->name('reports.customer.index')->middleware('password.modal');
     Route::get('reports/customers/allprint',[ReportsCustomerController::class,'allCustomerPrintView'])->where('area_id', '.*')->name('reports.customer.allprint');
+
+    Route::get('reports/finance/index',[ReportFinanceController::class,'index'])->name('reports.finance.index');
+
 
 });
 

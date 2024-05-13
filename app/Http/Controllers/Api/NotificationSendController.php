@@ -14,6 +14,10 @@ class NotificationSendController extends Controller
     public function updateDeviceToken(Request $request)
     {
         $userID = config('app.roleid.super_admin');
+        $request->validate([
+            'token' => 'required',
+        ]);
+
         $user = User::where('id',$userID)->update(['device_token' => $request->token ]);
         $responseData = [
             'status'            => true,
