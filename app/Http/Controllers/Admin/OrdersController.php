@@ -160,13 +160,13 @@ class OrdersController extends Controller
                 'created_by' => auth()->user()->name
             ]);
 
-            $notify_data = [
-                'subject' => trans('quickadmin.notify_subject.order_' . ($order->order_type == 'create' ? 'create' : 'return_create')),
-                'message'           => $message,
-                'notification_type' => trans('quickadmin.notification_type.order_' . ($order->order_type == 'create' ? 'create' : 'return_create')),
-            ];
+            // $notify_data = [
+            //     'subject' => trans('quickadmin.notify_subject.order_' . ($order->order_type == 'create' ? 'create' : 'return_create')),
+            //     'message'           => $message,
+            //     'notification_type' => trans('quickadmin.notification_type.order_' . ($order->order_type == 'create' ? 'create' : 'return_create')),
+            // ];
 
-            storeNotification($notify_data);
+            // storeNotification($notify_data);
 
             DB::commit();
 
@@ -533,16 +533,16 @@ class OrdersController extends Controller
             $order->update(['is_modified' => 1]);
             $invoiceNumberIs = $invoiceNumber ?? $order->invoice_number;
 
-            $message = trans('quickadmin.notify_message.order_' . ($order->order_type == 'create' ? 'edit' : 'return_edit'), [
+            $message = trans('quickadmin.notify_message.order_' . ($order->order_type == 'create' ? (!$isDraft ? 'edit' : 'draft_edit') : 'return_edit'), [
                 'party_name' => $order->customer->name,
                 'invoice_number' => $invoiceNumberIs,
                 'created_by' => auth()->user()->name
             ]);
 
             $notify_data = [
-                'subject' => trans('quickadmin.notify_subject.order_' . ($order->order_type == 'create' ? 'edit' : 'return_edit')),
+                'subject' => trans('quickadmin.notify_subject.order_' . ($order->order_type == 'create' ? (!$isDraft ? 'edit' : 'draft_edit') : 'return_edit')),
                 'message'           => $message,
-                'notification_type' => trans('quickadmin.notification_type.order_' . ($order->order_type == 'create' ? 'edit' : 'return_edit')),
+                'notification_type' => trans('quickadmin.notification_type.order_' . ($order->order_type == 'create' ? (!$isDraft ? 'edit' : 'draft_edit') : 'return_edit')),
             ];
             storeNotification($notify_data);
 

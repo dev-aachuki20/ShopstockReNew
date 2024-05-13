@@ -785,6 +785,8 @@ return [
         'order_create'          => 'New Estimate Added!',
         'order_edit'            => 'Estimate Updated!',
         'order_delete'          => 'Estimate Deleted!',
+        'order_draft_create'    => 'New Draft Estimate Added!',
+        'order_draft_edit'      => 'Draft Estimate Updated!',
         'order_return_create'   => 'New Estimate Return Added!',
         'order_return_edit'     => 'Estimate Return Updated!',
         'order_return_delete'   => 'Estimate Return Deleted!',
@@ -796,6 +798,8 @@ return [
     'notify_message' => [
         'order_create'          => 'New Estimate of :party_name [:invoice_number] Created by :created_by!',
         'order_edit'            => 'Estimate of :party_name [:invoice_number] Updated by :created_by!',
+        'order_draft_create'    => 'New Draft Estimate of :party_name [:invoice_number] Created by :created_by!',
+        'order_draft_edit'      => 'Draft Estimate of :party_name [:invoice_number] Updated by :created_by!',
         'order_delete'          => 'Estimate of :party_name [:invoice_number] Deleted by :created_by!',
         'order_return_create'   => 'New Estimate Return of :party_name [:invoice_number] Created by :created_by!',
         'order_return_edit'     => 'Estimate Return of :party_name [:invoice_number] Updated by :created_by!',
@@ -808,6 +812,8 @@ return [
     'notification_type' => [
         'order_create'          => 'order_create',
         'order_edit'            => 'order_edit',
+        'order_draft_create'    => 'order_draft_create',
+        'order_draft_edit'      => 'order_draft_edit',
         'order_delete'          => 'order_delete',
         'order_return_create'   => 'order_return_create',
         'order_return_edit'     => 'order_return_edit',

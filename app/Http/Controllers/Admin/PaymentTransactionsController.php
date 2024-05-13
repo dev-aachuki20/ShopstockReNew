@@ -55,13 +55,13 @@ class PaymentTransactionsController extends Controller
         addToLog($request,'Cash receipt','Create', $payment);
         $this->recordCashReceiptHistory($payment, $request->all());
 
-        $message = trans('quickadmin.notify_message.cash_receipt_create',['party_name' => $payment->customer->name,'invoice_number'=>$payment->voucher_number,'created_by'=>auth()->user()->name]);
-        $notify_data = [
-            'subject'           => trans('quickadmin.notify_subject.cash_receipt_create'),
-            'message'           => $message,
-            'notification_type' => trans('quickadmin.notification_type.cash_receipt_create')
-        ];
-        storeNotification($notify_data);
+        // $message = trans('quickadmin.notify_message.cash_receipt_create',['party_name' => $payment->customer->name,'invoice_number'=>$payment->voucher_number,'created_by'=>auth()->user()->name]);
+        // $notify_data = [
+        //     'subject'           => trans('quickadmin.notify_subject.cash_receipt_create'),
+        //     'message'           => $message,
+        //     'notification_type' => trans('quickadmin.notification_type.cash_receipt_create')
+        // ];
+        // storeNotification($notify_data);
 
         return redirect()->route('admin.transactions.create')->with('success', 'Successfully added!');
     }
