@@ -68,4 +68,12 @@
         }, 1000);
     });
 
+    function showLoader(){
+        $('#pagesubmitloader').css('display','flex');
+    }
+
+    function hideLoader(){
+        $('#pagesubmitloader').css('display','none');
+    }
+
 </script>

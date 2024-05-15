@@ -156,7 +156,6 @@
         $("#listfilter").show();
         var DataaTable = $('#customer-table').DataTable();
 
-
         $('#customer-print').printPage();
         // Page show from top when page changes
         $(document).on('draw.dt','#customer-table', function (e) {

@@ -894,8 +894,182 @@ table.dataTable tbody>tr:nth-child(even){
     margin-bottom: 0;
 }
 
+/* chart_admin_page */
+.chart_admin_page .leftside{
+    max-width: 230px;
+}
+.chart_admin_page .yearcard, .chart_admin_page .chartcard {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #062142;
+}
+.chart_admin_page .yearcard .title_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.chart_admin_page .title_header .title {
+    color: white;
+    margin: 0px;
+    font-size: 16px;
+    line-height: 26px;
+    font-weight: 600;
+}
 
+.chart_admin_page .yearcard .icons{
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+    list-style: none;
+}
 
+.chart_admin_page .yearcard .icons li, .chart_admin_page .yearcard .icons li a{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart_admin_page .yearcard .icons li a{
+    width: 30px;
+    height: 30px;
+}
+.chart_admin_page svg{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.chart_admin_page .yearcard .contant_body ul{
+    padding: 0px;
+    margin: 20px 0px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+}
+.chart_admin_page .yearcard .contant_body ul .addyearbtn{
+    padding: 5px 20px;
+    background: #e9ecef;
+    color: #062142;
+    font-size: 16px;
+    line-height: 26px;
+    font-weight: 500;
+    border-radius: 4px;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    transition: all ease-in-out 0.3s;
+}
+.chart_admin_page .yearcard .contant_body ul .addyearbtn.active, .chart_admin_page .yearcard .contant_body ul .addyearbtn:hover{
+    background-color: #db5102;
+    color: #fff;
+}
+
+.chart_admin_page .row-gap-30{
+    row-gap: 30px;
+}
+
+.sellcard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sellcard .contant .title {
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+}
+
+.sellcard .contant .amount {
+    font-weight: 700;
+    margin: 0px;
+    color: white;
+    font-size: 26px;
+    line-height: 1;
+}
+.sellcard  .sellicon {
+    width: 60px;
+    height: 60px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.chartcard .chart_header{
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.chartcard .chart_header .title{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 600;
+    margin: 0px;
+    color: white;
+    text-transform: uppercase;
+}
+.chartcard .chart_header .title span{
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-box{
+    height: 380px;
+    overflow-y: auto;
+}
+.chart-box ul{
+    padding: 0;
+    margin: 0;
+}
+.chart-box ul li{
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    padding: 5px;
+    align-items: center;
+    -webkit-align-items: center;
+    border-bottom: 1px solid #eee;
+}
+.chart-box ul li .pro-name{
+    flex: 0 0 30%;
+    -webkit-flex: 0 0 30%;
+    text-align: right;
+    padding-right: 10px;
+}
+.chart-box ul li .chart-content{
+    flex: 0 0 calc(100% - 30%);
+    -webkit-flex: 0 0 calc(100% - 30%);
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    -webkit-align-items: center;
+}
+.chart-box ul li .chart-content .progress{
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    background-color: transparent;
+    height: 25px;
+    border-radius: 0 8px 8px 0;
+}
+.chart-box ul li .chart-content .progress .progress-bar{
+    border-radius: 0 8px 8px 0;
+    background-color: #7fa5e0;
+}
+.chart-box ul li .chart-content .progress-value{
+    padding-left: 10px;
+}
 /* ------------Responsive Css------------ */
 
 
@@ -944,6 +1118,37 @@ table.dataTable tbody>tr:nth-child(even){
         flex: 0 0 15%;
         max-width: 15%;
         padding-left: 0;
+    }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1300px){
+    .sellcard  .sellicon {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    .sellcard .contant .title {
+        font-size: 14px !important;
+        line-height: 22px !important;
+        margin-bottom: 5px;
+    }
+    .sellcard .contant .amount {
+        font-size: 20px !important;
+    }
+}
+@media screen and (max-width: 1400px) {
+    .sellcard .contant .title {
+        font-size: 16px;
+        line-height: 26px;
+    }
+    .sellcard .contant .amount {
+        font-size: 22px;
+    }
+    .sellcard  .sellicon {
+        width: 50px;
+        height: 50px;
+    }
+    .chart_admin_page .leftside{
+        max-width: 190px;
     }
 }
 
@@ -1029,6 +1234,10 @@ table.dataTable tbody>tr:nth-child(even){
     .dbl-btns{
         flex-wrap: wrap;
         -webkit-flex-wrap: wrap;
+    }
+    .chart_admin_page .leftside{
+        max-width: 100%;
+        min-width: 100%;
     }
 }
 

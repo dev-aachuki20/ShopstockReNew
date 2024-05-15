@@ -255,7 +255,7 @@ class CustomerController extends Controller
         {
             $area_ids = explode(',', request()->area_id);
             $area_ids = array_map('intval', $area_ids);
-            $query->whereIn('area_id', $area_ids);
+            $query->whereIn('suppliers.id', $supplier_ids);
             $areaNames = Area::whereIn('id', $area_ids)->pluck('address')->toArray();
         }
 

@@ -568,6 +568,14 @@ class PermissionsTableSeeder extends Seeder
                 'updated_at' => $updateDate,
             ],
             [
+                'name'      => 'report_finance_access',
+                'title'      => 'Finance Report Menu Access',
+                'guard_name'=>'web',
+                'route_name'=>'reports',
+                'created_at' => $createDate,
+                'updated_at' => $updateDate,
+            ],
+            [
                 'name'      => 'setting_access',
                 'title'      => 'Setting Menu Access',
                 'guard_name'=>'web',

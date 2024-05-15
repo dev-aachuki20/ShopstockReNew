@@ -235,13 +235,21 @@
                 <span>@lang('quickadmin.reports.report_management')</span>
             </a>
             <ul class="dropdown-menu">
-                @if (Gate::check('report_customer_access'))
+                @can('report_customer_access')
                 <li class="{{ Request::is('admin/reports/customers*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('admin.reports.customer.index') }}">
                         @lang('quickadmin.reports.customer_report')
                     </a>
                 </li>
-                @endif
+                @endcan
+
+                {{-- @can('report_finance_access')
+                <li class="{{ Request::is('admin/reports/finance*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('admin.reports.finance.index') }}">
+                        @lang('quickadmin.reports.finance_report')
+                    </a>
+                </li>
+                @endcan --}}
             </ul>
         </li>
     @endcan
