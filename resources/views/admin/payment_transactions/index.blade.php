@@ -213,6 +213,15 @@ $(document).ready(function() {
             order_selectedIds.push($(this).val());
         });
 
+        // When uncheck order remove id from the selected_ids array
+        if (!$(this).is(':checked')) {
+            var valueToRemove = $(this).val();
+            var indexToRemove = order_selectedIds.indexOf(valueToRemove);
+            if (indexToRemove !== -1) {
+                order_selectedIds.splice(indexToRemove, 1);
+            }
+        }
+
         order_selectedIds = Array.from(new Set(order_selectedIds));
     });
 

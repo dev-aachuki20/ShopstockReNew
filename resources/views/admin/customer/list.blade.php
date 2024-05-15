@@ -156,6 +156,7 @@
         $("#listfilter").show();
         var DataaTable = $('#customer-table').DataTable();
 
+
         $('#customer-print').printPage();
         // Page show from top when page changes
         $(document).on('draw.dt','#customer-table', function (e) {
@@ -317,8 +318,16 @@
                 customer_selectedIds.push($(this).val());
             });
 
-            customer_selectedIds = Array.from(new Set(customer_selectedIds));
+            // When uncheck customer remove id from the selected_ids array
+            if (!$(this).is(':checked')) {
+                var valueToRemove = $(this).val();
+                var indexToRemove = customer_selectedIds.indexOf(valueToRemove);
+                if (indexToRemove !== -1) {
+                    customer_selectedIds.splice(indexToRemove, 1);
+                }
+            }
 
+            customer_selectedIds = Array.from(new Set(customer_selectedIds));
             var printUrl = "{{ route('admin.customer.allprint') }}?customer_id=" + encodeURIComponent(customer_selectedIds.join(','))+ '&listtype=' + globallisttype;
             $('#customer-print').attr('href', printUrl);
         });

@@ -414,6 +414,12 @@ $('#productForm').on('keyup keypress', function(e) {
             $('#products_table').html(productDetailHtml);
             $('#product_list').val(null).trigger('change');
             handleCustomerData(customer_id);
+
+            if ($('#tmptr').length === 0) {
+            // If it doesn't exist, append it to the table body
+                $('#order_products_table tbody').append('<tr id="tmptr"><td colspan="6"></td></tr>');
+            }
+            $('#order_products_table tbody tr:not(#tmptr)').remove();
         });
 
         // get product data
