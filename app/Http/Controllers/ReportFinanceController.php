@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\PaymentTransaction;
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -59,42 +60,34 @@ class ReportFinanceController extends Controller
         }
 
         $alldata = ['labels' => $labels, 'values' => $values , 'total_sales' => array_sum($values)];
-        // dd($alldata);
+
         return $alldata;
     }
 
     public function getSaleAmountForTimeFrame($startDate, $endDate)
     {
         $saleAmount = PaymentTransaction::where('payment_way', 'order_create')
-                        ->whereBetween('entry_date', [$startDate, $endDate])
-                        ->sum('amount');
-        $returnSaleAmount = PaymentTransaction::where('payment_way', 'order_return')
         ->whereBetween('entry_date', [$startDate, $endDate])
         ->sum('amount');
+
+        $returnSaleAmount = PaymentTransaction::where('payment_way', 'order_return')
+            ->whereBetween('entry_date', [$startDate, $endDate])
+            ->sum('amount');
+
         $finalSaleAmount = $saleAmount - $returnSaleAmount;
         return $finalSaleAmount;
     }
 
     public function fetchProductReportData(Request $request)
     {
-        // dd($request->timeFrame);
         $timeFrame = $request->timeFrame;
         $productData = $this->getProductDataForTimeFrame($timeFrame);
-        // dd($productData['totalProductAmount']);
-        return response()->json(['productData' => $productData['productSaleData'],'timeFrame'=>$timeFrame,'totalSaleAmount'=>$productData['totalProductAmount']]);
-
-        // $productData = $this->getProductDataForTimeFrame($timeFrame);
-        // $allamounts = $this->calculateAmounts($timeFrame);
-        // return response()->json(['productData' => $productData,'allamounts' => $allamounts,'timeFrame'=>$timeFrame]);
-
+        return response()->json(['productData' => $productData['productSaleData'],'timeFrame'=>$timeFrame ,'allamounts' => $productData['allamounts']]);
     }
 
     public function getProductDataForTimeFrame($timeFrame)
     {
         $amounts = [];
-        $labels = [];
-        $values = [];
-        // dd($timeFrame);
         if (strpos($timeFrame, '-') !== false) {
             // If the time frame contains a hyphen (year-month), calculate for the specified month
             $startDate = Carbon::parse($timeFrame)->startOfMonth();
@@ -104,14 +97,14 @@ class ReportFinanceController extends Controller
             $startDate = Carbon::createFromDate($timeFrame, 1, 1)->startOfYear();
             $endDate = Carbon::createFromDate($timeFrame, 12, 31)->endOfYear();
         }
-        // dd($startDate , $endDate);
+
         $productSaleData = Order::select('order_products.product_id','products.name AS product_name')
         ->selectRaw('SUM(order_products.total_price) as total_sale_amount')
         ->join('order_products', 'orders.id', '=', 'order_products.order_id')
         ->join('products', 'order_products.product_id', '=', 'products.id')
         ->whereBetween('orders.invoice_date', [$startDate, $endDate])
-        ->whereNull('orders.deleted_at') // Exclude soft deleted orders
-        ->whereNull('order_products.deleted_at') // Exclude soft deleted order products
+        ->whereNull('orders.deleted_at')
+        ->whereNull('order_products.deleted_at')
         ->groupBy('order_products.product_id')
         ->get()->toArray();
 
@@ -119,24 +112,56 @@ class ReportFinanceController extends Controller
             $amounts[] = $product['total_sale_amount'];
         }
 
-        $alldata = ['productSaleData' => $productSaleData, 'totalProductAmount' => array_sum($amounts)];
+        $allamounts = $this->calculateAmounts($startDate, $endDate);
+        $alldata = ['productSaleData' => $productSaleData,'allamounts' => $allamounts];
+
         return $alldata;
     }
 
 
-    public function calculateAmounts($timeFrame)
+    public function calculateAmounts($startDate, $endDate)
     {
-        $totalSale = 0;
-        $totalProfit = 0;
-        $toalProfitPercent = 0;
+        $totalSaleMinPrice = 0;
+        $totalSaleSoldPrice = 0;
+        $totalSaleReturnMinPrice = 0;
+        $totalSaleSoldReturnPrice = 0;
+        $paymentTransactions = PaymentTransaction::select(
+            DB::raw('SUM(order_products.quantity * order_products.price) AS total_sale_price'),
+            DB::raw('SUM(order_products.quantity * products.min_sale_price) AS total_min_price'),
+            'payment_transactions.payment_way'
+        )
+        ->join('order_products', 'payment_transactions.order_id', '=', 'order_products.order_id')
+        ->join('products', 'order_products.product_id', '=', 'products.id')
+        ->whereNull('payment_transactions.deleted_at')
+        ->whereNull('order_products.deleted_at')
+        ->whereBetween('payment_transactions.entry_date', [$startDate, $endDate])
+        ->groupBy('payment_transactions.payment_way')
+        ->get();
+
+        foreach($paymentTransactions as $transaction){
+            if($transaction->payment_way == 'order_create'){
+                $totalSaleMinPrice = $transaction->total_min_price;
+                $totalSaleSoldPrice = $transaction->total_sale_price;
+            }elseif($transaction->payment_way == 'order_return'){
+                $totalSaleReturnMinPrice = $transaction->total_min_price;
+                $totalSaleSoldReturnPrice = $transaction->total_sale_price;
+            }
+        }
+
+        $totalFinalSaleMinPrice = $totalSaleMinPrice - $totalSaleReturnMinPrice;
+        $totalFinalSalePrice = $totalSaleSoldPrice - $totalSaleSoldReturnPrice;
+        $profitAmount= $totalFinalSalePrice -  $totalFinalSaleMinPrice;
+        $profitInPercent = ($profitAmount/$totalFinalSalePrice) * 100;
+
         $amounts = [
-            'total_sale' => $totalSale,
-            'total_sale' => $totalProfit,
-            'total_sale' => $toalProfitPercent,
+            'total_sale' => $totalFinalSalePrice,
+            'total_profit' => $profitAmount,
+            'total_profit_percent' => $profitInPercent,
         ];
 
         return $amounts;
     }
+
 
     public function getMonthList()
     {

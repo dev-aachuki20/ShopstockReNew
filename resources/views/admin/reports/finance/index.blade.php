@@ -73,7 +73,7 @@
                                     <div class="sellcard yearcard">
                                         <div class="contant">
                                             <h5 class="title">@lang('quickadmin.reports.total_profit')</h5>
-                                            <h3 class="amount">₹64,785</h3>
+                                            <h3 class="amount" id="totalProfit">0</h3>
                                         </div>
                                         <div class="sellicon"><x-svg-icon icon="total-profit" /></div>
                                     </div>
@@ -82,7 +82,7 @@
                                     <div class="sellcard yearcard">
                                         <div class="contant">
                                             <h5 class="title">@lang('quickadmin.reports.profit_percent')  </h5>
-                                            <h3 class="amount">21%</h3>
+                                            <h3 class="amount" id="totalProfitPercent">0%</h3>
                                         </div>
                                         <div class="sellicon"><x-svg-icon icon="saving" /></div>
                                     </div>
@@ -170,14 +170,13 @@ am4core.ready(function() {
             url: "{{ route('admin.reports.finance.fetchReportData') }}",
             data: data,
             success: function(response) {
-                hideLoader();
+                // hideLoader();
                 var newSaleData = response.saleData;
-
                 var chartData = newSaleData.labels.map(function(label, index) {
                     return { months: label, amounts: newSaleData.values[index] };
                 });
                 chart1.data = chartData;
-                $('#totalSales').html(newSaleData.total_sales);
+
                 $('.timeFrame').html("@lang('quickadmin.reports.sale_duration', ['saleduration' => '" + response.timeFrame + "'])");
                 // Create series (only once)
                 if (chart1.series.length === 0) {
@@ -209,31 +208,37 @@ am4core.ready(function() {
     // Define the updateProductChart function
     window.updateProductChart = function(timeFrame) {
         var data = { timeFrame: timeFrame };
-        showLoader();
+        // showLoader();
         $.ajax({
             type: 'GET',
             url: "{{ route('admin.reports.finance.fetchProductReportData') }}",
             data: data,
             success: function(response) {
-                hideLoader();
+
                 var newProductData = response.productData;
-                var totalSaleAmount = parseFloat(response.totalSaleAmount);
-                console.log(totalSaleAmount);
+                var allamounts = response.allamounts;
+                var totalSaleAmount = parseFloat(allamounts.total_sale.toFixed(2));
+                $('#progress-bars-container ul').empty();
                 newProductData.forEach(function(product) {
-                var productSaleAmount = parseFloat(product.total_sale_amount);
-                var percentage = (productSaleAmount / totalSaleAmount) * 100;
-                var progressBarHtml = '<li>' +
-                                            '<span class="pro-name">' + product.product_name + '</span>' +
-                                            '<div class="chart-content">' +
-                                                '<div class="progress w-100">' +
-                                                    '<div class="progress-bar" role="progressbar" style="width: ' + percentage + '%;" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100"></div>' +
-                                                    '<div class="progress-value">₹ ' + productSaleAmount + '</div>' +
+                    var productSaleAmount = parseFloat(product.total_sale_amount);
+                    var percentage = (productSaleAmount / totalSaleAmount) * 100;
+                    //    var percentage = (productSaleAmount / totalSaleAmount) * 100 * 100;
+                    var progressBarHtml = '<li>' +
+                                                '<span class="pro-name">' + product.product_name + '</span>' +
+                                                '<div class="chart-content">' +
+                                                    '<div class="progress w-100">' +
+                                                        '<div class="progress-bar" role="progressbar" style="width: ' + percentage  + '%;" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100"></div>' +
+                                                        '<div class="progress-value">₹ ' + productSaleAmount + '</div>' +
+                                                    '</div>' +
                                                 '</div>' +
-                                            '</div>' +
-                                        '</li>';
-                $('#progress-bars-container ul').append(progressBarHtml);
+                                            '</li>';
+                    $('#progress-bars-container ul').append(progressBarHtml);
                 });
 
+                $('#totalSales').html(allamounts.total_sale.toFixed(2) + ' ₹');
+                $('#totalProfit').html(allamounts.total_profit.toFixed(2) + ' ₹');
+                $('#totalProfitPercent').html(allamounts.total_profit_percent.toFixed(2) + ' %');
+                hideLoader();
 
             },
             error: function(error) {
@@ -261,7 +266,6 @@ $(document).ready(function(){
         timeFrame = year;
         updateSaleChart(timeFrame);
         updateProductChart(timeFrame);
-        console.log(year);
     });
 
     $(document).on('click','.report-month',function(e){
@@ -274,7 +278,6 @@ $(document).ready(function(){
         timeFrame = year+'-'+month;
         updateSaleChart(timeFrame);
         updateProductChart(timeFrame);
-        console.log(timeFrame);
     });
 
 
