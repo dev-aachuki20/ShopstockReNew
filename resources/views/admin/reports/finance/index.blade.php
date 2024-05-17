@@ -228,7 +228,7 @@ am4core.ready(function() {
                                                 '<div class="chart-content">' +
                                                     '<div class="progress w-100">' +
                                                         '<div class="progress-bar" role="progressbar" style="width: ' + percentage  + '%;" aria-valuenow="' + percentage + '" aria-valuemin="0" aria-valuemax="100"></div>' +
-                                                        '<div class="progress-value">₹ ' + productSaleAmount + '</div>' +
+                                                        '<div class="progress-value">₹ ' + productSaleAmount + ' ('+ percentage.toFixed(3) + '%) ' + '</div>' +
                                                     '</div>' +
                                                 '</div>' +
                                             '</li>';

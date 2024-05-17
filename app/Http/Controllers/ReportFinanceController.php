@@ -37,14 +37,14 @@ class ReportFinanceController extends Controller
     {
         $labels = [];
         $values = [];
-        // dd($timeFrame);
+
         if (strpos($timeFrame, '-') == false) {
             for ($m = 1; $m <= 12; $m++) {
                 $startDate = Carbon::createFromDate($timeFrame, $m, 1)->startOfMonth();
                 $endDate = Carbon::createFromDate($timeFrame, $m, 1)->endOfMonth();
                 $saleAmount = $this->getSaleAmountForTimeFrame($startDate, $endDate);
-                $labels[] = $startDate->format('M'); // Month abbreviation (e.g., Jan, Feb)
-                $values[] = $saleAmount;
+                $labels[] = $startDate->format('M');
+                $values[] = $saleAmount ?? 0;
             }
         } // calculate for motnh with year which gives data of days of months of year
         else {
@@ -55,7 +55,7 @@ class ReportFinanceController extends Controller
             for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
                 $saleAmount = $this->getSaleAmountForTimeFrame($date, $date);
                 $labels[] = $date->format('d'); // Day of the month (1 to 31)
-                $values[] = $saleAmount;
+                $values[] = $saleAmount ?? 0;
             }
         }
 
@@ -109,7 +109,7 @@ class ReportFinanceController extends Controller
         ->get()->toArray();
 
         foreach ($productSaleData as $product) {
-            $amounts[] = $product['total_sale_amount'];
+            $amounts[] = $product['total_sale_amount'] ?? 0;
         }
 
         $allamounts = $this->calculateAmounts($startDate, $endDate);
@@ -140,18 +140,18 @@ class ReportFinanceController extends Controller
 
         foreach($paymentTransactions as $transaction){
             if($transaction->payment_way == 'order_create'){
-                $totalSaleMinPrice = $transaction->total_min_price;
-                $totalSaleSoldPrice = $transaction->total_sale_price;
+                $totalSaleMinPrice = $transaction->total_min_price ?? 0;
+                $totalSaleSoldPrice = $transaction->total_sale_price ?? 0;
             }elseif($transaction->payment_way == 'order_return'){
-                $totalSaleReturnMinPrice = $transaction->total_min_price;
-                $totalSaleSoldReturnPrice = $transaction->total_sale_price;
+                $totalSaleReturnMinPrice = $transaction->total_min_price ?? 0;
+                $totalSaleSoldReturnPrice = $transaction->total_sale_price ?? 0;
             }
         }
 
         $totalFinalSaleMinPrice = $totalSaleMinPrice - $totalSaleReturnMinPrice;
         $totalFinalSalePrice = $totalSaleSoldPrice - $totalSaleSoldReturnPrice;
         $profitAmount= $totalFinalSalePrice -  $totalFinalSaleMinPrice;
-        $profitInPercent = ($profitAmount/$totalFinalSalePrice) * 100;
+        $profitInPercent =  $totalFinalSalePrice ? ($profitAmount/$totalFinalSalePrice) * 100 : 0;
 
         $amounts = [
             'total_sale' => $totalFinalSalePrice,

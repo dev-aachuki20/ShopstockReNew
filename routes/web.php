@@ -127,7 +127,7 @@ Route::group(['middleware' => ['auth', 'PreventBackHistory'], 'prefix' => 'admin
     Route::get('reports/customers/index',[ReportsCustomerController::class,'index'])->name('reports.customer.index')->middleware('password.modal');
     Route::get('reports/customers/allprint',[ReportsCustomerController::class,'allCustomerPrintView'])->where('area_id', '.*')->name('reports.customer.allprint');
 
-    Route::get('reports/finance/index',[ReportFinanceController::class,'index'])->name('reports.finance.index')->middleware('password.modal');
+    Route::get('reports/finance/index',[ReportFinanceController::class,'index'])->name('reports.finance.index')/*->middleware('password.modal')*/;
     Route::get('reports/finance/fetchReportData',[ReportFinanceController::class,'fetchSaleReportData'])->name('reports.finance.fetchReportData');
     Route::get('reports/finance/fetchProductReportData',[ReportFinanceController::class,'fetchProductReportData'])->name('reports.finance.fetchProductReportData');
 
