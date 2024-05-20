@@ -11,6 +11,11 @@
           <div class="card">
             <div class="card-header">
               <h4>{{ trans('quickadmin.order.title-'.$orderType) }}</h4>
+              @if ($orderType == 'return')
+                <div class="red-block">
+
+                </div>
+              @endif
             </div>
             <div class="card-body">
             <form action="{{ route('admin.orders.store') }}"  id="productForm" method="POST"  name="productForm" enctype="multipart/form-data">

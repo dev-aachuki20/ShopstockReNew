@@ -415,6 +415,9 @@ $('#productForm').on('keyup keypress', function(e) {
             $('#product_list').val(null).trigger('change');
             handleCustomerData(customer_id);
 
+            $('#prevOrderLink').attr('data-order', '');
+            $('#view_model_Modal .modal-body.show_html').empty();
+
             if ($('#tmptr').length === 0) {
             // If it doesn't exist, append it to the table body
                 $('#order_products_table tbody').append('<tr id="tmptr"><td colspan="6"></td></tr>');
@@ -453,14 +456,12 @@ $('#productForm').on('keyup keypress', function(e) {
                 productCost['customer_id'] = customer_id;
                 productCost['is_sub_product'] = is_sub_product;
 
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
                 $.ajax({
                     type: 'POST',
                     url: "{{ route('admin.get_product_detail') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     data: {
                         product_id: product_id,
                         customer_id: customer_id,
@@ -1753,11 +1754,12 @@ $('#productForm').on('keyup keypress', function(e) {
             });
         });
 
-        $(document).on('click', '#prevOrderLink', function() {
+        $(document).on('click', '#prevOrderLink', function(e) {
+            e.preventDefault();
             $("#body").prepend('<div class="loader" id="loader_div"></div>');
             $("#view_model_Modal").modal('show');
             $('.show_html').html('');
-            var hrefurl = $(this).data('order');
+            var hrefurl = $(this).attr('data-order');
             //var head_title = $(this).attr('data-customerName');
             if (hrefurl) {
                 $.ajax({

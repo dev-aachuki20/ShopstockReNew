@@ -1070,6 +1070,32 @@ table.dataTable tbody>tr:nth-child(even){
 .chart-box ul li .chart-content .progress-value{
     padding-left: 10px;
 }
+.red-block{
+    background: #eb2c2c;
+    padding: 10px;
+    flex: 1;
+    -webkit-flex: 1;
+    height: 50px;
+    position: relative;
+}
+.red-block::after{
+    content: '';
+    position: absolute;
+    right: calc(30% - 25px);
+    top: 0;
+    border: 26px solid transparent;
+    border-left-color: #fff;
+    border-right: none;
+}
+.red-block::before{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 70%;
+    height: 100%;
+    background-color: #ffff;
+}
 /* ------------Responsive Css------------ */
 
 
@@ -1192,6 +1218,12 @@ table.dataTable tbody>tr:nth-child(even){
     .estimate-trans-topform .form-group{
         margin-bottom: 12px;
     }
+    .red-block::before{
+        width: 40%;
+    }
+    .red-block::after{
+        right: calc(60% - 25px);
+    }
 }
 
 @media screen and (max-width: 575px){
@@ -1238,6 +1270,9 @@ table.dataTable tbody>tr:nth-child(even){
     .chart_admin_page .leftside{
         max-width: 100%;
         min-width: 100%;
+    }
+    .red-block{
+        display: none;
     }
 }
 

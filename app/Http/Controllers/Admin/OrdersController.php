@@ -200,7 +200,7 @@ class OrdersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $id)
+    public function show(Request $request,$id)
     {
         abort_if(Gate::denies('estimate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if ($request->ajax()) {
@@ -689,8 +689,6 @@ class OrdersController extends Controller
             /* if (isset($last_order_price) && $last_order_price != 0) {
                 $price = $last_order_price;
             } else */
-
-
 
 
             $customerGroup = CustomerGroup::where('customer_id',$request->customer_id)->get()->pluck('group_id')->toArray();
