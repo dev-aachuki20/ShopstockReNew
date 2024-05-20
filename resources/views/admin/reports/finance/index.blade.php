@@ -219,6 +219,7 @@ am4core.ready(function() {
                 var allamounts = response.allamounts;
                 var totalSaleAmount = parseFloat(allamounts.total_sale.toFixed(2));
                 $('#progress-bars-container ul').empty();
+                
                 newProductData.forEach(function(product) {
                     var productSaleAmount = parseFloat(product.total_sale_amount);
                     var percentage = (productSaleAmount / totalSaleAmount) * 100;

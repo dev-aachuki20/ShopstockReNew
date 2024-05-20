@@ -21,7 +21,7 @@ class PermissionRoleTableSeeder extends Seeder
 
         $adminpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit', 'user_change_password' , 'customer_management_access', 'customer_access','customer_create' ,'customer_edit','customer_print','transaction_management_access','transaction_access','estimate_access','estimate_show','estimate_ledger_print','estimate_statement_print','estimate_print'])->pluck('id')->toArray();
 
-        $staffpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit' , 'user_change_password' , 'product_access', 'product_create', 'product_edit', 'product_delete', 'product_undo', 'product_print', 'product_export', 'estimate_management_access' ,'estimate_access' , 'estimate_create' ,'estimate_show' , 'estimate_edit','estimate_cancelled_show', 'estimate_history','estimate_print','transaction_management_access', 'transaction_access', 'transaction_create'])->pluck('id')->toArray();
+        $staffpermissionid= Permission::whereIn('name',['profile_access', 'profile_edit' , 'user_change_password' , 'product_access', 'product_create', 'product_edit', 'product_delete', 'product_undo', 'product_print', 'product_export', 'estimate_management_access' ,'estimate_access' , 'estimate_create' ,'estimate_show','estimate_cancelled_show', 'estimate_history','estimate_print','transaction_management_access', 'transaction_access', 'transaction_create'])->pluck('id')->toArray();
 
         foreach ($roles as $role) {
             switch ($role->id) {
