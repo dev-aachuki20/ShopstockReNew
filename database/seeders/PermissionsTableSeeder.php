@@ -186,7 +186,7 @@ class PermissionsTableSeeder extends Seeder
 
             [
                 'name'      => 'customer_access',
-                'title'      => 'Menu Access',
+                'title'      => 'Table Data Access',
                 'guard_name'=>'web',
                 'route_name'=>'parties',
                 'created_at' => $createDate,
@@ -602,7 +602,7 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'name'      => 'transaction_access',
-                'title'      => 'Menu Access',
+                'title'      => 'Table Data Access',
                 'guard_name'=>'web',
                 'route_name'=>'transaction-management',
                 'created_at' => $createDate,
@@ -642,7 +642,7 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'name'      => 'estimate_access',
-                'title'      => 'Menu Access',
+                'title'      => 'Table Data Access',
                 'guard_name'=>'web',
                 'route_name'=>'estimate-management',
                 'created_at' => $createDate,

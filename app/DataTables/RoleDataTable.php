@@ -28,18 +28,18 @@ class RoleDataTable extends DataTable
             ->editColumn('name',function($role){
                 return $role->name ?? "";
             })
-            // ->addColumn('action',function($role){
-            //     $action='';
-            //     if (Gate::check('role_edit')) {
-            //         $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
-            //         $action .= '<a href="'.route('roles.edit', $role->id).'" class="btn btn-icon btn-info m-1">'.$editIcon.'</a>';
-            //     }
-            //     if (Gate::check('role_show')) {
-            //         $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
-            //         $action .= '<a href="'.route('roles.show',$role->id).'" class="btn btn-icon btn-danger m-1">'.$viewIcon.'</a>';
-            //     }
-            //     return $action;
-            // })
+            ->addColumn('action',function($role){
+                $action='';
+                if (Gate::check('role_edit')) {
+                    $editIcon = view('components.svg-icon', ['icon' => 'edit'])->render();
+                    $action .= '<a href="'.route('roles.edit', $role->id).'" class="btn btn-icon btn-info m-1">'.$editIcon.'</a>';
+                }
+                if (Gate::check('role_show')) {
+                    $viewIcon = view('components.svg-icon', ['icon' => 'view'])->render();
+                    $action .= '<a href="'.route('roles.show',$role->id).'" class="btn btn-icon btn-danger m-1">'.$viewIcon.'</a>';
+                }
+                return $action;
+            })
             ->rawColumns([]);
     }
 
@@ -90,11 +90,11 @@ class RoleDataTable extends DataTable
 
             Column::make('DT_RowIndex')->title(trans('quickadmin.qa_sn'))->orderable(false)->searchable(false),
             Column::make('name')->title(trans('quickadmin.roles.fields.list.name')),
-            // Column::computed('action')
-            // ->exportable(false)
-            // ->printable(false)
-            // ->width(60)
-            // ->addClass('text-center')->title(trans('quickadmin.qa_action')),
+            Column::computed('action')
+            ->exportable(false)
+            ->printable(false)
+            ->width(60)
+            ->addClass('text-center')->title(trans('quickadmin.qa_action')),
         ];
     }
 

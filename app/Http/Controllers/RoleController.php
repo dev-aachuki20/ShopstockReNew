@@ -23,7 +23,6 @@ class RoleController extends Controller
 
     public function index(RoleDataTable $dataTable)
     {
-        //
         abort_if(Gate::denies('role_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         //$roles = Role::orderBy('id','asc')->get();
 
@@ -70,7 +69,6 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        return redirect()->route('roles.index');
         $role = Role::find($id);
         $permissions = $role->permissions;
         $groupedPermissions = $permissions->groupBy('route_name');
@@ -83,7 +81,6 @@ class RoleController extends Controller
      */
     public function edit(string $id)
     {
-        return redirect()->route('roles.index');
         $role = Role::find($id);
         $permissions = Permission::get()->groupBy('route_name');
         $selectedPermissions = $role->getAllPermissions();
@@ -95,7 +92,6 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return redirect()->route('roles.index');
         $role = Role::find($id);
         $validatedData = $request->validate([
             'name' => ['required','string','unique:roles,name,'.$role->id, new TitleValidationRule],
@@ -128,6 +124,6 @@ class RoleController extends Controller
         'title' => trans('quickadmin.roles.role')], 200);
     }
 
-   
+
 
 }
