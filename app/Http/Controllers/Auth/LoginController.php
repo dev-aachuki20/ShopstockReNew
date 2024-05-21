@@ -58,14 +58,11 @@ class LoginController extends Controller
     }
 
     public function logout(Request $request)
-        {
-            Auth::guard('web')->logout();
-
-            // Clear the password_entered session variable
-            $request->session()->forget('password_entered');
-            // Redirect to the login page
-            addToLog($request,'User','Logout successfully');
-            return redirect()->route('login');
-        }
+    {
+        Auth::guard('web')->logout();
+        $request->session()->forget('password_entered');
+        addToLog($request,'User','Logout successfully');
+        return redirect()->route('login');
+    }
 
 }

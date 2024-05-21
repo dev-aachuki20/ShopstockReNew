@@ -16,11 +16,9 @@ class ResetPasswordController extends Controller
         return view('auth.reset-password')->with(['token' => $token, 'email' => $request->email]);
     }
 
-    public function resetpass(Request $request){
-        //dd($request->all());
-
+    public function resetpass(Request $request)
+    {
         $email_id = decrypt($request->email);
-
         $validated = $request->validate([
             'token' => 'required',
             'email' => 'required|string',
@@ -30,30 +28,19 @@ class ResetPasswordController extends Controller
         ], getCommonValidationRuleMsgs());
 
         $updatePassword = DB::table('password_resets')->where(['email' => $email_id,'token' => $request->token])->first();
-
         if(!$updatePassword){
-
             return redirect()->back()->with('error', trans('passwords.token'))->withInput($request->all());
-
         }else{
             $isActive = User::where('email',$email_id)->pluck('is_active');
-
             if($isActive){
                 $user = User::where('email', $email_id)
                 ->update(['password' => Hash::make($request->password)]);
-
                 DB::table('password_resets')->where(['email'=> $email_id])->delete();
-
-                // Set Flash Message
-
                 return redirect()->route('login')->with('success',trans('passwords.reset'));
             }else{
-
                 return redirect()->back()->withErrors(['error' => trans('passwords.suspened')])->withInput($request->all());
             }
-
         }
 
-       // return redirect()->route('auth.login');
     }
 }
