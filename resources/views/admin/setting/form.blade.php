@@ -19,18 +19,12 @@
                           </div>
                         </div>
 
-                        <input type="password" class="form-control passwordh_42" name="{{ $setting->key }}" value="{{ isset($settings) ? decrypt($setting->value) : old($setting->key) }}" id="{{ $setting->key }}" autocomplete="true">
+                        <input type="password" class="form-control passwordh_42" name="{{ $setting->key }}" value="{{ isset($settings) ? decrypt($setting->value) : old($setting->key) }}" id="{{ $setting->key }}" >
                         <span class="current-password-toggle-icon pass-toggle-icon"><i class="fas fa-eye" onClick="ChangeEyeIcon($(this),'{{ $setting->key }}');"></i></span>
                     </div>
 
                     @elseif ($setting->type === 'number')
-                        @if ($setting->key == 'invoice_allow_day_admin_accountant')
-                            @can('setting_invoice_allow_days')
-                            <input type="number" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
-                            @endcan
-                        @else
-                            <input type="number" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
-                        @endif
+                        <input type="number" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
 
                     @elseif ($setting->type === 'text')
                         <input type="text" class="form-control" name="{{ $setting->key }}" value="{{ isset($settings) ? $setting->value : old($setting->value) }}" id="{{ $setting->key}}" autocomplete="true">
