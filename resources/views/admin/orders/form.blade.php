@@ -660,7 +660,7 @@ $('#productForm').on('keyup keypress', function(e) {
             delete glassProduct.products[$(this).attr('data-row-index')];
         });
 
-        $(document).on('click', '.glass-item-save', function(e) {
+        $(document).on('click keydown', '.glass-item-save', function(e) {
             e.preventDefault();
             var totalQty = 0;
             var products_table = $('#products_table');

@@ -1070,6 +1070,27 @@ table.dataTable tbody>tr:nth-child(even){
 .chart-box ul li .chart-content .progress-value{
     padding-left: 10px;
 }
+.new-card-header{
+    background: #eb2c2c;
+    padding: 5px 40px 5px 10px !important;
+    color: #fff !important;
+    height: 50px;
+    position: relative;
+    line-height: 20px !important;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.new-card-header::after{
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 26px solid transparent;
+    border-right-color: #fff;
+    border-left: none;
+}
+/*
 .red-block{
     background: #eb2c2c;
     padding: 10px;
@@ -1095,7 +1116,7 @@ table.dataTable tbody>tr:nth-child(even){
     width: 70%;
     height: 100%;
     background-color: #ffff;
-}
+} */
 /* ------------Responsive Css------------ */
 
 
@@ -1218,12 +1239,12 @@ table.dataTable tbody>tr:nth-child(even){
     .estimate-trans-topform .form-group{
         margin-bottom: 12px;
     }
-    .red-block::before{
+    /* .red-block::before{
         width: 40%;
     }
     .red-block::after{
         right: calc(60% - 25px);
-    }
+    } */
 }
 
 @media screen and (max-width: 575px){
@@ -1271,9 +1292,9 @@ table.dataTable tbody>tr:nth-child(even){
         max-width: 100%;
         min-width: 100%;
     }
-    .red-block{
+    /* .red-block{
         display: none;
-    }
+    } */
 }
 
 @media screen and (max-width: 320px){
