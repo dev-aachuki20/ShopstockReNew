@@ -490,6 +490,21 @@ class CustomerController extends Controller
             ->each(function($transaction) {
                 $transaction->delete();
             });
+
+            $message = trans('quickadmin.notify_message.customer_records_delete' , [
+                'party_name' => $customer->name ?? '',
+                'party_address' => $customer->area ? $customer->area->address : '',
+                'to_date' => Carbon::parse($to_date)->format('d M Y'),
+                'created_by' => auth()->user()->name
+            ]);
+
+            $notify_data = [
+                'subject' => trans('quickadmin.notify_subject.customer_records_delete'),
+                'message'           => $message,
+                'notification_type' => trans('quickadmin.notification_type.customer_records_delete'),
+            ];
+            storeNotification($notify_data);
+
             DB::commit();
 
             return response()->json([
@@ -499,7 +514,7 @@ class CustomerController extends Controller
 
         }catch(\Exception $e){
             DB::rollBack();
-           // dd($e->getMessage());
+            // dd($e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' =>"Something Went Wrong !",

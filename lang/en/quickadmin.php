@@ -781,6 +781,7 @@ return [
         'cash_receipt_create'   => 'New Cash Receipt Added!',
         'cash_receipt_edit'     => 'Cash Receipt Updated!',
         'cash_receipt_delete'   => 'Cash Receipt Deleted!',
+        'customer_records_delete'   => 'Customer Mass Records Deleted!',
     ],
 
     'notify_message' => [
@@ -795,6 +796,8 @@ return [
         'cash_receipt_create'   => 'New Cash Receipt of :party_name [:invoice_number] Created by :created_by!',
         'cash_receipt_edit'     => 'Cash Receipt of :party_name [:invoice_number] Updated by :created_by!',
         'cash_receipt_delete'   => 'Cash Receipt of :party_name [:invoice_number] Deleted by :created_by!',
+        'customer_records_delete'   => ':party_name - :party_address records has been deleted till :to_date by :created_by!',
+
     ],
 
     'notification_type' => [
@@ -809,5 +812,6 @@ return [
         'cash_receipt_create'   => 'cash_receipt_create',
         'cash_receipt_edit'     => 'cash_receipt_edit',
         'cash_receipt_delete'   => 'cash_receipt_delete',
+        'customer_records_delete'   => 'customer_records_delete'
     ],
 ];
