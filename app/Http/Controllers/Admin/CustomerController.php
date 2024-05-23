@@ -449,6 +449,7 @@ class CustomerController extends Controller
                     $pdf->setPaper('A5', 'portrait');
                     $pdf->setOption('charset', 'UTF-8');
                     return $pdf->stream($pdfFileName, ['Attachment' => false]);
+                    //return view('admin.exports.pdf.ledger_print', $pdfData);
 
                 }else if($type == 'print-statement')
                 {

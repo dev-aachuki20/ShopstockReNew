@@ -167,88 +167,33 @@
 <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
 <script type="text/javascript">
 
-    $(function() {
+    function initializeDatepicker() {
         $('input[name="endDate"]').daterangepicker({
             singleDatePicker: true,
             showDropdowns: true,
-            autoApply:true,
+            autoApply: false,
             minYear: 2000,
-            maxYear: parseInt(moment().format('YYYY'),10),
+            maxYear: parseInt(moment().format('YYYY'), 10),
             locale: {
-            format: 'DD/MM/YYYY' // Set the date format to 'DD/MM/YYYY'
-        }
+                format: 'YYYY-MM-DD' // Set the date format to 'DD/MM/YYYY'
+            },
         }, function(start, end, label) {
             var chosenDate = start.format('YYYY-MM-DD');
         });
+    }
+
+    $(function() {
+        initializeDatepicker();
     });
+
 </script>
 
 <script>
 
 $(document).ready(function () {
 
-    
-    /*$(document).on('submit','#estimate-delete-form1', function(e) {
-        e.preventDefault();
-        var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
-          swal({
-          title: 'Confirm',
-          content: {
-            element: 'div',
-            attributes: {
-              innerHTML: `
-                <input type="checkbox" id="agreeCheckbox">
-                <label for="agreeCheckbox"> I agree with the Terms</label>
-              `
-            },
-          },
-          buttons: {
-            confirm: {
-              text: 'Continue',
-              closeModal: false, // Do not close the modal on confirm click, we handle this manually
-            }
-          }
-        }).then((willContinue) => {
-          const checkbox = document.getElementById('agreeCheckbox');
-          if (checkbox && checkbox.checked) {
-            swal('You have agreed to the terms!', '', 'success');
-          } else {
-            swal('You need to agree with the Terms', '', 'error');
-          }
-        });
+    $('input[name="endDate"]').val('');
 
-    
-        swal({
-            title: 'Enter system password?',
-            content: {
-                element: 'input',
-                attributes: {
-                  placeholder: 'Enter password....',
-                  type: 'password',
-                  autocapitalize: 'off',
-                  autocorrect: "off",
-                },
-            },
-            buttons: {
-                confirm: {
-                  text: 'Continue',
-                  closeModal: false, // Do not close the modal on confirm click, we handle this manually
-                }
-            }
-        }).then((password) => {
-            var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
-            if (password == systemPassword) {
-                swal('You have agreed to the terms!'+ password, '', 'success');
-            } else {
-                swal('You need to agree with the Terms', '', 'error');
-            }
-              
-        });
-    });
-    
-    */
-    
-    
     $.ajaxSetup({
         headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -264,15 +209,11 @@ $(document).ready(function () {
     });
 
     $(document).on('submit','#estimate-delete-form', function(e) {
-
         e.preventDefault();
-        
-        // Get the date range picker instance
-        var picker = $('#estimatedelrange').data('daterangepicker');
-        // Retrieve the selected start and end dates
-        if (picker && picker.startDate && picker.endDate) {
-            var to_date = picker.startDate.format('YYYY-MM-DD');
+        var selectedDate = $('input[name="endDate"]').val();
 
+        if (selectedDate) {
+            var to_date = selectedDate;
             var formAction = $(this).attr('action');
             if(to_date == undefined || to_date == 'Invalid date'){
                 to_date = '';
@@ -282,27 +223,29 @@ $(document).ready(function () {
                 customer_id      : {{$customer->id}},
                 to_date          : to_date,
             };
-            // Delete after password confirmation
+
             swal({
                 title: 'Enter system password?',
                 content: {
                     element: 'input',
                     attributes: {
-                      placeholder: 'Enter password....',
-                      type: 'text',
-                      autocapitalize: 'off',
-                      autocorrect: "off",
+                    placeholder: 'Enter password....',
+                    type: 'password',
+                    autocapitalize: 'off',
+                    autocorrect: "off",
                     },
                 },
                 buttons: {
                     confirm: {
-                      text: 'Continue',
-                      closeModal: false, // Do not close the modal on confirm click, we handle this manually
+                    text: 'Continue',
+                    closeModal: false,
                     }
                 }
             }).then((password) => {
+                console.log('password',password);
                 var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
                 if (password == systemPassword) {
+                    console.log(systemPassword,password);
                     $.ajax({
                         url: formAction,
                         type: 'POST',
@@ -322,51 +265,9 @@ $(document).ready(function () {
                     swal('You need to enter correct password !', '', 'error');
                 }
             });
-            
-                    
-            // delete
-            /*swal({
-                title: "Are you sure?",
-                text: "are you sure want to delete these Estimates?",
-                icon: 'warning',
-                buttons: {
-                confirm: 'Yes, delete',
-                cancel: 'No, cancel',
-                },
-                dangerMode: true,
-            }).then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                    url: formAction,
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                            var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                            var message = "{{ trans('messages.crud.delete_record') }}";
-                            var title = "Customer's Estimates";
-                            showToaster(title,alertType,message);
-                            location.reload();
-                    },
-                    error: function (xhr) {
-                        swal("Error", 'Something Went Wrong !', 'error');
-                    }
-                    });
-                }
-            });*/
 
         } else {
-            // Handle the case where picker or its properties are undefined
-            swal("Error", 'Plese Select Estimate Dates !', 'error');
-        }
-
-    });
-
-    $(document).on('click','#reset-filter', function(e) {
-        e.preventDefault();
-        //Reset the Daterangepicker
-        if ($('#estimatedelrange').data('daterangepicker')) {
-            var today = moment();
-            $('#estimatedelrange').data('daterangepicker').setStartDate(today);
+            swal("Error", 'Plese Select Estimate Date !', 'error');
         }
     });
 
