@@ -34,7 +34,7 @@
                                         <div class="col-xl-4 col-md-3 mb-md-0 mb-3">
                                             <form action="" id="yearFilterForm">
                                                 <div class="form-group m-0 selectyearlabel">
-                                                    <label for="year" class="mb-0">Select Year</label>
+                                                    <label for="year" class="mb-0">Select Year1</label>
                                                     <div class="selectyear d-flex align-items-center">
                                                         <select class="form-control" name="year" id="year" data-customerid={{$customer->id}}>
                                                             @foreach ($yearlist as $data)
@@ -187,68 +187,6 @@
 
 $(document).ready(function () {
 
-    
-    /*$(document).on('submit','#estimate-delete-form1', function(e) {
-        e.preventDefault();
-        var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
-          swal({
-          title: 'Confirm',
-          content: {
-            element: 'div',
-            attributes: {
-              innerHTML: `
-                <input type="checkbox" id="agreeCheckbox">
-                <label for="agreeCheckbox"> I agree with the Terms</label>
-              `
-            },
-          },
-          buttons: {
-            confirm: {
-              text: 'Continue',
-              closeModal: false, // Do not close the modal on confirm click, we handle this manually
-            }
-          }
-        }).then((willContinue) => {
-          const checkbox = document.getElementById('agreeCheckbox');
-          if (checkbox && checkbox.checked) {
-            swal('You have agreed to the terms!', '', 'success');
-          } else {
-            swal('You need to agree with the Terms', '', 'error');
-          }
-        });
-
-    
-        swal({
-            title: 'Enter system password?',
-            content: {
-                element: 'input',
-                attributes: {
-                  placeholder: 'Enter password....',
-                  type: 'password',
-                  autocapitalize: 'off',
-                  autocorrect: "off",
-                },
-            },
-            buttons: {
-                confirm: {
-                  text: 'Continue',
-                  closeModal: false, // Do not close the modal on confirm click, we handle this manually
-                }
-            }
-        }).then((password) => {
-            var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
-            if (password == systemPassword) {
-                swal('You have agreed to the terms!'+ password, '', 'success');
-            } else {
-                swal('You need to agree with the Terms', '', 'error');
-            }
-              
-        });
-    });
-    
-    */
-    
-    
     $.ajaxSetup({
         headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -266,7 +204,6 @@ $(document).ready(function () {
     $(document).on('submit','#estimate-delete-form', function(e) {
 
         e.preventDefault();
-        
         // Get the date range picker instance
         var picker = $('#estimatedelrange').data('daterangepicker');
         // Retrieve the selected start and end dates
@@ -282,50 +219,8 @@ $(document).ready(function () {
                 customer_id      : {{$customer->id}},
                 to_date          : to_date,
             };
-            // Delete after password confirmation
-            swal({
-                title: 'Enter system password?',
-                content: {
-                    element: 'input',
-                    attributes: {
-                      placeholder: 'Enter password....',
-                      type: 'text',
-                      autocapitalize: 'off',
-                      autocorrect: "off",
-                    },
-                },
-                buttons: {
-                    confirm: {
-                      text: 'Continue',
-                      closeModal: false, // Do not close the modal on confirm click, we handle this manually
-                    }
-                }
-            }).then((password) => {
-                var systemPassword = "{{ config('constant.customersDeleteEstimatePassword') }}";
-                if (password == systemPassword) {
-                    $.ajax({
-                        url: formAction,
-                        type: 'POST',
-                        data: formData,
-                        success: function (response) {
-                                var alertType = "{{ trans('quickadmin.alert-type.success') }}";
-                                var message = "{{ trans('messages.crud.delete_record') }}";
-                                var title = "Customer's Estimates";
-                                showToaster(title,alertType,message);
-                                location.reload();
-                        },
-                        error: function (xhr) {
-                            swal("Error", 'Something Went Wrong !', 'error');
-                        }
-                    });
-                } else {
-                    swal('You need to enter correct password !', '', 'error');
-                }
-            });
-            
-                    
             // delete
-            /*swal({
+            swal({
                 title: "Are you sure?",
                 text: "are you sure want to delete these Estimates?",
                 icon: 'warning',
@@ -352,7 +247,7 @@ $(document).ready(function () {
                     }
                     });
                 }
-            });*/
+            });
 
         } else {
             // Handle the case where picker or its properties are undefined

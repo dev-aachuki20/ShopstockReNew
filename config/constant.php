@@ -42,4 +42,5 @@ return [
 		'by_check'		=>  'Check Reciept',
 		'by_account'	=>  'Account Reciept',
 	],
+	'customersDeleteEstimatePassword' => '12345678',
 ];
