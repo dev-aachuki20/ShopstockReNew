@@ -192,7 +192,8 @@
 
     <main>
     <table class="table table-wrapper heading_wrap" style="border:0px;margin-bottom:5px;">
-        <thead>
+        <thead >
+            <tr style="border:0px;margin-top:15px;padding-top:15px;"><td colspan="4" style="border: 0px !important;margin-top:15px;padding-top:15px;"> &nbsp;</td></tr>
             <tr>
                 <td colspan="7" style="border:0px;"><p class="font-18 font-800" style="margin: 0 0 3px;">{{ ucwords($customer->name) }}</p><p class="sm-font my-3">Address : {{ $customer->area->address ?? ''  }}</p>
                     <p class="sm-font" style="margin: 0 0 3px;">Item Wise Ledger</p>@if(!is_null($from_date) && !is_null($to_date))
