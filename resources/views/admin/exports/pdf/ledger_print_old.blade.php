@@ -5,7 +5,7 @@
 
 		body{
             text-align:center;
-            padding-top: 0px;
+            padding-top: 80px;
 		}
 
         .table {
@@ -81,7 +81,7 @@
         }
 
         .heading_wrap tbody td{
-            font-size:14px;
+            font-size:9px;
             font-weight:400;
             color:#000000;
             padding: 8px 2px;
@@ -152,7 +152,7 @@
             margin:0;
          }
          .sm-font{
-            font-size:14px;
+            font-size:12px;
          }
          .my-3{
             margin:2px 0 !important;
@@ -177,7 +177,7 @@
         $balance = 0;
     @endphp
 
-    {{-- <header>
+    <header>
         <div class="main">
             <div class="text-center">
                 <p class="font-18 font-800">{{ ucwords($customer->name) }}</p>
@@ -188,22 +188,16 @@
                 @endif
             </div>
         </div>
-    </header> --}}
+    </header>
 
     <main>
-    <table class="table table-wrapper heading_wrap" style="border:0px;margin-bottom:5px;">
+    <table class="table table-wrapper heading_wrap">
         <thead>
             <tr>
-                <td colspan="7" style="border:0px;"><p class="font-18 font-800" style="margin: 0 0 3px;">{{ ucwords($customer->name) }}</p><p class="sm-font my-3">Address : {{ $customer->area->address ?? ''  }}</p>
-                    <p class="sm-font" style="margin: 0 0 3px;">Item Wise Ledger</p>@if(!is_null($from_date) && !is_null($to_date))
-                    <p class="sm-font" style="margin: 0 0 3px;">{{ \Carbon\Carbon::parse($from_date)->format('d F Y') }} to {{ \Carbon\Carbon::parse($to_date)->format('d F Y') }}</p>
-                @endif</td>
-            </tr>
-            <tr>
-                <th colspan="4" style="font-size: 12px;">Particulars</th>
-                <th style="font-size: 12px;">Debit</th>
-                <th style="font-size: 12px;">Credit</th>
-                <th style="font-size: 12px;">Balance</th>
+                <th colspan="4">Particulars</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Balance</th>
             </tr>
         </thead>
         <tbody>
@@ -217,14 +211,14 @@
                 <td colspan="4" style="text-align: center; font-size:14px;">
                     <strong> Opening Balance </strong>
                 </td>
-                <td style="white-space: nowrap">
-                    <span style="">&#x20B9;</span> {{ number_format(abs($openingBalance),0) }}
+                <td>
+                    <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($openingBalance),0) }}
                 </td>
-                <td style="white-space: nowrap">
+                <td>
                     <strong> </strong>
                 </td>
-                <td style="white-space: nowrap">
-                    <span style="">&#x20B9;</span> {{ number_format(abs($balance),0) }}
+                <td>
+                    <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($balance),0) }}
                     {{ ($balance >= 0 ) ? 'Dr' : 'Cr' }}
                 </td>
             </tr>
@@ -242,30 +236,28 @@
                         }
                     @endphp
                     <tr>
-                        <td colspan="4" style="padding-top: 5px;padding-left:12px;padding-right:12px;">
+                        <td colspan="4">
                             <div class="title text-left" style="padding-left: 5px;">
-                                <span style="padding-bottom:5px;display: block;">
-                                    @if(!is_null($transaction->order))
-                                        <strong style="font-size:12px;">Type:</strong>
-                                    @endif
 
-                                    @if($isOpeningBalance == true && $transaction->remark == 'Opening balance' && in_array($transaction->payment_way,['by_cash','by_split']))
-                                        {{-- <strong style="display:block; font-size:10px; text-align: right; padding-right: 9px;">Opening Balance</strong> --}}
-                                    @else
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $type }}</span>
-                                        <strong style="font-size:12px;">Vch.No:</strong>
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $voucherNumber }}</span>
-                                        <strong style="font-size:12px;">Date:</strong>
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $invoiceDate }}</span>
-                                    @endif
-                                </span>
+                                @if(!is_null($transaction->order))
+                                    <strong style="font-size:10px;">Type:</strong>
+                                @endif
+
+                                @if($isOpeningBalance == true && $transaction->remark == 'Opening balance' && in_array($transaction->payment_way,['by_cash','by_split']))
+                                    {{-- <strong style="display:block; font-size:10px; text-align: right; padding-right: 9px;">Opening Balance</strong> --}}
+                                @else
+                                    <span style="padding-right: 8px;">{{ $type }}</span>
+                                    <strong style="font-size:10px;">Vch.No:</strong>
+                                    <span style="padding-right: 8px;">{{ $voucherNumber }}</span>
+                                    <strong style="font-size:10px;">Date:</strong>
+                                    <span style="padding-right: 8px;">{{ $invoiceDate }}</span>
+                                @endif
 
                             </div>
                             @if(!is_null($transaction->order))
                                 @if($transaction->order->orderProduct()->count() > 0)
                                 <table class="table data_type">
                                     <thead>
-                                        <tr><td style="padding: 5px;border:0px;"></td></tr>
                                         <tr>
                                             <td>SNo.</td>
                                             <td>Product Name</td>
@@ -280,21 +272,21 @@
                                             <td>
                                                 {{ ++$key }}
                                             </td>
-                                            <td class="">
+                                            <td class="HI">
                                                 {{ ucfirst($item->product->name) }}
                                                 @if(!is_null($item->is_sub_product))
                                                     ({{ $item->is_sub_product ?? '' }})
                                                 @endif
 
                                                 @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
-                                                <p style="margin-top:0px; margin-bottom:0px;padding:2px;"> {{ glassProductMeasurement($item->other_details,'one_line') }}</p>
+                                                <p style="margin-top:0px; margin-bottom:0px;"> {{ glassProductMeasurement($item->other_details,'one_line') }}</p>
                                                 @endif
 
                                                 @if(!is_null($item->description))
                                                 <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
                                                 @endif
                                             </td>
-                                            <td style="padding-left:5px;padding-right:5px;">
+                                            <td>
                                                 @php
                                                         $quantityString = '';
 
@@ -335,10 +327,10 @@
 
                                                 {{ $quantityString }}
                                             </td>
-                                            <td style="white-space: nowrap">
+                                            <td>
                                                 {{ removeTrailingZeros($item->price) }}
                                             </td>
-                                            <td style="white-space: nowrap">
+                                            <td>
                                                 {{ number_format(round($item->total_price),0) }}
                                             </td>
                                         </tr>
@@ -348,27 +340,27 @@
                                 @endif
                             @endif
                         </td>
-                        <td style="white-space: nowrap;">
+                        <td style="vertical-align: middle;">
                             @if($transaction->payment_type == 'debit')
                                 @php
                                     $amount = (float)$transaction->amount;
                                     $debitTotal += $amount;
                                     $balance += round($amount);
                                 @endphp
-                                <span style=""> &#x20B9;</span> {{ number_format(round($amount),0) }}
+                                <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($amount),0) }}
                             @endif
                         </td>
-                        <td style="white-space: nowrap;">
+                        <td style="vertical-align: middle;">
                             @if($transaction->payment_type == 'credit')
-                            <span style=""> &#x20B9;</span> {{ number_format(round($transaction->amount),0) }}
+                            <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(round($transaction->amount),0) }}
                                 @php
                                     $creditTotal += (float)$transaction->amount;
                                     $balance -= round((float)$transaction->amount);
                                 @endphp
                             @endif
                         </td>
-                        <td style="white-space: nowrap;">
-                            <span style=""> &#x20B9;</span> {{ number_format(abs($balance),0) }}
+                        <td style="vertical-align: middle;">
+                            <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format(abs($balance),0) }}
                             {{ ($balance >= 0 ) ? 'Dr' : 'Cr' }}
                         </td>
                     </tr>
@@ -377,18 +369,20 @@
                 @endforeach
             @endif
 
+        </tbody>
+        <tfoot>
             <tr class="text-right">
                 <td colspan="4" style="text-align: right; padding-right: 9px;">
                     <strong>Total</strong>
                 </td>
                 <td>
                     @if(isset($debitTotal) && $debitTotal > 0)
-                        <strong> <span style="">&#x20B9;</span> {{ number_format($debitTotal,0) }}</strong>
+                        <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($debitTotal,0) }}</strong>
                     @endif
                 </td>
                 <td>
                     @if(isset($creditTotal) && $creditTotal > 0)
-                        <strong> <span style="">&#x20B9;</span> {{ number_format($creditTotal,0) }}</strong>
+                        <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($creditTotal,0) }}</strong>
                     @endif
                 </td>
                 <td></td>
@@ -401,19 +395,13 @@
                     @php
                         $closingBalance = ((float)$debitTotal+(float)$openingBalance) - (float)$creditTotal;
                     @endphp
-                    <strong> <span style="">&#x20B9;</span> {{ number_format($closingBalance,0) }} </strong>
+                    <strong> <span style="font-family: DejaVu Sans, sans-serif;">&#x20B9;</span> {{ number_format($closingBalance,0) }} </strong>
                 </td>
                 <td>
                     <strong> </strong>
                 </td>
                 <td></td>
             </tr>
-        </tbody>
-        <tfoot>
-           <tr style="padding-top:0px;margin-top:0px;border:0px;"><td colspan="4" style="border: 0px !important;"></td></tr>
-           <tr style="padding-top:0px;margin-top:0px;border:0px;"><td colspan="4" style="border: 0px !important;"></td></tr>
-           <tr style="padding-top:0px;margin-top:0px;border:0px;"><td colspan="4" style="border: 0px !important;"></td></tr>
-           <tr style="padding-top:0px;margin-top:0px;border:0px;"><td colspan="4" style="border: 0px !important;"></td></tr>
         </tfoot>
     </table>
     </main>

@@ -16,11 +16,14 @@
                   <h4>@lang('quickadmin.qa_payment_history')</h4>
                   <div class="dbl-btns d-flex">
                     @can('estimate_ledger_print')
-                    <button class="printbtn btn btn-primary" id="print-ledger-btn" data-value="print-product-ledger"><i class="fa fa-print"></i> Print Product Ledger</button>
+                    {{-- <button class="printbtn btn btn-primary" id="print-ledger-btn" data-value="print-product-ledger"><i class="fa fa-print"></i> Print Product Ledger</button> --}}
+
+                    <a href="{{ route('admin.customers.printPaymentHistory', ['actiontype' => "print-product-ledger", 'customer_id' => $customer->id, 'month' => $month]) }}" class="printbtn btn btn-primary" id="print-ledger-btn" data-value="print-product-ledger"><i class="fa fa-print"></i> Print Product Ledger</a>
                     @endcan
 
                     @can('estimate_statement_print')
-                    <button class="printbtn btn btn-primary" id="print-statement-btn" data-value="print-statement"><i class="fa fa-print"></i> Print Statement</button>
+                    {{-- <button class="printbtn btn btn-primary" id="print-statement-btn" data-value="print-statement"><i class="fa fa-print"></i> Print Statement</button> --}}
+                    <a href="{{ route('admin.customers.printPaymentHistory', ['actiontype' => "print-statement", 'customer_id' => $customer->id, 'month' => $month]) }}" class="printbtn btn btn-primary" id="print-statement-btn" data-value="print-statement"><i class="fa fa-print"></i> Print Statement</a>
                     @endcan
                   </div>
                 </div>
@@ -141,7 +144,11 @@
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
 
 <script>
+
 $(document).ready(function(){
+    $('#print-ledger-btn').printPage();
+    $('#print-statement-btn').printPage();
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -173,13 +180,13 @@ $(document).ready(function(){
         }
     });
 
-    //Print Statement and Print ledger click event
-    $(document).on('click','#print-statement-btn,#print-ledger-btn',function(){
-        var yearmonth = '{{$month}}';
-        var actiontype = $(this).attr('data-value');
-        var hrefurl = "{{ route('admin.customers.printPaymentHistory') }}/"+actiontype+"/{{encrypt($customer->id)}}/"+yearmonth;
-        window.open(hrefurl,'_target');
-    });
+    // Print Statement and Print ledger click event
+    // $(document).on('click','#print-statement-btn',function(){
+    //     var yearmonth = '{{$month}}';
+    //     var actiontype = $(this).attr('data-value');
+    //     var hrefurl = "{{ route('admin.customers.printPaymentHistory') }}?actiontype="+actiontype+"&customer_id={{$customer->id}}&month="+yearmonth;
+    //     window.open(hrefurl,'_target');
+    // });
 });
 
 </script>

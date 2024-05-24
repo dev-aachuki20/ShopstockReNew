@@ -414,42 +414,42 @@ class CustomerController extends Controller
         return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
     }
 
-    public function printPaymentHistory($type,$customerId,$yearmonth)
+    // public function printPaymentHistory($type,$customerId,$yearmonth)
+    public function printPaymentHistory(Request $request)
     {
+        $type = $request->actiontype ;
+        $customerId = $request->customer_id ;
+        $yearmonth = $request->month ;
         ini_set('max_execution_time', 300);
         $from = null;
         $to = null;
-
         $year = substr($yearmonth, 0, 4);
         $month = substr($yearmonth, 5, 2);
-        $startDate = Carbon::create($year,$month, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+        $from_date = Carbon::create($year,$month, 1)->startOfMonth();
+        $to_date = Carbon::create($year, $month, 1)->endOfMonth();
         try{
-            if(!is_numeric($customerId)){
-                $customerId = decrypt($customerId);
-            }
-
             $openingBalance = 0;
-            if($customerId){
-
+            if($customerId)
+            {
                 $openingBalance = GetMonthWiseOpeningBalance($customerId,$yearmonth);
-
-                $customer = Customer::with(['transaction'=>function($query) use($startDate,$endDate){
-                        $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($startDate)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($endDate)));
+                $customer = Customer::with(['transaction'=>function($query) use($from_date,$to_date){
+                        $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($from_date)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($to_date)));
                 }])->where('id',$customerId)->first();
 
                 $pdfData['customer']  = $customer;
-                $pdfData['from_date'] = $startDate;
-                $pdfData['to_date']   = $endDate;
+                $pdfData['from_date'] = $from_date;
+                $pdfData['to_date']   = $to_date;
                 $pdfData['openingBalance']   = $openingBalance;
                 if($type == 'print-product-ledger')
                 {
                     $pdfFileName = 'Print_Ledeger_'.$yearmonth.'.pdf';
-                    $pdf = PDF::loadView('admin.exports.pdf.ledger_print',$pdfData);
-                    $pdf->setPaper('A5', 'portrait');
-                    $pdf->setOption('charset', 'UTF-8');
-                    return $pdf->stream($pdfFileName, ['Attachment' => false]);
-                    //return view('admin.exports.pdf.ledger_print', $pdfData);
+                    // $pdf = PDF::loadView('admin.exports.pdf.ledger_print',$pdfData);
+                    // $pdf->setPaper('A5', 'portrait');
+                    // $pdf->setOption('charset', 'UTF-8');
+                    // return $pdf->stream($pdfFileName, ['Attachment' => false]);
+                    // return view('admin.exports.pdf.ledger_print', $pdfData);
+                    // return view('admin.exports.pdf.ledger_print_old', $pdfData);
+                    return view('admin.exports.pdf.ledger_print',compact('pdfData','customer','from_date','to_date','openingBalance'))->render();
 
                 }else if($type == 'print-statement')
                 {
@@ -459,13 +459,12 @@ class CustomerController extends Controller
                     $pdf->setPaper('A5', 'portrait');
                     $pdf->setOption('charset', 'UTF-8');
                     return $pdf->stream($pdfFileName, ['Attachment' => false]);
-
-                    //return view('admin.exports.pdf.statement_pdf_header', $pdfData);
+                    //return view('admin.exports.pdf.statement_print', $pdfData);
                 }
             }
 
         }catch(\Exception $e){
-           // dd($e->getMessage());
+           dd($e->getMessage());
             return abort(404);
         }
     }

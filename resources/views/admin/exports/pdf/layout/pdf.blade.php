@@ -4,12 +4,12 @@
         <meta charset="UTF-8">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
         <title>@yield('title')</title>
-        <style> 
+        <style>
             /* devanagari */
-            @font-face {
+            /* @font-face {
                 font-family: 'Tiro Devanagari Hindi';
                 src: url('{{ storage_path("fonts/TiroDevanagariHindi-Regular.ttf") }}') format('truetype');
-            }
+            } */
 
             .HI{
                 font-family: 'Tiro Devanagari Hindi', serif;
