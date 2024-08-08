@@ -502,7 +502,7 @@ class CustomerController extends Controller
                 'message'           => $message,
                 'notification_type' => trans('quickadmin.notification_type.customer_records_delete'),
             ];
-            storeNotification($notify_data);
+            // storeNotification($notify_data);
 
             DB::commit();
 
