@@ -414,9 +414,9 @@ class CustomerController extends Controller
         return view('admin.customer.view_customer_month_detail',compact('customer','alldata','month','openingBalance'));
     }
 
-    // public function printPaymentHistory($type,$customerId,$yearmonth)
+    
     public function printPaymentHistory(Request $request)
-    {
+    {        
         $type = $request->actiontype ;
         $customerId = $request->customer_id ;
         $yearmonth = $request->month ;
@@ -431,7 +431,7 @@ class CustomerController extends Controller
             $openingBalance = 0;
             if($customerId)
             {
-                $openingBalance = GetMonthWiseOpeningBalance($customerId,$yearmonth);
+                $openingBalance = GetMonthWiseOpeningBalance($customerId,$yearmonth);                
                 $customer = Customer::with(['transaction'=>function($query) use($from_date,$to_date){
                         $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($from_date)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($to_date)));
                 }])->where('id',$customerId)->first();
@@ -462,12 +462,60 @@ class CustomerController extends Controller
                     //return view('admin.exports.pdf.statement_print', $pdfData);
                 }
             }
-
         }catch(\Exception $e){
            dd($e->getMessage());
             return abort(404);
         }
     }
+
+    // Print Ledger & Statement of Mass Customers
+    public function massPrintPaymentHistory(Request $request)
+    {        
+        $type = $request->type;
+        $customerIds =  explode(',',$request->customer_ids);  // Array of selected customer IDs
+        $yearmonth = $request->month;        
+        ini_set('max_execution_time', 300);
+        $year = substr($yearmonth, 0, 4);
+        $month = substr($yearmonth, 5, 2);
+        $from_date = Carbon::create($year, $month, 1)->startOfMonth();
+        $to_date = Carbon::create($year, $month, 1)->endOfMonth();
+
+        try {
+            $allCustomerData = [];
+
+            foreach ($customerIds as $customerId) {
+                $openingBalance = GetMonthWiseOpeningBalance($customerId, $yearmonth);                
+                $customer = Customer::with(['transaction' => function($query) use ($from_date, $to_date) {
+                    $query->with(['order'])
+                        ->whereDate('entry_date', '>=', $from_date)
+                        ->whereDate('entry_date', '<=', $to_date);
+                }])->where('id', $customerId)->first();
+                
+                $allCustomerData[] = [
+                    'customer' => $customer,
+                    'from_date' => $from_date,
+                    'to_date' => $to_date,
+                    'openingBalance' => $openingBalance
+                ];                
+            }  
+          
+            if ($type == 'print-product-ledger') {
+                return view('admin.exports.pdf.mass_ledger_print', compact('allCustomerData'))->render();
+            } else if ($type == 'print-statement') {
+                $pdfFileName = 'Print_Statement_'.$yearmonth.'.pdf';
+                    $pdf = PDF::loadView('admin.exports.pdf.mass_statement_print',compact('allCustomerData'));
+                    $pdf->setPaper('A5', 'portrait');
+                    $pdf->setOption('charset', 'UTF-8');
+                    return $pdf->stream($pdfFileName, ['Attachment' => false]);
+                // return view('admin.exports.pdf.mass_statement_print', compact('allCustomerData'))->render();
+            }
+
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return abort(404);
+        }
+    }
+
 
     public function deleteCustomerDateEstimates(Request $request)
     {
@@ -502,7 +550,7 @@ class CustomerController extends Controller
                 'message'           => $message,
                 'notification_type' => trans('quickadmin.notification_type.customer_records_delete'),
             ];
-            // storeNotification($notify_data);
+            storeNotification($notify_data);
 
             DB::commit();
 

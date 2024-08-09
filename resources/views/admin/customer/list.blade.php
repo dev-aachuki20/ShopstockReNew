@@ -4,6 +4,9 @@
 @section('customCss')
 <meta name="csrf-token" content="{{ csrf_token() }}" >
 <link rel="stylesheet" href="{{ asset('admintheme/assets/css/printView-datatable.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+
 <style>
     .dropdown-toggle::after {
     display: none;
@@ -61,6 +64,25 @@
         border: 1px solid #3584a5;
         border-radius: 60px;
     }
+    .select_your_month label.select_year_month {
+        top: -8px !important;
+        font-size: 12px !important;
+        line-height: 1;
+    }
+    .select_your_month .form-control {
+        height: 34px;
+        padding: 0.6rem 0.75rem 0.45rem;
+    }
+    .text-nopwrap {
+        white-space: nowrap;
+    }
+    .top_card_header {
+        gap: 15px;
+    }
+    .right-side{
+        column-gap: 10px;
+        row-gap: 15px;
+    }
 
 </style>
 @endsection
@@ -71,14 +93,73 @@
           <div class="row">
             <div class="col-12">
               <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>@lang('quickadmin.customer-management.fields.list')</h4>
-                    <div class="form-group mb-0 d-flex justify-content-md-end filegroip m-0">
-                        @can('customer_print')
-                        <div class="col-auto px-md-1 pr-1">
-                            <a href="{{ route('admin.customer.allprint')}}" class="btn printbtn h-10 col circlebtn"  id="customer-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
+                <div class="card-header justify-content-center my-2">
+                    <div class="row align-items-center w-100 top_card_header">
+                        <div class="col px-0">
+                            <h4 class="text-nopwrap">@lang('quickadmin.customer-management.fields.list')</h4>
                         </div>
-                        @endcan
+                        {{-- <div class="col">
+                            <div class="row cart_filter_box pb-0">
+                                <div class="col-xl-3 col-md-4 col-sm-5 pl-md-0 pr-sm-0 mb-sm-0 mb-2">
+                                    <div class="mx-0 custom-select2 select_your_month">
+                                        <div class="form-control-inner">
+                                            <label for="estimatedelrange">Select Year-Month </label>
+                                            <input type="text" name="filterDate" id="filterDateForm" class="form-control"  value="" />
+                                        </div>
+                                    </div>
+                                </div>     
+                            </div>           
+                        </div> --}}
+                        <div class="col-auto ">
+                            <div class="row right-side align-items-center">
+                                <div class="col-md-auto col-12 px-0">
+                                    <div class="mx-0 custom-select2 select_your_month">
+                                        <div class="form-control-inner">
+                                            <label for="estimatedelrange" class="select_year_month">Select Year-Month </label>
+                                            <input type="text" name="filterDate" id="filterDateForm" class="form-control"  value="" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-auto print_btn d-flex align-items-center dbl-btns px-0">
+                                    @can('estimate_ledger_print')                                    
+                                        <a href="#" id="print-ledger-btn" class="printbtn h-auto btn btn-primary" onclick="
+                                            var month = document.getElementById('filterDateForm').value,
+                                            customerIds = window.customer_selectedIds || [],
+                                            showError = (msg) => swal('Error', msg, 'error');
+                                            if (!customerIds.length || !month) {
+                                                showError(!customerIds.length ? 'Please select customers.' : 'Please select a year and month.');
+                                                $(this).attr('href', '#').off('click.printPage');
+                                                return false;
+                                            }
+                                            var printLedgerUrl = '{{ route('admin.customers.massPrintPaymentHistory') }}?type=print-product-ledger&customer_ids=' + encodeURIComponent(customerIds.join(',')) + '&month=' + encodeURIComponent(month);
+                                            $(this).attr('href', printLedgerUrl).printPage();
+                                        "><i class="fa fa-print"></i> Print Product Ledger </a>
+                                    @endcan
+        
+                                    @can('estimate_statement_print')
+                                        <a href="#" id="print-statement-btn" class="printbtn h-auto btn btn-primary" onclick="
+                                        var month = document.getElementById('filterDateForm').value,
+                                            customerIds = window.customer_selectedIds || [],
+                                            showError = (msg) => swal('Error', msg, 'error');
+                                        if (!customerIds.length || !month) {
+                                            showError(!customerIds.length ? 'Please select customers.' : 'Please select a year and month.');
+                                            $(this).attr('href', '#').off('click.printPage');
+                                            return false;
+                                        }
+                                        var printStatementUrl = '{{ route('admin.customers.massPrintPaymentHistory') }}?type=print-statement&customer_ids=' + encodeURIComponent(customerIds.join(',')) + '&month=' + encodeURIComponent(month);
+                                        $(this).attr('href', printStatementUrl).printPage();
+                                    "><i class="fa fa-print"></i> Print Statement</a>
+                                    @endcan
+                                </div>
+                                <div class="col-auto form-group mb-0 d-flex justify-content-md-end filegroip m-0 px-0">
+                                    @can('customer_print')
+                                    <div class="col-auto px-md-1 pr-1">
+                                        <a href="{{ route('admin.customer.allprint')}}" class="btn printbtn h-10 col circlebtn"  id="customer-print" title="@lang('quickadmin.qa_print')"> <x-svg-icon icon="print" /></a>
+                                    </div>
+                                    @endcan
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                     <div class="col">
@@ -147,10 +228,25 @@
 <script src="{{ asset('admintheme/assets/bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('admintheme/assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('admintheme/assets/js/page/datatables.js') }}"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
 <script type="text/javascript">
     var selectedFilterAreaValues = [];
     var customer_selectedIds = [];
     $(document).ready(function(){
+       
+        //Initialize datepicker for year month
+        var currentDate = new Date();
+        $('#filterDateForm').datepicker({
+            format: 'yyyy-mm',
+            startView: 1,
+            minViewMode: 1,
+            autoclose: true,
+            endDate: currentDate
+        });
+
         var globallisttype = '{{ $listtype }}';
         $("#customer-table_filter.dataTables_filter").append($("#listfilter"));
         $("#listfilter").show();
@@ -188,6 +284,38 @@
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
+        });
+
+        // Mass print Ledger & Statement
+        $(document).on('click','#printds-ledger-btn , #print-statement-btn ',function(e) {
+            e.preventDefault();
+            customer_selectedIds = Array.from(new Set(customer_selectedIds));
+            // Update the print URLs dynamically
+            var month = $('#filterDateForm').val(); // Get selected month
+      
+            console.log(month);
+            console.log(customer_selectedIds);
+            // Validate form data before sending the request
+
+            // Check if the month field is empty
+            if (customer_selectedIds.length === 0 || !month) {
+                let errorMessage = 'Please select a year and month and Customers.';
+                if (!month && customer_selectedIds.length === 0) {
+                    errorMessage = 'Please select a year and month and Customers.';
+                } else if (!month) {
+                    errorMessage = 'Please select a year and month.';
+                } else if (customer_selectedIds.length === 0) {
+                    errorMessage = 'Please select Customers.';
+                }
+                swal("Error", errorMessage, 'error');
+                return;
+            }
+
+            // Re-initialize printPage
+            // $(this).printPage();           
+            
+            // $('.dt_checkbox').trigger('change');
+            
         });
 
 
@@ -330,6 +458,19 @@
             customer_selectedIds = Array.from(new Set(customer_selectedIds));
             var printUrl = "{{ route('admin.customer.allprint') }}?customer_id=" + encodeURIComponent(customer_selectedIds.join(','))+ '&listtype=' + globallisttype;
             $('#customer-print').attr('href', printUrl);
+
+            // Update the print URLs dynamically
+            var month = $('#filterDateForm').val(); // Get selected month      
+                       
+            var baseUrl = "{{ route('admin.customers.massPrintPaymentHistory') }}";
+            var printLedgerUrl = baseUrl + "?type=print-product-ledger&customer_ids=" + encodeURIComponent(customer_selectedIds.join(',')) + "&month=" + encodeURIComponent(month);
+            var printStatementUrl = baseUrl + "?type=print-statement&customer_ids=" + encodeURIComponent(customer_selectedIds.join(',')) + "&month=" + encodeURIComponent(month);
+            $('#print-ledger-btn').attr('href', printLedgerUrl);
+            $('#print-statement-btn').attr('href', printStatementUrl);
+
+            // Re-initialize printPage
+            $('#print-ledger-btn').printPage();
+            $('#print-statement-btn').printPage();
         });
 
     });
