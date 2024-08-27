@@ -396,26 +396,32 @@ if (!function_exists('glassProductMeasurement')) {
     {
         $glassProductMeasurementList = ($type == 'new_line') ? '' : [];
         if ($object) {
-            foreach (json_decode($object, true) as $key => $otherDetail) {
-                $productMeasurement = ' ';
-                $extra_option_hint = $otherDetail['extra_option_hint'] ?? '';
-                if (isset($otherDetail['height']) && isset($otherDetail['width'])) {
-                    $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['width'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
-                } else if (isset($otherDetail['width']) && isset($otherDetail['length'])) {
-                    $productMeasurement = $otherDetail['width'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
-                } else if (isset($otherDetail['height']) && isset($otherDetail['length'])) {
-                    $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
-                } else if (isset($otherDetail['height']) && isset($otherDetail['width']) && isset($otherDetail['length'])) {
-                    $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['width'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . 'inch - ' . $otherDetail['qty'] . ' pc';
-                } else if (isset($otherDetail['height']) && !isset($otherDetail['width']) && !isset($otherDetail['length'])) {
-                    $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
+            try{
+
+                foreach (json_decode($object, true) as $key => $otherDetail) {
+                    $productMeasurement = ' ';
+                    $extra_option_hint = $otherDetail['extra_option_hint'] ?? '';
+                    if (isset($otherDetail['height']) && isset($otherDetail['width'])) {
+                        $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['width'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
+                    } else if (isset($otherDetail['width']) && isset($otherDetail['length'])) {
+                        $productMeasurement = $otherDetail['width'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
+                    } else if (isset($otherDetail['height']) && isset($otherDetail['length'])) {
+                        $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
+                    } else if (isset($otherDetail['height']) && isset($otherDetail['width']) && isset($otherDetail['length'])) {
+                        $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['width'] . ' ' . $extra_option_hint . ' × ' . $otherDetail['length'] . 'inch - ' . $otherDetail['qty'] . ' pc';
+                    } else if (isset($otherDetail['height']) && !isset($otherDetail['width']) && !isset($otherDetail['length'])) {
+                        $productMeasurement = $otherDetail['height'] . ' ' . $extra_option_hint . ' - ' . $otherDetail['qty'] . ' pc';
+                    }
+
+                    if ($type == 'new_line') {
+                        $glassProductMeasurementList .= "<p style='margin-bottom: 0px;'>" . $productMeasurement . "</p>";
+                    } else if ($type == 'one_line') {
+                        $glassProductMeasurementList[$key] = $productMeasurement;
+                    }
                 }
 
-                if ($type == 'new_line') {
-                    $glassProductMeasurementList .= "<p style='margin-bottom: 0px;'>" . $productMeasurement . "</p>";
-                } else if ($type == 'one_line') {
-                    $glassProductMeasurementList[$key] = $productMeasurement;
-                }
+            }catch(\Exception $e){
+                dd($e->getMessage(),$object);
             }
         }
 

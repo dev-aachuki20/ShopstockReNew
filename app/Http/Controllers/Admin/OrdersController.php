@@ -97,10 +97,10 @@ class OrdersController extends Controller
                 ]);
                 $order = $checkOrder;
             }
-
+            
             $orderProducts = $request->get('products');
             $allOrderProducts = array();
-            foreach ($orderProducts as $oProduct) {
+            foreach ($orderProducts as $oProduct) {                
                 $createOrderProduct = [
                     'product_id' => $oProduct['product_id'],
                     'quantity'   => $oProduct['quantity'],
@@ -110,7 +110,7 @@ class OrdersController extends Controller
                     'length'     => $oProduct['length'] ?? null,
                     'is_draft'   => $oProduct['is_draft'] ?? 0,
                     'description'  => (isset($oProduct['description']) && !empty($oProduct['description'])) ?  $oProduct['description'] : null,
-                    'other_details'  => isset($oProduct['other_details']) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
+                    'other_details'  => (isset($oProduct['other_details']) && $oProduct['other_details'] !== 'false' && $oProduct['other_details'] !== false) ? json_encode(json_decode($oProduct['other_details'], true)) : null,
                     'is_sub_product'  => (isset($oProduct['is_sub_product_value']) && !empty($oProduct['is_sub_product_value'])) ?  $oProduct['is_sub_product_value'] : null,
                     'total_price'   => round((float)str_replace(',', '', $oProduct['total_price'])) ?? 0.00,
                 ];

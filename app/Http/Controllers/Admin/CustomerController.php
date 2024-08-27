@@ -22,6 +22,8 @@ use Carbon\Carbon;
 use Auth;
 use PDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 // use Mpdf\Mpdf;
 
 class CustomerController extends Controller
@@ -434,8 +436,8 @@ class CustomerController extends Controller
                 $openingBalance = GetMonthWiseOpeningBalance($customerId,$yearmonth);                
                 $customer = Customer::with(['transaction'=>function($query) use($from_date,$to_date){
                         $query->with(['order'])->whereDate('entry_date','>=',date('Y-m-d', strtotime($from_date)))->whereDate('entry_date','<=',date('Y-m-d', strtotime($to_date)));
-                }])->where('id',$customerId)->first();
-
+                }])->where('id',$customerId)->first();               
+   
                 $pdfData['customer']  = $customer;
                 $pdfData['from_date'] = $from_date;
                 $pdfData['to_date']   = $to_date;
@@ -463,7 +465,7 @@ class CustomerController extends Controller
                 }
             }
         }catch(\Exception $e){
-           dd($e->getMessage());
+           dd($e->getMessage().'-'.$e->getLine());
             return abort(404);
         }
     }

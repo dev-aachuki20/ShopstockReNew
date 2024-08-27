@@ -176,7 +176,7 @@
         $creditTotal = 0;
         $balance = 0;
     @endphp
-
+   
     {{-- <header>
         <div class="main">
             <div class="text-center">
@@ -230,154 +230,158 @@
                 </td>
             </tr>
 
-                @foreach($customer->transaction as $transaction)
-                @if(!is_null($transaction->voucher_number) && $transaction->remark != 'Opening balance')
-                    @php
-                        $type = 'Cash Reciept';
-                        $voucherNumber = $transaction->voucher_number;
-                        $invoiceDate = date('d-m-Y',strtotime($transaction->entry_date));
-                        if($transaction->payment_way == 'order_create'){
-                            $type = 'Sales';
-                        }else if($transaction->payment_way == 'order_return'){
-                            $type = 'Sales Return';
-                        }
-                    @endphp
-                    <tr>
-                        <td colspan="4" style="padding-top: 5px;padding-left:12px;padding-right:12px;">
-                            <div class="title text-left" style="padding-left: 5px;">
-                                <span style="padding-bottom:5px;display: block;">
-                                    @if(!is_null($transaction->order))
-                                        <strong style="font-size:12px;">Type:</strong>
+                @if($customer->transaction)
+                    @foreach($customer->transaction as $transaction)
+                    
+                    @if(!is_null($transaction->voucher_number) && $transaction->remark != 'Opening balance')
+                        @php
+                            $type = 'Cash Reciept';
+                            $voucherNumber = $transaction->voucher_number;
+                            $invoiceDate = date('d-m-Y',strtotime($transaction->entry_date));
+                            if($transaction->payment_way == 'order_create'){
+                                $type = 'Sales';
+                            }else if($transaction->payment_way == 'order_return'){
+                                $type = 'Sales Return';
+                            }
+                        @endphp
+                        <tr>
+                            <td colspan="4" style="padding-top: 5px;padding-left:12px;padding-right:12px;">
+                                <div class="title text-left" style="padding-left: 5px;">
+                                    <span style="padding-bottom:5px;display: block;">
+                                        @if(!is_null($transaction->order))
+                                            <strong style="font-size:12px;">Type:</strong>
+                                        @endif
+
+                                        @if($isOpeningBalance == true && $transaction->remark == 'Opening balance' && in_array($transaction->payment_way,['by_cash','by_split']))
+                                            {{-- <strong style="display:block; font-size:10px; text-align: right; padding-right: 9px;">Opening Balance</strong> --}}
+                                        @else
+                                            <span style="padding-right: 8px;font-size:12px;">{{ $type }}</span>
+                                            <strong style="font-size:12px;">Vch.No:</strong>
+                                            <span style="padding-right: 8px;font-size:12px;">{{ $voucherNumber }}</span>
+                                            <strong style="font-size:12px;">Date:</strong>
+                                            <span style="padding-right: 8px;font-size:12px;">{{ $invoiceDate }}</span>
+                                        @endif
+                                    </span>
+
+                                </div>
+                                @if(!is_null($transaction->order))
+                                    @if($transaction->order->orderProduct()->count() > 0)
+                                    <table class="table data_type">
+                                        <thead>
+                                            <tr><td style="padding: 5px;border:0px;"></td></tr>
+                                            <tr>
+                                                <td>SNo.</td>
+                                                <td>Product Name</td>
+                                                <td>Qty</td>
+                                                <td>Price</td>
+                                                <td>Amount</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($transaction->order->orderProduct()->get() as $key=>$item)
+                                            <tr>
+                                                <td>
+                                                    {{ ++$key }}
+                                                </td>
+                                                <td class="">
+                                                    {{ ucfirst($item->product->name) }}
+                                                    @if(!is_null($item->is_sub_product))
+                                                        ({{ $item->is_sub_product ?? '' }})
+                                                    @endif
+
+                                                    @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details) && $item->other_details !== 'false')
+                                                    <p style="margin-top:0px; margin-bottom:0px;padding:2px;"> {{ glassProductMeasurement($item->other_details,'one_line') }} </p>
+                                                    @endif
+
+                                                    @if(!is_null($item->description))
+                                                    <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
+                                                    @endif
+                                                </td>
+                                                <td style="padding-left:5px;padding-right:5px;">
+                                                    @php
+                                                            $quantityString = '';
+
+                                                            if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
+                                                                if(!is_null($item->height)){
+                                                                    $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
+                                                                }
+
+                                                                if(!is_null($item->height) && !is_null($item->width)){
+                                                                    $quantityString .= ' x ';
+                                                                }else if(!is_null($item->height) && !is_null($item->length)){
+                                                                    $quantityString .= ' x ';
+                                                                }
+
+                                                                if(!is_null($item->width)){
+                                                                    $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
+                                                                }
+
+                                                                if(!is_null($item->length) && !is_null($item->width)){
+                                                                    $quantityString .= ' x ';
+                                                                }else if(!is_null($item->height) && !is_null($item->length)){
+                                                                    $quantityString .= ' x ';
+                                                                }
+
+                                                                if(!is_null($item->length)){
+                                                                    $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
+                                                                }
+
+                                                                if($quantityString !=''){
+                                                                    $quantityString .= ' - ';
+                                                                }
+                                                            }
+
+                                                            if(!is_null($item->quantity)){
+                                                                $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
+                                                            }
+                                                        @endphp
+
+                                                    {{ $quantityString }}
+                                                </td>
+                                                <td style="white-space: nowrap">
+                                                    {{ removeTrailingZeros($item->price) }}
+                                                </td>
+                                                <td style="white-space: nowrap">
+                                                    {{ number_format(round($item->total_price),0) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
                                     @endif
-
-                                    @if($isOpeningBalance == true && $transaction->remark == 'Opening balance' && in_array($transaction->payment_way,['by_cash','by_split']))
-                                        {{-- <strong style="display:block; font-size:10px; text-align: right; padding-right: 9px;">Opening Balance</strong> --}}
-                                    @else
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $type }}</span>
-                                        <strong style="font-size:12px;">Vch.No:</strong>
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $voucherNumber }}</span>
-                                        <strong style="font-size:12px;">Date:</strong>
-                                        <span style="padding-right: 8px;font-size:12px;">{{ $invoiceDate }}</span>
-                                    @endif
-                                </span>
-
-                            </div>
-                            @if(!is_null($transaction->order))
-                                @if($transaction->order->orderProduct()->count() > 0)
-                                <table class="table data_type">
-                                    <thead>
-                                        <tr><td style="padding: 5px;border:0px;"></td></tr>
-                                        <tr>
-                                            <td>SNo.</td>
-                                            <td>Product Name</td>
-                                            <td>Qty</td>
-                                            <td>Price</td>
-                                            <td>Amount</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach($transaction->order->orderProduct()->get() as $key=>$item)
-                                        <tr>
-                                            <td>
-                                                {{ ++$key }}
-                                            </td>
-                                            <td class="">
-                                                {{ ucfirst($item->product->name) }}
-                                                @if(!is_null($item->is_sub_product))
-                                                    ({{ $item->is_sub_product ?? '' }})
-                                                @endif
-
-                                                @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
-                                                <p style="margin-top:0px; margin-bottom:0px;padding:2px;"> {{ glassProductMeasurement($item->other_details,'one_line') }}</p>
-                                                @endif
-
-                                                @if(!is_null($item->description))
-                                                <p style="margin-top:0px; margin-bottom:0px;">({{ $item->description }})</p>
-                                                @endif
-                                            </td>
-                                            <td style="padding-left:5px;padding-right:5px;">
-                                                @php
-                                                        $quantityString = '';
-
-                                                        if(!in_array($item->product->calculation_type,config('constant.product_category_id'))){
-                                                            if(!is_null($item->height)){
-                                                                $quantityString .= removeTrailingZeros($item->height) .$item->product->extra_option_hint;
-                                                            }
-
-                                                            if(!is_null($item->height) && !is_null($item->width)){
-                                                                $quantityString .= ' x ';
-                                                            }else if(!is_null($item->height) && !is_null($item->length)){
-                                                                $quantityString .= ' x ';
-                                                            }
-
-                                                            if(!is_null($item->width)){
-                                                                $quantityString .= removeTrailingZeros($item->width) .$item->product->extra_option_hint;
-                                                            }
-
-                                                            if(!is_null($item->length) && !is_null($item->width)){
-                                                                $quantityString .= ' x ';
-                                                            }else if(!is_null($item->height) && !is_null($item->length)){
-                                                                $quantityString .= ' x ';
-                                                            }
-
-                                                            if(!is_null($item->length)){
-                                                                $quantityString .= removeTrailingZeros($item->length) .$item->product->extra_option_hint;
-                                                            }
-
-                                                            if($quantityString !=''){
-                                                                $quantityString .= ' - ';
-                                                            }
-                                                        }
-
-                                                        if(!is_null($item->quantity)){
-                                                            $quantityString .= removeTrailingZeros($item->quantity).' '.strtoupper($item->product->product_unit->name??'').' ';
-                                                        }
-                                                    @endphp
-
-                                                {{ $quantityString }}
-                                            </td>
-                                            <td style="white-space: nowrap">
-                                                {{ removeTrailingZeros($item->price) }}
-                                            </td>
-                                            <td style="white-space: nowrap">
-                                                {{ number_format(round($item->total_price),0) }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
                                 @endif
-                            @endif
-                        </td>
-                        <td style="white-space: nowrap;">
-                            @if($transaction->payment_type == 'debit')
-                                @php
-                                    $amount = (float)$transaction->amount;
-                                    $debitTotal += $amount;
-                                    $balance += round($amount);
-                                @endphp
-                                <span style=""> &#x20B9;</span> {{ number_format(round($amount),0) }}
-                            @endif
-                        </td>
-                        <td style="white-space: nowrap;">
-                            @if($transaction->payment_type == 'credit')
-                            <span style=""> &#x20B9;</span> {{ number_format(round($transaction->amount),0) }}
-                                @php
-                                    $creditTotal += (float)$transaction->amount;
-                                    $balance -= round((float)$transaction->amount);
-                                @endphp
-                            @endif
-                        </td>
-                        <td style="white-space: nowrap;">
-                            <span style=""> &#x20B9;</span> {{ number_format(abs($balance),0) }}
-                            {{ ($balance >= 0 ) ? 'Dr' : 'Cr' }}
-                        </td>
-                    </tr>
+                            </td>
+                            <td style="white-space: nowrap;">
+                                @if($transaction->payment_type == 'debit')
+                                    @php
+                                        $amount = (float)$transaction->amount;
+                                        $debitTotal += $amount;
+                                        $balance += round($amount);
+                                    @endphp
+                                    <span style=""> &#x20B9;</span> {{ number_format(round($amount),0) }}
+                                @endif
+                            </td>
+                            <td style="white-space: nowrap;">
+                                @if($transaction->payment_type == 'credit')
+                                <span style=""> &#x20B9;</span> {{ number_format(round($transaction->amount),0) }}
+                                    @php
+                                        $creditTotal += (float)$transaction->amount;
+                                        $balance -= round((float)$transaction->amount);
+                                    @endphp
+                                @endif
+                            </td>
+                            <td style="white-space: nowrap;">
+                                <span style=""> &#x20B9;</span> {{ number_format(abs($balance),0) }}
+                                {{ ($balance >= 0 ) ? 'Dr' : 'Cr' }}
+                            </td>
+                        </tr>
 
+                    @endif
+                    @endforeach
                 @endif
-                @endforeach
-            @endif
 
+            @endif
+            
             <tr class="text-right">
                 <td colspan="4" style="text-align: right; padding-right: 9px;">
                     <strong>Total</strong>

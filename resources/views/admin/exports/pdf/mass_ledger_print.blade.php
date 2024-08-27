@@ -302,7 +302,7 @@
                                                         ({{ $item->is_sub_product ?? '' }})
                                                     @endif
 
-                                                    @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details))
+                                                    @if(in_array($item->product->calculation_type, config('constant.product_category_id')) && isset($item->other_details) && $item->other_details !== 'false')
                                                     <p style="margin-top:0px; margin-bottom:0px;padding:2px;"> {{ glassProductMeasurement($item->other_details,'one_line') }}</p>
                                                     @endif
 
