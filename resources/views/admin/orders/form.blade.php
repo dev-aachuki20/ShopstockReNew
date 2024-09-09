@@ -280,7 +280,7 @@
         </table>
     </div>
 
-    <div class="text-left">
+    <div class="text-left" style="display:none">
         <input type="checkbox" name="is_add_shipping" class="is_add_shipping" id="isAddShipping" {{ isset($order) && $order->is_add_shipping == 1 ? 'checked': '' }}>
         <label for="isAddShipping">Add Shipping</label>
     </div>

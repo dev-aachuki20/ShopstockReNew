@@ -375,7 +375,7 @@
             </tfoot>
         </table>
 
-        <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
+        <p style="margin-left:6px;font-size:12px;">{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
         <h6 style="margin-left:6px;">THANK YOU</h6>
     </main>
 
