@@ -248,7 +248,7 @@
         </table>
     </header>
     <footer>
-        <table style="padding-left:8px;">
+        {{-- <table style="padding-left:8px;">
             @if(!empty($order->remark))
             <tr>
                 <td style="margin: 0px; font-size:12px;">
@@ -276,7 +276,7 @@
                 </p>
                 </td>
             </tr>
-        </table>
+        </table> --}}
         <hr>
         <div class="pagenum-container"><small>Page <span class="pagenum"></span></small></div>
     </footer>
@@ -374,8 +374,14 @@
 
             </tfoot>
         </table>
+        @if(!empty($order->remark))
+        <p style="margin-left:6px;font-size:12px;"><strong>Remark :  </strong>{{ $order->remark ?? ''}} </p>            
+        @endif
 
+        @if (getSetting('custom_invoice_print_message'))
         <p style="margin-left:6px;font-size:12px;">{{ getSetting('custom_invoice_print_message') ?? ''}} </p>
+        @endif
+
         <h6 style="margin-left:6px;">THANK YOU</h6>
     </main>
 
