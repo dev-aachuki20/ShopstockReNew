@@ -1214,7 +1214,7 @@ $('#productForm').on('keyup keypress', function(e) {
 
         $(document).on('click','.order_form_submit', function(e) {
             e.preventDefault();
-            $(this).prop('disabled', true);
+            $(this).attr('disabled', true);
             var getTypeSave = $(this).data('checktype_is');
             // var customerCreditAmount = parseFloat($(".customers option:selected").attr('data-credit'));
             // var customerDebitAmount  = parseFloat($(".customers option:selected").attr('data-debit'));
@@ -1245,9 +1245,8 @@ $('#productForm').on('keyup keypress', function(e) {
                 url: $("#productForm").attr('action'),
                 data: $("#productForm").serialize(),
                 dataType: 'json',
-                success: function(response, status, xhr) {
-                    console.log(response);
-                    $(`.${getTypeSave}`).prop('disabled', false);
+                success: function(response, status, xhr) {                    
+                    // $(`.${getTypeSave}`).attr('disabled', false);
 
                     if (response.success) {
                         Swal.fire(
@@ -1262,7 +1261,7 @@ $('#productForm').on('keyup keypress', function(e) {
                 },
                 error: function(response) {
                     // console.log(response);
-                    $(`.${getTypeSave}`).prop('disabled', false);
+                    $(`.${getTypeSave}`).attr('disabled', false);
                     var errorArray = response.responseJSON.errors;
                         var alertType = "{{ trans('quickadmin.alert-type.error') }}";
                         var message = response?.responseJSON?.message;
