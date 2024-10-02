@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Console\Commands\BackupAndEmailCommand;
+use App\Console\Commands\BackupDatabase;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,13 +13,13 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         // ... (other commands)
-        BackupAndEmailCommand::class, // Add your custom command here
+        BackupDatabase::class, // Add your custom command here
     ];
 
     protected function schedule(Schedule $schedule): void
-    {
-       $schedule->command('backup:email')->cron('0 0 31 12 *');
-       // $schedule->command('backup:email')->everyTwoMinutes();
+    {    
+       $schedule->command('backup:database')->hourly();
+       $schedule->command('backup:database')->everyMinute();
     }
 
     /**
