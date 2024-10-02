@@ -31,16 +31,15 @@ class BackupDatabase extends Command
         $database = env('DB_DATABASE');
         try {
             putenv('PATH=' . getenv('PATH') . env('DB_MYSLDUMP_PATH'));
-            // for complete database backup
-            // $command = 'mysqldump --user=' . $username . ' --password=' . $password . ' --host=' . $host . ' --databases ' . $database . ' > ' . $backupPath . $fileName;
+            
             $deleteTables= config('db_backup_tables.delete_tables');
-            // command for taking backup of specific tables only
-           // $command = 'mysqldump --user=' . $username . ' --password=' . $password . ' --host=' . $host . ' ' . $database . ' ' . implode(' ', $deleteTables) . ' > ' . $backupPath . $fileName;
+            
+        //    $command = 'mysqldump -u '.$username.' --password='.$password.' -h '.$host.' '.$database.' --no-tablespaces '.implode(' ', $deleteTables).' > '.$backupPath.$fileName;
            $command = 'mysqldump -u '.$username.' --password='.$password.' -h '.$host.' '.$database.' --no-tablespaces '.implode(' ', $deleteTables).' > '.$backupPath.$fileName;
             $returnVar = null;
             $output = null;
             exec($command, $output, $returnVar);
-
+            
             // Upload backup to Google Drive
             $this->uploadToGoogleDrive($filePath, $fileName);
             // Delete the local backup file after uploading
@@ -50,13 +49,13 @@ class BackupDatabase extends Command
                 throw new \Exception('mysqldump command failed: ' . implode(PHP_EOL, $output));
             }
             // Cache the backup file path
-            Cache::put('database_backup_filepath', $this->backupFilePath, now()->addMinutes(5));
             $this->info('Database backup completed successfully.');
             $this->info('Backup file created at: ' . $filePath);
         } catch (\Exception $e) {
-            //dd($e->getMessage());
+            dd($e->getMessage());
             $this->error('Database backup failed. Error: ' . $e->getMessage());
             // Log the exception for debugging
+            Log::error('Error: ' . $e->getMessage());
             Log::info($e->getMessage());
             //\Log::error($e->getMessage());
         }
