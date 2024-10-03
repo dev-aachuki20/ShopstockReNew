@@ -22,8 +22,7 @@ class BackupDatabase extends Command
             File::makeDirectory($backupPath, 0755, true);
         }
 
-        $fileName = 'backup_db' . now()->format('d_M_Y_H_i_s') . '.sql';
-        // $fileName = 'backup_db02_Oct_2024_13_07_35.sql';
+        $fileName = 'backup_db' . now()->format('d_M_Y_H_i') . '.sql';
         $filePath = $backupPath . $fileName;
         $this->backupFilePath = $backupPath . $fileName;
         $host = env('DB_HOST', '127.0.0.1');
@@ -31,22 +30,16 @@ class BackupDatabase extends Command
         $password = env('DB_PASSWORD');
         $database = env('DB_DATABASE');
         try {
-            putenv('PATH=' . getenv('PATH') . env('DB_MYSLDUMP_PATH'));
+            putenv('PATH=' . getenv('PATH') . env('DB_MYSLDUMP_PATH'));   
             
-            // $deleteTables= config('db_backup_tables.delete_tables');
-            // dd($username , $password,$host,$database );
-        //    $command = 'mysqldump -u '.$username.' --password='.$password.' -h '.$host.' '.$database.' --no-tablespaces '.implode(' ', $deleteTables).' > '.$backupPath.$fileName;
-            $command = 'mysqldump -u '.$username.' --password='.$password.' -h '.$host.' '.$database.' > '.$backupPath.$fileName;
-            //$command = 'mysqldump -u ' . escapeshellarg($username) . ' --password=' . escapeshellarg($password) . ' -h ' . escapeshellarg($host) . ' ' . escapeshellarg($database) . ' > ' . escapeshellarg($backupPath . $fileName);
+            $command = 'mysqldump --no-tablespaces -u '.$username.' -p' . $password . ' '.$database.' > '.$backupPath.$fileName;  
             $returnVar = null;
             $output = null;
-            exec($command, $output, $returnVar);
-            
-        
+            exec($command, $output, $returnVar);        
             // Upload backup to Google Drive
             $this->uploadToGoogleDrive($filePath, $fileName);
             // Delete the local backup file after uploading
-            // File::delete($filePath);
+            File::delete($filePath);
 
             if ($returnVar !== 0) {
                 throw new \Exception('mysqldump command failed: ' . implode(PHP_EOL, $output));
@@ -57,10 +50,8 @@ class BackupDatabase extends Command
         } catch (\Exception $e) {
             dd($e->getMessage());
             $this->error('Database backup failed. Error: ' . $e->getMessage());
-            // Log the exception for debugging
             Log::error('Error: ' . $e->getMessage());
             Log::info($e->getMessage());
-            //\Log::error($e->getMessage());
         }
     }
 
@@ -69,7 +60,6 @@ class BackupDatabase extends Command
         try {
             // Get the access token using refresh token
             $accessToken = $this->getAccessToken();
-
             // Prepare the file for upload
             $fileData = file_get_contents($filePath);
             $boundary = uniqid();
