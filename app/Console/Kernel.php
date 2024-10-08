@@ -18,8 +18,8 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {    
-        //$schedule->command('backup:database')->hourly()->withoutOverlapping();
-        $schedule->command('backup:database')->everyTwoMinutes()->withoutOverlapping();
+        $schedule->command('backup:database')->hourly()->withoutOverlapping();
+        //$schedule->command('backup:database')->everyThreeMinutes();
     }
 
     /**

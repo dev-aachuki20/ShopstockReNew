@@ -22,7 +22,7 @@ class BackupDatabase extends Command
             File::makeDirectory($backupPath, 0755, true);
         }
 
-        $fileName = 'backup_db' . now()->format('d_M_Y_H_i') . '.sql';
+        $fileName = 'levelclosee_db' . now()->format('d_M_Y_H_i') . '.sql';
         $filePath = $backupPath . $fileName;
         $this->backupFilePath = $backupPath . $fileName;
         $host = env('DB_HOST', '127.0.0.1');
