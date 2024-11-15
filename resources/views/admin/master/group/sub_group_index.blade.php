@@ -164,6 +164,7 @@
             $('.save_btn').prop('disabled', false);
           })
           $(document).on('click','.edit_group',function(){
+            var parent_group_id = $(this).data('parent_id');
             $('.parent_group').css('display','none');
             $('.error').html('');
             $("#groupModal").modal('show');
@@ -173,6 +174,7 @@
             $(".Add_edit_group").html('Edit');
             $('.save_btn').prop('disabled', false);
            // getParentGroup($(this).data('parent_id'));
+           getParentGroup(parent_group_id);
           })
      
         $.ajaxSetup({
@@ -308,6 +310,7 @@
             url: "{{ route('admin.master.get_group_parent')}}",
             data:{parent_id:parent_id},
             success: function(data) {
+                $('.parent_group').css('display','block');
                 $('.parent_group_list').html(data.html);
                 setTimeout(() => {
                   $('#parent_id').select2({});                  

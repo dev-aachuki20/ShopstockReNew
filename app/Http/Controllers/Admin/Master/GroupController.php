@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use App\Exports\GroupExport;
 use App\Exports\GroupSubExport;
+use App\Models\Product;
 
 class GroupController extends Controller
 {
@@ -108,13 +109,14 @@ class GroupController extends Controller
     {
         abort_if(Gate::denies('group_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $id =  decrypt($id);
-        $checkParentGroup = Group::Where('id',$id)->first(); 
+        
+        $checkParentGroup = Group::Where('id',$id)->first();
         if($checkParentGroup->parent_id > 0){
             $validator = Validator::make($request->all(), [
                 'name' => [
                     'required',
                     Rule::unique('groups', 'name')->where('parent_id',$checkParentGroup->parent_id)->ignore($id)
-                ]]);
+                    ]]);
         }else{
             $validator = Validator::make($request->all(), [
             'name' => [
@@ -128,11 +130,21 @@ class GroupController extends Controller
                 'error' => $validator->errors()->toArray()
             ]);
         }
+
         $groupData =  Group::find($id);
         $oldvalue = $groupData->getOriginal();         
         $groupData->name = $request->name;
+        $groupData->parent_id = $request->parent_id ?? 0;
         $groupData->updated_by = Auth::id();
-        $groupData->save();       
+        $groupData->save();
+
+        // Update the related products
+        $products = Product::where('sub_group_id', $id)->get();
+        foreach ($products as $product) {
+            $product->group_id = $request->parent_id ?? 0;
+            $product->save();
+        }
+        
         $newValue = $groupData->refresh();
         addToLog($request,'Group','Edit', $newValue ,$oldvalue);  
         return response()->json(['success' => 'Group Update successfully.']);
